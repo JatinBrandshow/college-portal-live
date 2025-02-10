@@ -1,0 +1,107 @@
+import { Search, Sliders, LocateIcon, Home, Landmark, Briefcase } from "lucide-react";
+import { useState, useEffect } from "react";
+
+const images = [
+    "image/hero/img1.jpg",
+    "image/hero/img2.jpg",
+    "image/hero/img3.jpg",
+    "image/hero/img4.jpg",
+];
+const Hero = () => {
+
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
+        }, 3000); // Change image every 3 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
+    return (
+        <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0">
+            {/* Left Section */}
+            <div className="items-center justify-center sm:pl-5  lg:pl-40 w-full md:w-1/2 md:mb-20">
+                <div className="mb-6 md:text-left pt-8 md:pt-0">
+                    <h1 className="text-5xl  lg:text-5xl font-bold text-gray-900 leading-tight mb-3">
+                        Welcome to <br /> College Portal
+                    </h1>
+                    <p className="text-gray-600">
+                        Discover endless opportunities and resources to make your academic journey<br className="lg:flex hidden" /> extraordinary. Learn, connect, and grow with us.
+                    </p>
+                </div>
+                <div className="flex space-x-1  md:justify-start">
+                    <button className="px-5 py-4 font-bold text-xs rounded-lg bg-blue-600 text-white">
+                        FOR RENT
+                    </button>
+                    <button className="px-5 py-4 font-bold text-xs rounded-lg bg-gray-400 text-gray-600 hover:bg-blue-600 hover:text-white">
+                        FOR SALE
+                    </button>
+                </div>
+                {/* Search Section */}
+                <div className="flex flex-col md:absolute md:pr-5">
+                    <div className="flex flex-col md:items-center md:flex-row gap-3 md:gap-2  bg-white py-5 lg:px-5 px-2 rounded-2xl shadow-sm">
+                        <div className="flex  flex-col md:w-auto border-b md:border-b-0 md:border-r lg:px-2 px-1 pb-2 md:pb-0">
+                            <label className="text-gray-400 text-xs">Type</label>
+                            <select className=" text-black outline-none rounded-xl w-full">
+                                <option>All</option>
+                                <option>House</option>
+                                <option>Villa</option>
+                                <option>Apartment</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col w-full md:w-auto border-b md:border-b-0 md:border-r  lg:px-2 px-1 pb-2 md:pb-0">
+                            <label className="text-gray-400 text-xs">Location</label>
+                            <div className="flex items-center">
+                                <input type="text" placeholder="Search Location" className=" outline-none text-gray-800 rounded-xl w-full" />
+                                <LocateIcon className="w-4 h-4 text-gray-500 ml-2" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col w-full md:w-auto lg:px-2 px-1">
+                            <label className="text-gray-400 text-xs">Keyword</label>
+                            <input type="text" placeholder="Search Keyword" className=" outline-none text-gray-800 rounded-xl w-full" />
+                        </div>
+                        <div className="gap-3 flex  md:justify-start">
+                            <button className="flex items-center border border-blue-600 h-9 py-2 space-x-2 px-2 sm:px-5 bg-white hover:bg-blue-600 hover:text-white text-gray-600 rounded-3xl">
+                                <span>Advanced</span>
+                                <Sliders className="w-5 h-5" />
+                            </button>
+                            <button className="flex items-center border space-x-2 h-9 sm:px-3 px-3  md:px-5 py-2 border-blue-600 bg-blue-600 text-white rounded-3xl">
+                                <span>Search</span>
+                                <Search className="w-5 h-5" />
+                            </button>
+                        </div>
+                    </div>
+                    {/* Property Type Icons */}
+                    <div className="mt-2 ml-2 lg:flex  items-center">
+                        <p className="text-xs ml-4 lg:ml-0">What are you looking for:</p>
+                        <div className="flex gap-3 overflow-x-auto scrollbar-hide p-2">
+                            {[{ icon: Home, label: "House" }, { icon: Landmark, label: "Villa" }, { icon: Briefcase, label: "Office" }].map((item, index) => (
+                                <div key={index} className="flex items-center gap-2  p-2 rounded-lg">
+                                    <item.icon className="w-4 h-4 text-blue-700" />
+                                    <p className="text-xs whitespace-nowrap">{item.label}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            {/* Right Section - Image */}
+            <div className="hidden md:block absolute top-0 right-0 w-1/2 h-full -z-10 overflow-hidden">
+                {images.map((img, index) => (
+                    <img
+                        key={index}
+                        src={img}
+                        alt="House"
+                        className={`w-full h-full object-cover absolute transition-opacity duration-1000 ${index === currentIndex ? "opacity-100" : "opacity-0"
+                            }`}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default Hero;
