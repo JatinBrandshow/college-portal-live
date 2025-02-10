@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const tabs = [
   { name: 'Uttar Pradesh', key: 'up' },
@@ -94,20 +95,45 @@ const data = {
   ]
 };
 
-export default function PopularCities() {
+export default function PopularColleges() {
   const [activeTab, setActiveTab] = useState('up');
+  const scrollRef = useRef(null);
+  const [showLeftButton, setShowLeftButton] = useState(false);
+  const [showRightButton, setShowRightButton] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (scrollRef.current) {
+        setShowLeftButton(scrollRef.current.scrollLeft > 0);
+        setShowRightButton(
+          scrollRef.current.scrollLeft + scrollRef.current.clientWidth <
+          scrollRef.current.scrollWidth
+        );
+      }
+    };
+    handleScroll();
+    scrollRef.current?.addEventListener('scroll', handleScroll);
+    return () => scrollRef.current?.removeEventListener('scroll', handleScroll);
+  }, [activeTab]);
+
+  const scroll = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = 170; // Adjust scroll distance
+      scrollRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const firstRowCount = Math.min(9, Math.ceil(data[activeTab]?.length / 2));
-const firstRow = data[activeTab]?.slice(0, firstRowCount);
-const secondRow = data[activeTab]?.slice(firstRowCount);
-
+  const firstRow = data[activeTab]?.slice(0, firstRowCount);
+  const secondRow = data[activeTab]?.slice(firstRowCount);
 
   return (
-    <div className="py-6 px-12 my-10">
+    <div className="py-6 px-12 my-10 relative">
       <h2 className="text-2xl font-bold mb-2">Popular Colleges/Universities Across India</h2>
       <p className="text-gray-600">Book student Colleges near top cities around India.</p>
 
-      <div className="flex gap-3 overflow-x-auto mt-8">
+      {/* Tab Buttons */}
+      <div className="flex gap-3 overflow-x-auto mt-8 max-w-7xl ">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -122,74 +148,74 @@ const secondRow = data[activeTab]?.slice(firstRowCount);
         ))}
       </div>
 
-      <div
-  className="mt-6 overflow-x-auto relative"
-  style={{
-    scrollbarWidth: "none", // Firefox
-    msOverflowStyle: "none", // IE & Edge
-  }}
->
-  {/* Hide scrollbar for Chrome, Safari */}
-  <style>
-    {`
-      ::-webkit-scrollbar {
-        display: none;
-      }
-    `}
-  </style>
+      {/* Scrollable Cities Section */}
+      <div className="mt-6 relative">
+        {/* Left Scroll Button */}
+        {showLeftButton && (
+          <button
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 z-10 hover:bg-red-500 hover:text-white transition"
+            onClick={() => scroll('left')}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+        )}
+        
 
-  {/* Scrollable container */}
-  <div className="flex flex-col gap-4 w-max">
-    
-    {/* First Row */}
-    <div className="flex gap-4">
-      {firstRow.map((item, index) => (
-        <div
-          key={index}
-          className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
-        >
-          {/* Background zoom effect */}
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110"
-            style={{
-              backgroundImage: `url(${item.img})`,
-            }}
-          ></div>
+        {/* Scrollable Content */}
+        <div ref={scrollRef} className="overflow-x-auto scroll-smooth w-full px-10 relative no-scrollbar ">
+          <div className="flex flex-col gap-4 w-max">
+            {/* First Row */}
+            <div className="flex gap-4">
+              {firstRow.map((item, index) => (
+                <div
+                  key={index}
+                  className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
+                >
+                  {/* Background Image */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400"
+                    style={{ backgroundImage: `url(${item.img})` }}
+                  ></div>
+                  {/* Overlay Text */}
+                  <div className="absolute flex items-end p-2 bottom-0 left-1/2 -translate-x-1/2">
+                    <p className="text-white font-semibold mx-auto">{item.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-          {/* Overlay text */}
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end p-2">
-            <p className="text-white font-semibold mx-auto">{item.text}</p>
+            {/* Second Row */}
+            <div className="flex gap-4">
+              {secondRow.map((item, index) => (
+                <div
+                  key={index}
+                  className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
+                >
+                  {/* Background Image */}
+                  <div
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400"
+                    style={{ backgroundImage: `url(${item.img})` }}
+                  ></div>
+                  {/* Overlay Text */}
+                  <div className="absolute flex items-end p-2 bottom-0 left-1/2 -translate-x-1/2">
+                    <p className="text-white font-semibold mx-auto">{item.text}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      ))}
-    </div>
 
-    {/* Second Row */}
-    <div className="flex gap-4">
-      {secondRow.map((item, index) => (
-        <div
-          key={index}
-          className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
-        >
-          {/* Background zoom effect */}
-          <div
-            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110"
-            style={{
-              backgroundImage: `url(${item.img})`,
-            }}
-          ></div>
-
-          {/* Overlay text */}
-          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end p-2">
-            <p className="text-white font-semibold mx-auto">{item.text}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-
-  </div>
-</div>
-
+        {/* Right Scroll Button */}
+        {showRightButton && (
+          <button
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 z-10 hover:bg-red-500 hover:text-white transition"
+            onClick={() => scroll('right')}
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        )}
+      </div>
     </div>
   );
 }
