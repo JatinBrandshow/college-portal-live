@@ -35,6 +35,7 @@ const AboutSection = () => {
           animate={{ scale: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
         >
+          
           <a
             href="#"
             className="bg-yellow-400 text-blue-900 font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-500 hover:shadow-2xl transition-transform transform hover:-translate-y-1 duration-300"
