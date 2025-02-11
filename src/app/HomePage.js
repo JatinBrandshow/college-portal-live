@@ -33,10 +33,10 @@ const HomePage = () => {
       <PropertyType />
       <StudyGoal />
       <OurTestimonial />
-      <Banner />
+      {/* <Banner />
       <EventsSection />
       <LogoSlider />
-      <Achievements />
+      <Achievements /> */}
       <Footer />
     </div>
   );
