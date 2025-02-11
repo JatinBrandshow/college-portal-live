@@ -40,9 +40,10 @@ const Hero = () => {
                         </span>
                         <br /> College Portal
                     </h1>
-                    <p className="text-gray-600">
-                        Discover endless opportunities and resources to make your academic journey<br className="lg:flex hidden" /> extraordinary. Learn, connect, and grow with us.
+                    <p className="text-gray-600 pe-8">
+                        Discover endless opportunities and resources to make your academic journey extraordinary. 
                     </p>
+                    <p className="text-gray-800 mt-2 font-semibold">Learn, connect, and grow with us.</p>
                 </div>
                 <div className="flex space-x-1  md:justify-start">
                     <button className="px-8 py-5 font-bold text-sm rounded-lg bg-blue-600 text-white">

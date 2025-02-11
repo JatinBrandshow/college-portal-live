@@ -130,7 +130,7 @@ export default function PopularColleges() {
   return (
     <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative">
       <h2 className="text-2xl font-bold mb-2">Popular Colleges/Universities Across India</h2>
-      <p className="text-gray-600">Book student Colleges near top cities around India.</p>
+      <p className="text-gray-600">Find Your Ideal Campus Among <span className="font-semibold"> India’s Best Institutions</span> !</p>
 
       {/* Tab Buttons */}
       <div className="flex gap-3 overflow-x-auto mt-8 max-w-7xl ">

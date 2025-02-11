@@ -41,15 +41,17 @@ const PropertyType = () => {
               <span className="uppercase font-semibold text-sm tracking-wider">Trusted Real Estate Care</span>
             </div>
             <h2 className="text-3xl font-bold text-gray-800 mt-2">Property By Type</h2>
+            <p className="text-gray-600 mt-2 text-left">
+            Different Stays for Different Needs – <span className="font-semibold"> Pick What Suits You </span>!
+            </p>
           </div>
 
           {/* Right Section */}
-          <div className="lg:w-1/2 mt-6 lg:mt-0">
+          {/* <div className="lg:w-1/2 mt-6 lg:mt-0">
             <p className="text-gray-600 leading-relaxed">
-              Our company provides a full range of services for the construction of private houses and cottages
-              since 19XX.
+            Different Stays for Different Needs – <span className="font-semibold"> Pick What Suits You </span>!
             </p>
-          </div>
+          </div> */}
         </div>
 
         {/* Cards Section */}
@@ -58,7 +60,7 @@ const PropertyType = () => {
             <div key={index} className="flex flex-col items-center">
             {/* Card */}
             <div
-                className="relative bg-white shadow-lg rounded-lg p-6 flex items-center justify-center text-center w-24 h-24 sm:w-28 sm:h-28 lg:w-52 lg:h-40 transition-transform transform hover:scale-105 hover:shadow-2xl"
+                className="relative bg-white shadow-lg rounded-lg p-6 flex items-center justify-center text-center w-24 h-24 sm:w-28 sm:h-28 lg:w-72 lg:h-60 transition-transform transform hover:scale-105 hover:shadow-2xl"
             >
                 {/* Number Badge */}
                 <div className="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs font-semibold transition-transform transform hover:scale-125 hover:bg-red-600">
