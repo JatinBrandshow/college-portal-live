@@ -47,10 +47,10 @@ const Hero = () => {
                 </div>
                 <div className="flex flex-wrap md:flex-nowrap md:space-x-1  md:justify-start">
                     <button className="px-8 py-5 font-bold text-sm rounded-lg bg-blue-600 text-white">
-                        FOR COLLEGE
+                        COLLEGE
                     </button>
                     <button className="px-8 py-5 font-bold text-sm rounded-lg bg-gray-200 text-black hover:bg-blue-600 hover:text-white">
-                        FOR ACCOMMODATIONS
+                        ACCOMMODATIONS
                     </button>
                 </div>
                 {/* Search Section */}
