@@ -81,7 +81,7 @@ const BudgetProperties = () => {
               Budget Properties
             </h2>
             <p className="text-gray-600 mt-2 text-left">
-              From studios to private rooms to shared apartments, we’ve got it all.
+            Affordable Living, Comfortable Stay – <span className="font-semibold"> Your Home Away from Home </span>!
             </p>
           </div>
   

@@ -19,7 +19,7 @@ export default function HeroSection() {
     <>
     <div className=" p-6 md:p-12 bg-gray-50">
     <h1 className="text-5xl font-bold mb-2 md:px-12">USP</h1>
-    <p className="text-md mb-2 text-gray-500 md:px-12">Empowering students with a seamless college experience – from admissions to <br/> academics, all in one smart portal!</p>
+    <p className="text-md mb-2 text-gray-500 md:px-12">Hassle-Free Booking – Secure Your Perfect Student Home in <span className="font-semibold"> Just a Few Clicks! </span></p>
       {/* Left Column */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center relative md:p-10">
       <div className="relative z-10 shadow-lg h-full px-4 py-10 bg-white rounded-lg pl-10 border border-gray-200">

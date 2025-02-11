@@ -79,7 +79,7 @@ const OurTestimonial = () => {
         <h2 className="text-xl font-semibold text-sky-500">Our Testimonial</h2>
         <p className="text-4xl text-black font-bold mt-4">What's People Say's</p>
         <p className="text-gray-500 mt-2 max-w-3xl mx-auto">
-          Our seasoned team excels in real estate with years of successful market navigation, offering informed decisions and optimal results.
+        <span className="font-semibold">Don’t Just Take Our Word for It – Read Reviews </span>From Students and Parents Who Successfully Used College Portal to Choose the Right Institution and Accommodation!
         </p>
       </div>
 
