@@ -25,17 +25,17 @@ const HomePage = () => {
       <Header />
       <Hero />
       {/* <SearchBar /> */}
-      <AboutSection />
+      {/* <AboutSection /> */}
       <PopularCities />
       <PopularColleges />
       <Usp />
-      <StudyGoal />
-      <Banner />
-      <EventsSection />
-      <OurTestimonial />
-      <LogoSlider />
       <BudgetProperties />
       <PropertyType />
+      <StudyGoal />
+      <OurTestimonial />
+      <Banner />
+      <EventsSection />
+      <LogoSlider />
       <Achievements />
       <Footer />
     </div>

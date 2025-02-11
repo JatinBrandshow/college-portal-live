@@ -50,6 +50,27 @@ const OurTestimonial = () => {
         role: "CTO ABC Inc.",
         image: "image/student/student6.png",
       },
+      {
+        id: 7,
+        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
+        name: "Jane Smith",
+        role: "CTO ABC Inc.",
+        image: "image/student/student5.png",
+      },
+      {
+        id: 8,
+        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
+        name: "Jane Smith",
+        role: "CTO ABC Inc.",
+        image: "image/student/student5.png",
+      },
+      {
+        id: 9,
+        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
+        name: "Jane Smith",
+        role: "CTO ABC Inc.",
+        image: "image/student/student5.png",
+      },
   ];
 
   return (
@@ -64,13 +85,14 @@ const OurTestimonial = () => {
 
       <div className="relative flex flex-col justify-center">
         <Swiper
-          slidesPerView={1}
-          spaceBetween={20}
+          slidesPerView={5}
+          spaceBetween={10}
           breakpoints={{
             640: { slidesPerView: 1 },
             768: { slidesPerView: 2 },
-            1024: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
             1280: { slidesPerView: 4 },
+            2560: {slidesPerView: 6}
           }}
           centeredSlides={true}
           loop={true}

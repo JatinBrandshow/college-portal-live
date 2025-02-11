@@ -117,7 +117,7 @@ export default function PopularCities() {
   const secondRow = data[activeTab]?.slice(firstRowCount);
 
   return (
-    <div className="py-6 px-12 my-10 relative">
+    <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative">
       <h2 className="text-2xl font-bold mb-2">Popular Cities Across India</h2>
       <p className="text-gray-600">Book student accommodations near top cities and universities around India.</p>
 
@@ -150,7 +150,7 @@ export default function PopularCities() {
         )}
 
         {/* Scrollable Content */}
-        <div ref={scrollRef} className="overflow-x-auto scroll-smooth w-full px-10 relative no-scrollbar">
+        <div ref={scrollRef} className="overflow-x-auto scroll-smooth w-full px-0 relative no-scrollbar">
           <div className="flex flex-col gap-4 w-max">
             {/* First Row */}
             <div className="flex gap-4">

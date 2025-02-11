@@ -31,7 +31,7 @@ const LogoSlider = () => {
         },
     };
 
-    const infiniteLogos = [...logos, ...logos];
+    const infiniteLogos = [...logos, ...logos,...logos];
 
     return (
         <>

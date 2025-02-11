@@ -100,7 +100,7 @@ const Footer = () => {
             <h3 className="text-xl font-semibold mb-4">Connect With Us</h3>
             <div className="flex flex-wrap space-x-4 gap-y-4 lg:gap-y-0">
               <a
-                href="https://facebook.com"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-blue-400 transition duration-200"
@@ -108,7 +108,7 @@ const Footer = () => {
                 <FaFacebook className="w-6 h-6" />
               </a>
               <a
-                href="https://twitter.com"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-blue-400 transition duration-200"
@@ -116,7 +116,7 @@ const Footer = () => {
                 <FaTwitter className="w-6 h-6" />
               </a>
               <a
-                href="https://instagram.com"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-pink-400 transition duration-200"
@@ -124,7 +124,7 @@ const Footer = () => {
                 <FaInstagram className="w-6 h-6" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-blue-600 transition duration-200"
@@ -132,7 +132,7 @@ const Footer = () => {
                 <FaLinkedin className="w-6 h-6" />
               </a>
               <a
-                href="https://youtube.com"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-red-400 transition duration-200"

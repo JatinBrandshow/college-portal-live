@@ -78,7 +78,7 @@ const BudgetProperties = () => {
           {/* Heading and Subheading */}
           <div className="mb-10">
             <h2 className="text-3xl font-bold text-gray-800 text-left">
-              Thousands Of Properties Globally
+              Budget Properties
             </h2>
             <p className="text-gray-600 mt-2 text-left">
               From studios to private rooms to shared apartments, we’ve got it all.
@@ -114,7 +114,8 @@ const BudgetProperties = () => {
               breakpoints={{
                 640: { slidesPerView: 1 },
                 768: { slidesPerView: 2 },
-                1024: { slidesPerView: 5 },
+                1024: { slidesPerView: 4 },
+                1280: {slidesPerView: 5},
               }}
               centeredSlides={false}
               modules={[Navigation]}
@@ -173,12 +174,12 @@ const BudgetProperties = () => {
   
             {/* Custom Navigation Buttons */}
             <button
-              className="custom-prev absolute top-1/2 transform -translate-y-1/2 left-12 lg:-left-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10"
+              className="custom-prev absolute top-1/2 transform -translate-y-1/2 left-12 xl:-left-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10"
             >
               <FiChevronLeft size={16} />
             </button>
             <button
-              className="custom-next absolute top-1/2 transform -translate-y-1/2 right-12 lg:-right-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10"
+              className="custom-next absolute top-1/2 transform -translate-y-1/2 right-12 xl:-right-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10"
             >
               <FiChevronRight size={16} />
             </button>

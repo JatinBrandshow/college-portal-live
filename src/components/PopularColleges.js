@@ -16,22 +16,22 @@ const tabs = [
 
 const data = {
   up: [
-    { img: '/liverpool.jpg', text: 'Liverpool' },
-    { img: '/sheffield.jpg', text: 'Sheffield' },
-    { img: '/newcastle.jpg', text: 'Newcastle Upon Tyne' },
-    { img: '/cardiff.jpg', text: 'Cardiff' },
-    { img: '/edinburgh.jpg', text: 'Edinburgh' },
-    { img: '/plymouth.jpg', text: 'Plymouth' },
-    { img: '/chester.jpg', text: 'Chester' },
-    { img: '/exeter.jpg', text: 'Exeter' },
-    { img: '/edinburgh.jpg', text: 'Edinburgh' },
-    { img: '/plymouth.jpg', text: 'Plymouth' },
-    { img: '/chester.jpg', text: 'Chester' },
-    { img: '/chester.jpg', text: 'Chester' },
-    { img: '/exeter.jpg', text: 'Exeter' },
-    { img: '/edinburgh.jpg', text: 'Edinburgh' },
-    { img: '/plymouth.jpg', text: 'Plymouth' },
-    { img: '/chester.jpg', text: 'Chester' },
+    { "img": "image/homepage/iit.webp", "text": "Indian Institute of Technology Kanpur" },
+    { "img": "image/homepage/bhu.webp", "text": "Indian Institute of Technology (BHU) Varanasi" },
+    { "img": "image/homepage/iit.webp", "text": "Amity University, Noida" },
+    { "img": "image/homepage/bhu.webp", "text": "Indian Institute of Information Technology Allahabad" },
+    { "img": "image/homepage/iit.webp", "text": "Motilal Nehru National Institute of Technology Allahabad" },
+    { "img": "image/homepage/bhu.webp", "text": "Aligarh Muslim University, Aligarh" },
+    { "img": "image/homepage/iit.webp", "text": "Banaras Hindu University, Varanasi" },
+    { "img": "image/homepage/bhu.webp", "text": "JSS Academy of Technical Education, Noida" },
+    { "img": "/galgotias_university.jpg", "text": "Galgotias University, Greater Noida" },
+    { "img": "/sharda_university.jpg", "text": "Sharda University, Greater Noida" },
+    { "img": "/jaypee_noida.jpg", "text": "Jaypee Institute of Information Technology, Noida" },
+    { "img": "/abviiitm_gwalior.jpg", "text": "Atal Bihari Vajpayee Indian Institute of Information Technology and Management, Gwalior" },
+    { "img": "/hbtui_kanpur.jpg", "text": "Harcourt Butler Technical University, Kanpur" },
+    { "img": "/iet_lucknow.jpg", "text": "Institute of Engineering and Technology, Lucknow" },
+    { "img": "/knit_sultanpur.jpg", "text": "Kamla Nehru Institute of Technology, Sultanpur" },
+    { "img": "/bundelkhand_university.jpg", "text": "Bundelkhand University, Jhansi" }
   ],
   wb: [
     { img: '/sydney.jpg', text: 'Sydney' },
@@ -128,7 +128,7 @@ export default function PopularColleges() {
   const secondRow = data[activeTab]?.slice(firstRowCount);
 
   return (
-    <div className="py-6 px-12 my-10 relative">
+    <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative">
       <h2 className="text-2xl font-bold mb-2">Popular Colleges/Universities Across India</h2>
       <p className="text-gray-600">Book student Colleges near top cities around India.</p>
 
@@ -162,7 +162,7 @@ export default function PopularColleges() {
         
 
         {/* Scrollable Content */}
-        <div ref={scrollRef} className="overflow-x-auto scroll-smooth w-full px-10 relative no-scrollbar ">
+        <div ref={scrollRef} className="overflow-x-auto scroll-smooth w-full px-0 relative no-scrollbar ">
           <div className="flex flex-col gap-4 w-max">
             {/* First Row */}
             <div className="flex gap-4">
@@ -177,8 +177,8 @@ export default function PopularColleges() {
                     style={{ backgroundImage: `url(${item.img})` }}
                   ></div>
                   {/* Overlay Text */}
-                  <div className="absolute flex items-end p-2 bottom-0 left-1/2 -translate-x-1/2">
-                    <p className="text-white font-semibold mx-auto">{item.text}</p>
+                  <div className="absolute flex items-end p-2 bottom-0">
+                    <p className="text-white bg-opacity-20 bg-black font-semibold mx-auto ">{item.text}</p>
                   </div>
                 </div>
               ))}
@@ -197,7 +197,7 @@ export default function PopularColleges() {
                     style={{ backgroundImage: `url(${item.img})` }}
                   ></div>
                   {/* Overlay Text */}
-                  <div className="absolute flex items-end p-2 bottom-0 left-1/2 -translate-x-1/2">
+                  <div className="absolute flex items-end p-2 bottom-0">
                     <p className="text-white font-semibold mx-auto">{item.text}</p>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import { Search, Sliders, LocateIcon, Home, Landmark, Briefcase } from "lucide-react";
 import { useState, useEffect } from "react";
+import { Typewriter } from "react-simple-typewriter";
 
 const images = [
     "image/hero/img1.jpg",
@@ -22,10 +23,22 @@ const Hero = () => {
     return (
         <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50">
             {/* Left Section */}
-            <div className="items-center justify-center sm:pl-5 lg:pl-32 xl:pl-32 w-full md:w-1/2 md:mb-20 ">
+            <div className="items-center justify-center sm:pl-5 lg:pl-32 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20 ">
                 <div className="mb-6 md:text-left pt-8 md:pt-0">
-                    <h1 className="text-5xl  lg:text-6xl font-bold text-gray-900 leading-tight mb-3">
-                        Welcome to <br /> College Portal
+                    {/* Typewriter Effect */}
+                    <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-3">
+                        <span className="text-blue-600">
+                            <Typewriter
+                                words={["Welcome to", "Find Your Path at"]}
+                                loop={true}
+                                cursor
+                                cursorStyle="_"
+                                typeSpeed={80}
+                                deleteSpeed={50}
+                                delaySpeed={2000}
+                            />
+                        </span>
+                        <br /> College Portal
                     </h1>
                     <p className="text-gray-600">
                         Discover endless opportunities and resources to make your academic journey<br className="lg:flex hidden" /> extraordinary. Learn, connect, and grow with us.
