@@ -24,7 +24,7 @@ const data = {
     { img: '/image/homepage/up/jhansi.webp', text: 'Jhansi' },
     { img: '/image/homepage/up/kanpur-city.webp', text: 'Kanpur' },
     { img: '/image/homepage/up/noida.webp', text: 'Noida' },
-    { img: '/image/homepage/up/pryagraj.webp', text: 'Pryagraj' },
+    { img: '/image/homepage/up/pryagraj.webp', text: 'Prayagraj' },
     { img: '/image/homepage/up/unnao.webp', text: 'Unnao' },
     { img: '/image/homepage/up/varanasi.webp', text: 'Varanasi' },
   ],

@@ -23,7 +23,7 @@ const Hero = () => {
     return (
         <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50">
             {/* Left Section */}
-            <div className="items-center justify-center sm:pl-5 lg:pl-16 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20 ">
+            <div className="items-center justify-center sm:pl-5 lg:pl-10 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20 ">
                 <div className="mb-6 md:text-left pt-8 md:pt-0">
                     {/* Typewriter Effect */}
                     <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-3">
@@ -43,7 +43,7 @@ const Hero = () => {
                     <p className="text-gray-600 pe-8">
                         Discover endless opportunities and resources to make your academic journey extraordinary. 
                     </p>
-                    <p className="text-gray-800 mt-2 font-semibold">Learn, connect, and grow with us.</p>
+                    <p className="text-gray-800 mt-2 font-semibold">Connect, learn, and grow with us.</p>
                 </div>
                 <div className="flex flex-wrap md:flex-nowrap md:space-x-1  md:justify-start">
                     <button className="px-8 py-5 font-bold text-sm rounded-lg bg-blue-600 text-white">
@@ -90,9 +90,9 @@ const Hero = () => {
                     {/* Property Type Icons */}
                     <div className="mt-2 ml-2 lg:flex  items-center">
                         <p className="text-base ml-4 lg:ml-0">What are you looking for:</p>
-                        <div className="flex gap-3 overflow-x-auto scrollbar-hide p-2">
+                        <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16 ">
                             {[{ icon: Home, label: "House" }, { icon: Landmark, label: "College" }, { icon: Briefcase, label: "Accommodation" }].map((item, index) => (
-                                <div key={index} className="flex items-center gap-2  p-2 rounded-lg">
+                                <div key={index} className="flex items-center gap-2 lg:gap-1 xl:gap-2 p-2 lg:p-0 xl:p-2 rounded-lg">
                                     <item.icon className="w-4 h-4 text-blue-700" />
                                     <p className="text-base whitespace-nowrap">{item.label}</p>
                                 </div>
