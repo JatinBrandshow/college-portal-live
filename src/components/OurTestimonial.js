@@ -85,7 +85,7 @@ const OurTestimonial = () => {
 
       <div className="relative flex flex-col justify-center">
         <Swiper
-          slidesPerView={5}
+          slidesPerView={1}
           spaceBetween={10}
           breakpoints={{
             640: { slidesPerView: 1 },

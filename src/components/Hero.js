@@ -3,10 +3,10 @@ import { useState, useEffect } from "react";
 import { Typewriter } from "react-simple-typewriter";
 
 const images = [
-    "image/hero/img1.jpg",
-    "image/hero/img2.jpg",
-    "image/hero/img3.jpg",
-    "image/hero/img4.jpg",
+    "image/hero/img5.jpg",
+    "image/hero/img6.jpg",
+    "image/hero/img7.jpg",
+    "image/hero/img8.webp",
 ];
 const Hero = () => {
 
@@ -23,7 +23,7 @@ const Hero = () => {
     return (
         <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50">
             {/* Left Section */}
-            <div className="items-center justify-center sm:pl-5 lg:pl-32 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20 ">
+            <div className="items-center justify-center sm:pl-5 lg:pl-16 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20 ">
                 <div className="mb-6 md:text-left pt-8 md:pt-0">
                     {/* Typewriter Effect */}
                     <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-3">
@@ -44,12 +44,12 @@ const Hero = () => {
                         Discover endless opportunities and resources to make your academic journey<br className="lg:flex hidden" /> extraordinary. Learn, connect, and grow with us.
                     </p>
                 </div>
-                <div className="flex space-x-1  md:justify-start">
+                <div className="flex flex-wrap md:flex-nowrap md:space-x-1  md:justify-start">
                     <button className="px-8 py-5 font-bold text-sm rounded-lg bg-blue-600 text-white">
-                        FOR RENT
+                        FOR COLLEGE
                     </button>
                     <button className="px-8 py-5 font-bold text-sm rounded-lg bg-gray-200 text-black hover:bg-blue-600 hover:text-white">
-                        FOR SALE
+                        FOR ACCOMMODATIONS
                     </button>
                 </div>
                 {/* Search Section */}
@@ -60,8 +60,8 @@ const Hero = () => {
                             <select className=" text-black outline-none rounded-xl w-full">
                                 <option>All</option>
                                 <option>House</option>
-                                <option>Villa</option>
-                                <option>Apartment</option>
+                                <option>College</option>
+                                <option>Accommodation</option>
                             </select>
                         </div>
                         <div className="flex flex-col w-full md:w-1/5 border-b md:border-b-0 md:border-r  lg:px-2 px-1 pb-2 md:pb-0">
@@ -90,7 +90,7 @@ const Hero = () => {
                     <div className="mt-2 ml-2 lg:flex  items-center">
                         <p className="text-base ml-4 lg:ml-0">What are you looking for:</p>
                         <div className="flex gap-3 overflow-x-auto scrollbar-hide p-2">
-                            {[{ icon: Home, label: "House" }, { icon: Landmark, label: "Villa" }, { icon: Briefcase, label: "Office" }].map((item, index) => (
+                            {[{ icon: Home, label: "House" }, { icon: Landmark, label: "College" }, { icon: Briefcase, label: "Accommodation" }].map((item, index) => (
                                 <div key={index} className="flex items-center gap-2  p-2 rounded-lg">
                                     <item.icon className="w-4 h-4 text-blue-700" />
                                     <p className="text-base whitespace-nowrap">{item.label}</p>
@@ -102,7 +102,7 @@ const Hero = () => {
 
             </div>
             {/* Right Section - Image */}
-            <div className="hidden md:block absolute top-0 right-0 w-1/2 h-full z-10 overflow-hidden">
+            <div className="hidden md:block absolute top-0 right-0 w-1/2 h-full z-10 overflow-hidden ">
                 {images.map((img, index) => (
                     <img
                         key={index}

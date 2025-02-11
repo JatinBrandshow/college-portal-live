@@ -2,6 +2,17 @@
 
 import Image from 'next/image';
 import { FaCheckCircle, FaHeadset, FaTag, FaPassport, FaShieldAlt } from 'react-icons/fa';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Pagination, Autoplay } from 'swiper/modules';
+import 'swiper/css';
+import 'swiper/css/pagination';
+
+const features = [
+  { icon: <FaHeadset className="text-green-500 text-xl" />, title: "24x7 Personal Assistance", description: "We offer 24*7 expert support in resolving all your housing-related queries, providing peace !", bgColor: "bg-green-50" },
+  { icon: <FaTag className="text-orange-500 text-xl" />, title: "Price Match Guarantee", description: "If you find a lower price for any place on another platform, we'll match it when you book.", bgColor: "bg-orange-50" },
+  { icon: <FaPassport className="text-red-500 text-xl" />, title: "No Visa, No Pay", description: "If you are unable to obtain a visa, you can cancel your booking at no cost.", bgColor: "bg-red-50" },
+  { icon: <FaShieldAlt className="text-yellow-500 text-xl" />, title: "Verified Listings", description: "All our properties are verified, which guarantees a seamless booking experience.", bgColor: "bg-yellow-50" }
+];
 
 export default function HeroSection() {
   return (
@@ -50,25 +61,45 @@ export default function HeroSection() {
       
       
       {/* Right Column */}
-      <div className="space-y-0 border border-gray-200 rounded-lg">
-  {features.map((feature, index) => (
-    <div key={index} className="flex items-start px-4 py-8 bg-white shadow-xl rounded-lg h-full border border-gray-200">
-      <div className={`p-4 rounded-full ${feature.bgColor} my-auto`}>{feature.icon}</div>
-      <div className="ml-4 flex-1">
-        <h3 className="text-sm font-semibold text-black">{feature.title}</h3>
-        <p className="text-gray-500 text-sm mt-1">{feature.description}</p>
+      {/* Right Column - Static for md and above, Swiper for sm */}
+      <div className="hidden md:block space-y-0 border border-gray-200 rounded-lg">
+        {features.map((feature, index) => (
+          <div key={index} className="flex items-start px-4 py-8 bg-white shadow-xl rounded-lg h-full border border-gray-200">
+            <div className={`p-4 rounded-full ${feature.bgColor} my-auto`}>{feature.icon}</div>
+            <div className="ml-4 flex-1">
+              <h3 className="text-sm font-semibold text-black">{feature.title}</h3>
+              <p className="text-gray-500 text-sm mt-1">{feature.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Swiper Slider for sm view */}
+      <div className="md:hidden">
+        <Swiper
+          modules={[Pagination, Autoplay]}
+          spaceBetween={20}
+          slidesPerView={1}
+          pagination={{ clickable: true }}
+          autoplay={{ delay: 3000, disableOnInteraction: false }}
+          loop={true}
+          className="pb-8"
+        >
+          {features.map((feature, index) => (
+            <SwiperSlide key={index}>
+              <div className="flex items-start px-4 py-8 bg-white shadow-xl rounded-lg h-full border border-gray-200">
+                <div className={`p-4 rounded-full ${feature.bgColor} my-auto`}>{feature.icon}</div>
+                <div className="ml-4 flex-1">
+                  <h3 className="text-sm font-semibold text-black">{feature.title}</h3>
+                  <p className="text-gray-500 text-sm mt-1">{feature.description}</p>
+                </div>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
     </div>
-  ))}
-</div>
     </div>
-    </div>
-</>
+  </>
   );
 }
-const features = [
-  { icon: <FaHeadset className="text-green-500 text-xl" />, title: "24x7 Personal Assistance", description: "We offer 24*7 expert support in resolving all your housing-related queries, providing peace !", bgColor: "bg-green-50" },
-  { icon: <FaTag className="text-orange-500 text-xl" />, title: "Price Match Guarantee", description: "If you find a lower price for any place on another platform, we'll match it when you book.", bgColor: "bg-orange-50" },
-  { icon: <FaPassport className="text-red-500 text-xl" />, title: "No Visa, No Pay", description: "If you are unable to obtain a visa, you can cancel your booking at no cost.", bgColor: "bg-red-50" },
-  { icon: <FaShieldAlt className="text-yellow-500 text-xl" />, title: "Verified Listings", description: "All our properties are verified, which guarantees a seamless booking experience.", bgColor: "bg-yellow-50" }
-];

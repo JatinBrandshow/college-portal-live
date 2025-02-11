@@ -9,7 +9,7 @@ const tabs = [
   { name: 'West Bengal', key: 'wb' },
   { name: 'Gujarat', key: 'gj' },
   { name: 'Rajasthan', key: 'rj' },
-  { name: 'kerala', key: 'kr' },
+  { name: 'Kerala', key: 'kr' },
   { name: 'Madhya Pradesh', key: 'mp' },
   { name: 'Assam', key: 'as' }
 ];
@@ -117,7 +117,7 @@ export default function PopularCities() {
   const secondRow = data[activeTab]?.slice(firstRowCount);
 
   return (
-    <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative">
+    <div className="max-w-[1500px] mx-auto lg:mx-12 2xl:mx-auto py-6 px-6 my-10 relative">
       <h2 className="text-2xl font-bold mb-2">Popular Cities Across India</h2>
       <p className="text-gray-600">Book student accommodations near top cities and universities around India.</p>
 
@@ -128,7 +128,7 @@ export default function PopularCities() {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={clsx(
-              'px-4 py-2 border rounded-full transition-all',
+              'px-2 md:px-4 py-2 border rounded-2xl md:rounded-full transition-all text-sm md:text-base',
               activeTab === tab.key ? 'border-red-500 text-red-500' : 'border-gray-300'
             )}
           >
@@ -157,16 +157,16 @@ export default function PopularCities() {
               {firstRow.map((item, index) => (
                 <div
                   key={index}
-                  className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
+                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
                 >
                   {/* Background Image */}
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
                     style={{ backgroundImage: `url(${item.img})` }}
                   ></div>
                   {/* Overlay Text */}
                   <div className="absolute flex items-end p-2 bottom-0 left-1/2 -translate-x-1/2">
-                    <p className="text-white font-semibold mx-auto">{item.text}</p>
+                    <p className="text-white font-bold mx-auto">{item.text}</p>
                   </div>
                 </div>
               ))}
@@ -177,16 +177,16 @@ export default function PopularCities() {
               {secondRow.map((item, index) => (
                 <div
                   key={index}
-                  className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
+                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
                 >
                   {/* Background Image */}
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
                     style={{ backgroundImage: `url(${item.img})` }}
                   ></div>
                   {/* Overlay Text */}
                   <div className="absolute flex items-end p-2 bottom-0 left-1/2 -translate-x-1/2">
-                    <p className="text-white font-semibold mx-auto">{item.text}</p>
+                    <p className="text-white font-bold mx-auto">{item.text}</p>
                   </div>
                 </div>
               ))}

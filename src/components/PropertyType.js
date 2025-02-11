@@ -53,7 +53,7 @@ const PropertyType = () => {
         </div>
 
         {/* Cards Section */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {propertyTypes.map((property, index) => (
             <div key={index} className="flex flex-col items-center">
             {/* Card */}
@@ -65,13 +65,13 @@ const PropertyType = () => {
                 {property.number}
                 </div>
                 {/* Icon */}
-                <div className="text-gray-800">{property.icon}</div>
+                <div className="text-gray-800 ">{property.icon}</div>
             </div>
             {/* Title and Properties */}
-            <h3 className="text-lg font-semibold text-gray-800 mt-4 text-center">
+            <h3 className="text-xs md:text-lg font-semibold text-gray-800 mt-4 text-center">
                 {property.title}
             </h3>
-            <p className="text-red-700 text-md text-center">{property.properties}</p>
+            <p className="text-red-700 text-xs md:text-md text-center">{property.properties}</p>
             </div>
         ))}
         </div>

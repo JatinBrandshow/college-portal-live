@@ -128,7 +128,7 @@ export default function PopularColleges() {
   const secondRow = data[activeTab]?.slice(firstRowCount);
 
   return (
-    <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative">
+    <div className="max-w-[1500px] mx-auto lg:mx-12 2xl:mx-auto py-6 px-6 my-10 relative">
       <h2 className="text-2xl font-bold mb-2">Popular Colleges/Universities Across India</h2>
       <p className="text-gray-600">Book student Colleges near top cities around India.</p>
 
@@ -139,7 +139,7 @@ export default function PopularColleges() {
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={clsx(
-              'px-4 py-2 border rounded-full transition-all',
+              'px-4 py-2 border rounded-2xl md:rounded-full transition-all text-sm md:text-base',
               activeTab === tab.key ? 'border-red-500 text-red-500' : 'border-gray-300'
             )}
           >
@@ -169,16 +169,16 @@ export default function PopularColleges() {
               {firstRow.map((item, index) => (
                 <div
                   key={index}
-                  className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
+                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
                 >
                   {/* Background Image */}
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
                     style={{ backgroundImage: `url(${item.img})` }}
                   ></div>
                   {/* Overlay Text */}
                   <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white bg-opacity-20 bg-black font-semibold mx-auto ">{item.text}</p>
+                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden ">{item.text}</p>
                   </div>
                 </div>
               ))}
@@ -189,16 +189,16 @@ export default function PopularColleges() {
               {secondRow.map((item, index) => (
                 <div
                   key={index}
-                  className="relative w-40 h-40 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[11rem] rounded-lg overflow-hidden cursor-pointer"
+                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
                 >
                   {/* Background Image */}
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400"
+                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
                     style={{ backgroundImage: `url(${item.img})` }}
                   ></div>
                   {/* Overlay Text */}
                   <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white font-semibold mx-auto">{item.text}</p>
+                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden ">{item.text}</p>
                   </div>
                 </div>
               ))}
