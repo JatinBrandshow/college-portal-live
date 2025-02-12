@@ -21,13 +21,13 @@ const Hero = () => {
     }, []);
 
     return (
-        <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50">
+        <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-violet-50">
             {/* Left Section */}
             <div className="items-center justify-center sm:pl-5 lg:pl-10 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20 ">
                 <div className="mb-6 md:text-left pt-8 md:pt-0">
                     {/* Typewriter Effect */}
                     <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-3">
-                        <span className="text-blue-600">
+                        <span className="text-violet-600">
                             <Typewriter
                                 words={["Welcome to", "Find Your Path at"]}
                                 loop={true}
@@ -46,10 +46,10 @@ const Hero = () => {
                     <p className="text-gray-800 mt-2 font-semibold">Connect, learn, and grow with us.</p>
                 </div>
                 <div className="flex flex-wrap md:flex-nowrap md:space-x-1  md:justify-start">
-                    <button className="px-8 py-5 font-bold text-sm rounded-lg bg-blue-600 text-white">
+                    <button className="px-8 py-5 font-bold text-sm rounded-lg bg-violet-600 text-white">
                         COLLEGE
                     </button>
-                    <button className="px-8 py-5 font-bold text-sm rounded-lg bg-gray-200 text-black hover:bg-blue-600 hover:text-white">
+                    <button className="px-8 py-5 font-bold text-sm rounded-lg bg-gray-200 text-black hover:bg-violet-600 hover:text-white">
                         ACCOMMODATIONS
                     </button>
                 </div>
@@ -77,11 +77,11 @@ const Hero = () => {
                             <input type="text" placeholder="Search Keyword" className=" outline-none text-black rounded-xl w-full" />
                         </div>
                         <div className="gap-3 flex  md:justify-start">
-                            <button className="flex items-center border border-blue-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-blue-600 hover:text-white text-black font-semibold rounded-3xl">
+                            <button className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl">
                                 <span>Advanced</span>
                                 <Sliders className="w-5 h-5" />
                             </button>
-                            <button className="flex items-center border space-x-2 h-12 sm:px-3 px-3  md:px-5 py-2 border-blue-600 bg-blue-600 text-white rounded-3xl">
+                            <button className="flex items-center border space-x-2 h-12 sm:px-3 px-3  md:px-5 py-2 border-violet-600 bg-violet-600 text-white rounded-3xl">
                                 <span>Search</span>
                                 <Search className="w-5 h-5" />
                             </button>
@@ -93,7 +93,7 @@ const Hero = () => {
                         <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16 ">
                             {[{ icon: Home, label: "House" }, { icon: Landmark, label: "College" }, { icon: Briefcase, label: "Accommodation" }].map((item, index) => (
                                 <div key={index} className="flex items-center gap-2 lg:gap-1 xl:gap-2 p-2 lg:p-0 xl:p-2 rounded-lg">
-                                    <item.icon className="w-4 h-4 text-blue-700" />
+                                    <item.icon className="w-4 h-4 text-violet-700" />
                                     <p className="text-base whitespace-nowrap">{item.label}</p>
                                 </div>
                             ))}

@@ -23,14 +23,14 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-blue-900 via-blue-700 to-blue-500 shadow-lg">
+    <header className="bg-gradient-to-r from-violet-900 via-violet-700 to-violet-500 shadow-lg">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <a href="/" className="text-white text-3xl font-bold tracking-wide hover:opacity-90">
           College<span className="text-yellow-400">Portal</span>
         </a>
 
         <nav className="hidden md:flex space-x-8">
-          <a href="#" className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300">
+          <a href="/" className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300">
             Home
           </a>
           <a href="/about" className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300">

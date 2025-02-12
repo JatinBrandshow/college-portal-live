@@ -3,25 +3,25 @@ import { FaHome, FaBuilding, FaHouseUser, FaWarehouse, FaHotel } from "react-ico
 
 const propertyTypes = [
   {
-    icon: <FaHouseUser size={60} className="text-red-500" />,
+    icon: <FaHouseUser size={60} className="text-blue-500" />,
     title: "Multifamily Homes",
     properties: "13 Properties",
     number: 13,
   },
   {
-    icon: <FaBuilding size={60} className="text-red-500" />,
+    icon: <FaBuilding size={60} className="text-blue-500" />,
     title: "Duplex Homes",
     properties: "15 Properties",
     number: 15,
   },
   {
-    icon: <FaWarehouse size={60} className="text-red-500" />,
+    icon: <FaWarehouse size={60} className="text-blue-500" />,
     title: "Commercial House",
     properties: "16 Properties",
     number: 16,
   },
   {
-    icon: <FaHotel size={60} className="text-red-500" />,
+    icon: <FaHotel size={60} className="text-blue-500" />,
     title: "Sweet Apartments",
     properties: "12 Properties",
     number: 12,
@@ -36,7 +36,7 @@ const PropertyType = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10">
           {/* Left Section */}
           <div className="lg:w-1/2">
-            <div className="flex items-center text-red-500 space-x-2">
+            <div className="flex items-center text-blue-500 space-x-2">
               <FaHome size={24} />
               <span className="uppercase font-semibold text-sm tracking-wider">Trusted Real Estate Care</span>
             </div>
@@ -63,7 +63,7 @@ const PropertyType = () => {
                 className="relative bg-white shadow-lg rounded-lg p-6 flex items-center justify-center text-center w-24 h-24 sm:w-28 sm:h-28 lg:w-72 lg:h-60 transition-transform transform hover:scale-105 hover:shadow-2xl"
             >
                 {/* Number Badge */}
-                <div className="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs font-semibold transition-transform transform hover:scale-125 hover:bg-red-600">
+                <div className="absolute top-2 right-2 bg-blue-500 text-white w-6 h-6 flex items-center justify-center rounded-full text-xs font-semibold transition-transform transform hover:scale-125 hover:bg-red-600">
                 {property.number}
                 </div>
                 {/* Icon */}
@@ -73,7 +73,7 @@ const PropertyType = () => {
             <h3 className="text-xs md:text-lg font-semibold text-gray-800 mt-4 text-center">
                 {property.title}
             </h3>
-            <p className="text-red-700 text-xs md:text-md text-center">{property.properties}</p>
+            <p className="text-blue-700 text-xs md:text-md text-center">{property.properties}</p>
             </div>
         ))}
         </div>

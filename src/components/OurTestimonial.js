@@ -1,77 +1,56 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { BiSolidQuoteAltLeft } from "react-icons/bi";
+import { useRouter } from "next/navigation";
+import { API_NODE_URL, API_KEY } from "../../config/config";
 
 
 const OurTestimonial = () => {
-  const testimonials = [
-    {
-      id: 1,
-      text: "My experience with property management services has exceeded expectations. They efficiently manage properties with a professional and attentive approach in every situation. I feel reassured that any issue will be resolved promptly and effectively.",
-      name: "Courtney Henry",
-      role: "CEO Themesflat",
-      image: "image/student/student1.png",
-    },
-    {
-      id: 2,
-      text: "The team is incredible! They offer unparalleled expertise and always keep our best interests in mind. The results speak for themselves.",
-      name: "John Doe",
-      role: "Founder XYZ Corp",
-      image: "image/student/student2.png",
-    },
-    {
-      id: 3,
-      text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
-      name: "Jane Smith",
-      role: "CTO ABC Inc.",
-      image: "image/student/student3.png",
-    },
-    {
-        id: 4,
-        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
-        name: "Jane Smith",
-        role: "CTO ABC Inc.",
-        image: "image/student/student4.png",
-      },
-      {
-        id: 5,
-        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
-        name: "Jane Smith",
-        role: "CTO ABC Inc.",
-        image: "image/student/student5.png",
-      },
-      {
-        id: 6,
-        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
-        name: "Jane Smith",
-        role: "CTO ABC Inc.",
-        image: "image/student/student6.png",
-      },
-      {
-        id: 7,
-        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
-        name: "Jane Smith",
-        role: "CTO ABC Inc.",
-        image: "image/student/student5.png",
-      },
-      {
-        id: 8,
-        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
-        name: "Jane Smith",
-        role: "CTO ABC Inc.",
-        image: "image/student/student5.png",
-      },
-      {
-        id: 9,
-        text: "Professional and timely services. The team ensures everything is handled efficiently, making our lives stress-free.",
-        name: "Jane Smith",
-        role: "CTO ABC Inc.",
-        image: "image/student/student5.png",
-      },
-  ];
+  const router = useRouter();
+  const [testimonials, setTestimonials] = useState([]);
+
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}testimonial/all-testimonials`, {
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`,
+          },
+        });
+    
+        const text = await response.text();
+        console.log("Raw API Response:", text); // Log full response to inspect the issue
+    
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+    
+        const data = JSON.parse(text);
+    
+        if (Array.isArray(data.data)) {
+          const mappedTestimonials = data.data.map((item) => ({
+            id: item._id,
+            text: item.message || "No message available",
+            name: item.name || "Anonymous",
+            role: item.role || "No role specified",
+            image: item.image || "image/student/default.png",
+          }));
+    
+          setTestimonials(mappedTestimonials);
+        } else {
+          console.error("Unexpected API response structure:", data);
+        }
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
 
   return (
     <section className="bg-blue-50 py-16 px-4">
