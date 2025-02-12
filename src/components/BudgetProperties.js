@@ -80,7 +80,7 @@ const BudgetProperties = () => {
               key={city}
               onClick={() => setFilter(city)}
               className={`px-4 py-2 rounded-full border ${
-                filter === city ? "bg-red-500 text-white border-red-500" : "bg-white text-gray-700 border-gray-300"
+                filter === city ? "bg-[#5e23dd] text-white border-[#5e23dd]" : "bg-white text-gray-700 border-gray-300"
               } transition`}
             >
               {city}
@@ -140,7 +140,7 @@ const BudgetProperties = () => {
                       From <span className="text-red-500">{property.price}</span>/week
                     </p>
                     <div className="flex items-center justify-between mt-4">
-                      <div className="flex items-center text-green-600 text-sm font-semibold">
+                      <div className="flex items-center text-yellow-600 text-sm font-semibold">
                         <FaStar className="mr-1" />
                         {property.rating}
                       </div>

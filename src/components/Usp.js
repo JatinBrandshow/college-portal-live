@@ -26,11 +26,11 @@ export default function HeroSection() {
         <h1 className="text-2xl md:text-3xl font-bold font-sans text-gray-900">Where every student feels <br/> at home!</h1>
         <p className="text-gray-600 mt-4">Get personalised options with your preferences <br/> in just a few clicks.</p>
         
-        <div className="flex items-center mt-4 text-green-600 font-medium">
+        <div className="flex items-center mt-4 text-[#8070dd] font-medium">
           <FaCheckCircle className="mr-2" /> Upto £200 Cashback
         </div>
         
-        <button className="mt-6 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-lg font-semibold shadow-lg w-auto md:w-48">
+        <button className="mt-6 px-6 py-3 bg-gradient-to-r from-yellow-400 via-yellow-600 to-yellow-400 text-white rounded-lg font-semibold shadow-lg w-auto md:w-48">
           Find My Home
         </button>
         

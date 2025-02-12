@@ -129,7 +129,7 @@ export default function PopularCities() {
             onClick={() => setActiveTab(tab.key)}
             className={clsx(
               'px-2 md:px-4 py-2 border rounded-2xl md:rounded-full transition-all text-sm md:text-base',
-              activeTab === tab.key ? 'border-red-500 text-red-500' : 'border-gray-300'
+              activeTab === tab.key ? 'border-[#5e23dd] text-white bg-[#5e23dd]' : 'border-gray-300'
             )}
           >
             {tab.name}
