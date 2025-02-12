@@ -23,7 +23,6 @@ const PopularColleges = () => {
         })
 
         const text = await response.text() // Read raw response
-        console.log("Raw response:", text) // Log raw response
 
         const data = JSON.parse(text) // Parse JSON manually
 

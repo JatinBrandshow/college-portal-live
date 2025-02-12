@@ -26,7 +26,6 @@ const BudgetProperties = () => {
         });
   
         const text = await response.text();
-        console.log("Raw API Response:", text);
   
         const data = JSON.parse(text);
 

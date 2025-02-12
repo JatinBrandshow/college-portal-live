@@ -22,7 +22,6 @@ const OurTestimonial = () => {
         });
 
         const text = await response.text();
-        console.log("Raw API Response:", text);
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
