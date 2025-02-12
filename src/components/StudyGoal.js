@@ -40,7 +40,7 @@ const StudyGoal = () => {
                     <>
                       <div className="flex items-start">
                         {goal.icon && (
-                          <div className="w-16 h-16 bg-white border-2 border-gray-400 rounded-full flex items-center justify-center text-sky-400">
+                          <div className="w-16 h-16 bg-white border-2 border-gray-400 rounded-full flex items-center justify-center text-violet-400">
                             {goal.icon}
                           </div>
                         )}
@@ -52,7 +52,7 @@ const StudyGoal = () => {
                       {goal.branches && (
                         <ul className="mt-4 border-t pt-4 text-gray-700">
                           {goal.branches.map((branch, idx) => (
-                            <li key={idx} className={`hover:underline hover:text-sky-600 cursor-pointer ${idx !== goal.branches.length - 1 ? "border-b" : ""} py-2`}>
+                            <li key={idx} className={`hover:underline hover:text-[#5e23dd] cursor-pointer ${idx !== goal.branches.length - 1 ? "border-b" : ""} py-2`}>
                               {branch}
                             </li>
                           ))}
