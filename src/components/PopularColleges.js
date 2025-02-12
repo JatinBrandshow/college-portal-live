@@ -22,15 +22,15 @@ const PopularColleges = () => {
           },
         })
 
-        const text = await response.text(); // Read raw response
-        console.log("Raw response:", text); // Log raw response
-    
+        const text = await response.text() // Read raw response
+        console.log("Raw response:", text) // Log raw response
 
-        const data = await response.json()
+        const data = JSON.parse(text) // Parse JSON manually
 
-        if (Array.isArray(data.data)) {
-          setColleges(data.data)
-          const uniqueCities = ["All", ...new Set(data.data.map((college) => college.city))]
+        if (Array.isArray(data.colleges)) {
+          setColleges(data.colleges)
+
+          const uniqueCities = ["All", ...new Set(data.colleges.map((college) => college.city))]
           setCities(uniqueCities)
         } else {
           console.error("Unexpected API response structure:", data)
@@ -62,7 +62,6 @@ const PopularColleges = () => {
     }
   }
 
-  
   const filteredColleges = activeCity === "All" ? colleges : colleges.filter((college) => college.city === activeCity)
 
   const firstRowCount = Math.min(9, Math.ceil(filteredColleges.length / 2))
@@ -113,7 +112,7 @@ const PopularColleges = () => {
                 >
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${college.image})` }}
+                    style={{ backgroundImage: `url(${college.img[0]})` }}
                   ></div>
                   <div className="absolute flex items-end p-2 bottom-0">
                     <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{college.name}</p>
@@ -131,7 +130,7 @@ const PopularColleges = () => {
                 >
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${college.image})` }}
+                    style={{ backgroundImage: `url(${college.img[0]})` }}
                   ></div>
                   <div className="absolute flex items-end p-2 bottom-0">
                     <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{college.name}</p>
