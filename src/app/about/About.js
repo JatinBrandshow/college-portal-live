@@ -106,7 +106,7 @@ const About = () => {
             <main className="bg-gray-100 text-gray-800">
                 <section
                     ref={heroRef}
-                    className="relative h-screen bg-gradient-to-b from-blue-500 via-blue-300 to-yellow-400 text-yellow-100 overflow-hidden flex items-center"
+                    className="relative h-screen bg-gradient-to-b from-[#8070dd]/80 via-violet-600 to-violet-900 text-yellow-100 overflow-hidden flex items-center"
                 >
                     <div
                         ref={heroImageRef}

@@ -67,7 +67,7 @@ const Programs = () => {
         <>
             <Header />
             <main className="bg-gray-100 text-gray-800">
-                <section className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-20 lg:py-32 overflow-hidden">
+                <section className="relative bg-gradient-to-br from-[#8070dd]/80 via-violet-600 to-violet-900 text-white py-20 lg:py-32 overflow-hidden">
                     <div className="container mx-auto px-6 lg:px-12 flex flex-col-reverse lg:flex-row items-center lg:items-start gap-12">
                         <div className="lg:w-1/2 text-center lg:text-left">
                             <motion.h1 className="text-2xl md:text-4xl font-bold leading-tight" initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -119,7 +119,7 @@ const Programs = () => {
                                             </div>
                                             <div className="mt-4 flex justify-between items-center text-sm text-gray-500">
                                                 <span className="flex items-center">
-                                                    <svg className="w-5 h-5 text-blue-600 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                                    <svg className="w-5 h-5 text-[#5e23dd] mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                         <path
                                                             fillRule="evenodd"
                                                             d="M6 3a1 1 0 00-1 1v3a1 1 0 102 0V5h3a1 1 0 000-2H6zm8 0a1 1 0 011 1v3a1 1 0 01-2 0V5h-3a1 1 0 110-2h4zm2 8a1 1 0 00-1-1H5a1 1 0 000 2h10a1 1 0 011-1zm-3 5a1 1 0 10-2 0v1h-3a1 1 0 100 2h4a1 1 0 001-1v-2zm-4-5a1 1 0 100 2H9a1 1 0 100-2h2z"
@@ -141,7 +141,7 @@ const Programs = () => {
                                             </div>
                                         </div>
                                         <div className="p-6 ">
-                                            <a href="#learn-more" className="block text-center bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200">
+                                            <a href="#learn-more" className="block text-center bg-[#5e23dd] text-white py-3 px-6 rounded-lg font-semibold hover:bg-[#5e23dd]/70 transition-all duration-200">
                                                 Learn More
                                             </a>
                                         </div>
@@ -171,7 +171,7 @@ const Programs = () => {
                         >
                             {testimonials.map((testimonial, index) => (
                                 <SwiperSlide key={index}>
-                                    <div className="bg-gray-800 rounded-lg p-8 shadow-lg text-center transform transition hover:scale-105">
+                                    <div className="bg-[#282828] rounded-lg p-8 shadow-lg text-center transform transition hover:scale-105 ">
                                         <div className="text-yellow-400 mb-4">
                                             <svg className="w-10 h-10 mx-auto" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                 <path d="M7.89 11.166c0 .967-.767 1.75-1.71 1.75-.944 0-1.71-.783-1.71-1.75s.766-1.75 1.71-1.75c.944 0 1.71.783 1.71 1.75zM6.18 6.8a3.75 3.75 0 100 7.5c1.855 0 3.566-1.467 3.566-3.75h-1.78c0 .967-.767 1.75-1.71 1.75-.944 0-1.71-.783-1.71-1.75s.766-1.75 1.71-1.75a3.75 3.75 0 013.566-3.75zm9.63 4.366c0 .967-.767 1.75-1.71 1.75-.944 0-1.71-.783-1.71-1.75s.766-1.75 1.71-1.75c.944 0 1.71.783 1.71 1.75zM16.82 6.8a3.75 3.75 0 100 7.5c1.855 0 3.566-1.467 3.566-3.75h-1.78c0 .967-.767 1.75-1.71 1.75-.944 0-1.71-.783-1.71-1.75s.766-1.75 1.71-1.75a3.75 3.75 0 013.566-3.75z" />
@@ -181,8 +181,8 @@ const Programs = () => {
                                         <div className="mt-6 flex items-center justify-center gap-4">
                                             <img src={testimonial.avatar} alt={testimonial.name} className="w-12 h-12 rounded-full border-2 border-yellow-400" />
                                             <div>
-                                                <h4 className="text-md font-semibold text-gray-300">{testimonial.name}</h4>
-                                                <p className="text-sm text-gray-400">{testimonial.role}</p>
+                                                <h4 className="text-md font-semibold text-gray-200">{testimonial.name}</h4>
+                                                <p className="text-sm text-yellow-400">{testimonial.role}</p>
                                             </div>
                                         </div>
                                     </div>
@@ -217,11 +217,11 @@ const Programs = () => {
                         </motion.div>
                     </div>
                 </section>
-                <section className="relative bg-gradient-to-r from-blue-800 via-gray-900 to-blue-900 py-16 lg:py-24 overflow-hidden">
-                    <div className="absolute inset-0 pointer-events-none">
+                <section className="relative bg-gradient-to-r from-violet-500 via-violet-700 to-violet-500 py-16 lg:py-24 overflow-hidden">
+                    {/* <div className="absolute inset-0 pointer-events-none">
                         <div className="absolute -top-20 -left-20 w-96 h-96 bg-yellow-300 opacity-20 rounded-full blur-3xl animate-pulse"></div>
                         <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-gray-500 opacity-20 rounded-full blur-3xl animate-pulse"></div>
-                    </div>
+                    </div> */}
 
                     <div className="container mx-auto relative z-10 text-center px-6">
                         <motion.h2 className="text-2xl lg:text-3xl font-extrabold text-yellow-400 leading-tight mb-8" initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>

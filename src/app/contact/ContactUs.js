@@ -6,7 +6,7 @@ const ContactUs = () => {
     return (
         <>
             <section className="relative h-[80vh] bg-cover bg-no-repeat bg-center bg-BG1 bg-slate-600 bg-blend-multiply">
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-black to-gray-200 opacity-50 z-0"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-black via-gray-200 to-gray-700 opacity-50 z-0"></div>
                 <div className="relative z-10 h-full max-w-[1400px] mx-auto text-white flex flex-col items-center justify-center">
                     <div className="relative z-10 text-center px-2 py-2">
                         <h1 className="text-3xl md:text-4xl font-bold">Contact Us</h1>

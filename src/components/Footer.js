@@ -4,7 +4,7 @@ import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaYoutube, FaGraduation
 
 const Footer = () => {
   return (
-    <footer className="bg-[#002855] text-white py-10">
+    <footer className="bg-[#282828] text-white py-10">
       <div className="container mx-auto px-5">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8 mb-10">
           <div>
@@ -151,7 +151,7 @@ const Footer = () => {
               placeholder="Enter your email"
               className="w-2/3 sm:w-1/3 px-4 py-2 text-black rounded-l-md focus:outline-none"
             />
-            <button className="bg-gray-700 px-4 py-2 rounded-r-md hover:bg-gray-600 transition duration-200">
+            <button className="bg-violet-700 px-4 py-2 rounded-r-md hover:bg-gray-600 transition duration-200">
               Subscribe
             </button>
           </form>
