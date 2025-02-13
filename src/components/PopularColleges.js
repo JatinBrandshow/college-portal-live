@@ -69,7 +69,7 @@ const PopularColleges = () => {
 
   return (
     <div className="max-w-[1500px] mx-auto lg:mx-12 2xl:mx-auto py-6 px-6 my-10 relative">
-      <h2 className="text-2xl font-bold mb-2">Popular Colleges/Universities Across India</h2>
+      <h2 className="text-2xl font-bold mb-2">Top Colleges/Universities </h2>
       <p className="text-gray-600">
         Top Cities, Best Colleges – <span className="font-semibold">Your Stay, Sorted</span>!
       </p>

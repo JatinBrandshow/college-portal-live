@@ -17,7 +17,7 @@ const features = [
 export default function HeroSection() {
   return (
     <>
-    <div className=" p-6 md:p-12 bg-gray-50">
+    <div className=" p-6 md:p-12 bg-gray-50 max-w-[1500px] mx-auto">
     <h1 className="text-5xl font-bold mb-2 md:px-12">USP</h1>
     <p className="text-md mb-2 text-gray-500 md:px-12">Hassle-Free Booking – Secure Your Perfect Student Home in <span className="font-semibold"> Just a Few Clicks! </span></p>
       {/* Left Column */}

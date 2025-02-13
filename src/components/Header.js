@@ -26,7 +26,7 @@ const Header = () => {
     <header className="bg-gradient-to-r from-violet-900 via-violet-700 to-violet-500 shadow-lg">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <a href="/" className="text-white text-3xl font-bold tracking-wide hover:opacity-90">
-          College<span className="text-yellow-400">Portal</span>
+          Admi<span className="text-yellow-400">Stay</span>
         </a>
 
         <nav className="hidden md:flex space-x-8">

@@ -38,7 +38,7 @@ const Hero = () => {
                                 delaySpeed={2000}
                             />
                         </span>
-                        <br /> College Portal
+                        <br /> AdmiStay
                     </h1>
                     <p className="text-gray-600 pe-8">
                         Discover endless opportunities and resources to make your academic journey extraordinary.
@@ -99,15 +99,17 @@ const Hero = () => {
                                     </button>
                                 </div>
                             </div>
-                            <p className="mt-2 ml-2 text-base">Which courses are you looking for?</p>
+                            <div className="mt-2 ml-2 lg:flex items-center">
+                            <p className="text-base ml-4 lg:ml-0">Which courses are you looking for?</p>
                             <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16">
-                                {[{ icon: Home, label: "Engineering" }, { icon: Landmark, label: "Medical" }].map((item, index) => (
+                                {[{ icon: Home, label: "Engineering" }, { icon: Briefcase, label: "Medical" }].map((item, index) => (
                                     <div key={index} className="flex items-center gap-2 lg:gap-1 xl:gap-2 p-2 lg:p-0 xl:p-2 rounded-lg">
                                         <item.icon className="w-4 h-4 text-blue-700" />
                                         <p className="text-base whitespace-nowrap">{item.label}</p>
                                     </div>
                                 ))}
                             </div>
+                        </div>
                         </div>
                     )}
                     {activeTab === "accommodation" && (
