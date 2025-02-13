@@ -67,7 +67,7 @@ const BudgetProperties = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading and Subheading */}
         <div className="mb-10">
-          <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties</h2>
+          <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties by Cities </h2>
           <p className="text-gray-600 mt-2 text-left">
             From studios to private rooms to shared apartments, we’ve got it all.
           </p>

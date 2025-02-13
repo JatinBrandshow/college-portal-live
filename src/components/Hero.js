@@ -38,7 +38,7 @@ const Hero = () => {
                                 delaySpeed={2000}
                             />
                         </span>
-                        <br /> College Portal
+                        <br /> AdmiStay
                     </h1>
                     <p className="text-gray-600 pe-8">
                         Discover endless opportunities and resources to make your academic journey extraordinary.

@@ -118,7 +118,8 @@ export default function PopularCities() {
 
   return (
     <div className="max-w-[1500px] mx-auto lg:mx-12 2xl:mx-auto py-6 px-6 my-10 relative">
-      <h2 className="text-2xl font-bold mb-2">Popular Cities Across India</h2>
+      <h2 className="text-2xl font-bold mb-2">Popular Accommodation Cities 
+      </h2>
       <p className="text-gray-600"> Find Student Stays in <span className="font-semibold"> India’s Best Cities</span> !</p>
 
       {/* Tab Buttons */}
