@@ -68,19 +68,19 @@ const PopularColleges = () => {
   const secondRow = filteredColleges.slice(firstRowCount)
 
   return (
-    <div className="max-w-[1500px] mx-auto lg:mx-12 2xl:mx-auto py-6 px-6 my-10 relative">
-      <h2 className="text-2xl font-bold mb-2">Top Colleges/Universities </h2>
-      <p className="text-gray-600">
+    <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative max-md:px-5 max-sm:px-3 max-md:py-5 max-sm:py-3 max-lg:my-8 max-md:my-6 max-sm:my-4">
+      <h2 className="text-3xl font-bold mb-2 max-md:text-2xl max-sm:text-xl">Top Colleges/Universities </h2>
+      <p className="text-base text-gray-600">
         Top Cities, Best Colleges – <span className="font-semibold">Your Stay, Sorted</span>!
       </p>
 
       {/* City Tabs */}
-      <div className="flex gap-3 overflow-x-auto mt-8 max-w-7xl">
+      <div className="flex gap-3 overflow-x-auto mt-8 max-w-7xl max-md:mt-6 max-sm:mt-4 max-md:gap-2.5 max-sm:gap-2">
         {cities.map((city) => (
           <button
             key={city}
             onClick={() => setActiveCity(city)}
-            className={`px-4 py-2 border rounded-2xl md:rounded-full transition-all text-sm md:text-base ${
+            className={`px-4 py-2 border rounded-2xl md:rounded-full transition-all text-sm md:text-base max-sm:px-2.5 max-sm:py-1.5 max-sm:whitespace-nowrap ${
               activeCity === city ? "border-[#5e23dd] bg-[#5e23dd] text-white" : "border-gray-300"
             }`}
           >
@@ -93,7 +93,7 @@ const PopularColleges = () => {
       <div className="mt-6 relative">
         {showLeftButton && (
           <button
-            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 z-10 hover:bg-red-500 hover:text-white transition"
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 z-10 hover:bg-red-500 hover:text-white transition max-sm:p-1.5"
             onClick={() => scroll("left")}
           >
             <ChevronLeft className="w-6 h-6" />
@@ -101,7 +101,7 @@ const PopularColleges = () => {
         )}
 
         <div ref={scrollRef} className="overflow-x-auto scroll-smooth w-full px-0 relative no-scrollbar">
-          <div className="flex flex-col gap-4 w-max">
+          <div className="flex flex-col gap-4 w-max max-sm:grid max-sm:grid-cols-2">
             {/* First Row */}
             <div className="flex gap-4">
               {firstRow.map((college) => (
@@ -142,7 +142,7 @@ const PopularColleges = () => {
 
         {showRightButton && (
           <button
-            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 z-10 hover:bg-red-500 hover:text-white transition"
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-white shadow-lg rounded-full p-3 z-10 hover:bg-red-500 hover:text-white transition max-sm:p-1.5"
             onClick={() => scroll("right")}
           >
             <ChevronRight className="w-6 h-6" />

@@ -210,12 +210,12 @@ const Hero = () => {
   };
 
   return (
-    <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50">
+    <div className="relative h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50 max-sm:h-fit">
       {/* Left Section */}
       <div className="items-center justify-center sm:pl-5 lg:pl-10 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20">
         <div className="mb-6 md:text-left pt-8 md:pt-0">
           {/* Typewriter Effect */}
-          <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-3">
+          <h1 className="text-6xl font-bold text-gray-900 leading-tight mb-3 max-lg:text-5xl max-md:text-4xl max-sm:text-3xl">
             <span className="text-violet-600">
               <Typewriter
                 words={["Welcome to", "Find Your Path at"]}
@@ -229,18 +229,18 @@ const Hero = () => {
             </span>
             <br /> AdmiStay
           </h1>
-          <p className="text-gray-600 pe-8">
+          <p className="text-base text-gray-600 pe-8 max-sm:text-sm max-sm:pe-4 max-md:pe-6">
             Discover endless opportunities and resources to make your academic journey extraordinary.
           </p>
-          <p className="text-gray-800 mt-2 font-semibold">
+          <p className="text-base text-gray-800 mt-2 font-semibold max-sm:text-sm max-sm:mt-1">
             Connect, learn, and grow with us.
           </p>
         </div>
 
         {/* Tab Buttons */}
-        <div className="flex flex-wrap md:flex-nowrap md:space-x-1 md:justify-start">
+        <div className="flex justify-start space-x-1 max-sm:space-x-0.5 max-sm:mb-1">
           <button
-            className={`px-8 py-5 font-bold text-sm rounded-lg ${
+            className={`px-8 py-5 font-bold text-base rounded-lg max-sm:text-sm max-md:px-6 max-sm:px-4 max-md:py-4 max-sm:py-3 ${
               activeTab === "college"
                 ? "bg-violet-600 text-white"
                 : "bg-gray-200 text-black hover:bg-violet-600 hover:text-white"
@@ -250,7 +250,7 @@ const Hero = () => {
             COLLEGE
           </button>
           <button
-            className={`px-8 py-5 font-bold text-sm rounded-lg ${
+            className={`px-8 py-5 font-bold text-base rounded-lg max-sm:text-sm max-md:px-6 max-sm:px-4 max-md:py-4 max-sm:py-3 ${
               activeTab === "accommodation"
                 ? "bg-violet-600 text-white"
                 : "bg-gray-200 text-black hover:bg-violet-600 hover:text-white"
@@ -292,16 +292,16 @@ const Hero = () => {
                     className="outline-none text-black rounded-xl w-full"
                   />
                 </div>
-                <div className="gap-3 flex md:justify-start">
+                <div className="gap-3 flex md:justify-start max-sm:justify-around">
                   <button
-                    className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl"
+                    className="text-base flex items-center border border-violet-600 h-12 py-2 space-x-2 px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl max-sm:text-sm max-sm:px-2.5 max-sm:h-fit"
                     onClick={openModal}
                   >
                     <span>Advanced</span>
                     <Sliders className="w-5 h-5" />
                   </button>
                   <button 
-                    className="flex items-center border space-x-2 h-12 sm:px-3 px-3 md:px-5 py-2 border-violet-600 bg-violet-600 text-white rounded-3xl"
+                    className="text-base flex items-center border space-x-2 h-12 px-5 py-2 border-violet-600 bg-violet-600 text-white rounded-3xl max-sm:text-sm max-sm:px-2.5 max-sm:h-fit"
                     onClick={handleSearch}>
                     <span>Search</span>
                     <Search className="w-5 h-5" />
@@ -311,8 +311,8 @@ const Hero = () => {
               {/* Selected Filters */}
               {renderSelectedFilters()}
               <div className="mt-2 ml-2 lg:flex items-center">
-                <p className="text-base ml-4 lg:ml-0">Which courses are you looking for?</p>
-                <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16">
+                <p className="text-base max-sm:pl-2">Which courses are you looking for?</p>
+                <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16 max-sm:pr-0">
                   {[
                     { icon: Home, label: "Engineering" },
                     { icon: Briefcase, label: "Medical" },
