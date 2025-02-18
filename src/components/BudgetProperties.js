@@ -15,6 +15,10 @@ const BudgetProperties = () => {
   const [properties, setProperties] = useState([]);
   const [filter, setFilter] = useState("All");
 
+  const handleCardClick = (id) => {
+    router.push(`/pages/${id}`);
+  };
+
   useEffect(() => {
     const fetchProperties = async () => {
       try {
@@ -33,8 +37,8 @@ const BudgetProperties = () => {
           const mappedProperties = data.data.map((item) => ({
             id: item._id,
             title: item.name || "No Name",
-            city: item.city || "Unknown City",
-            country: item.country || "Unknown Country",
+            city: item.location.city || "Unknown City",
+            country: item.location.country || "Unknown Country",
             price: item.price ? `₹${item.price}` : "N/A",
             rating: item.reviews.length > 0 ? item.reviews[0].rating || "No Rating" : "No Rating",
             images: Array.isArray(item.images)
@@ -42,7 +46,6 @@ const BudgetProperties = () => {
               : [],
           }));
   
-          console.log("Mapped Properties:", mappedProperties);
           setProperties(mappedProperties);
         } else {
           console.error("Unexpected API response structure:", data);
@@ -73,7 +76,7 @@ const BudgetProperties = () => {
         </div>
 
         {/* Filter Buttons (Dynamic from API) */}
-        <div className="flex justify-left space-x-4 mb-8">
+        <div className="flex justify-left space-x-4 mb-8 overflow-x-auto">
           {cities.map((city) => (
             <button
               key={city}
@@ -108,7 +111,9 @@ const BudgetProperties = () => {
           >
             {filteredProperties.map((property) => (
               <SwiperSlide key={property.id}>
-                <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+                <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer"
+            onClick={() => handleCardClick(property.id)} // Navigate on click
+                >
                   {/* Image Slider */}
                   <div className="relative w-full h-48">
                     <Swiper
@@ -131,7 +136,7 @@ const BudgetProperties = () => {
 
                   {/* Property Details */}
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800">{property.title}</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 line-clamp-1">{property.title}</h3>
                     <p className="text-gray-600">
                       {property.city}, {property.country}
                     </p>
@@ -151,10 +156,10 @@ const BudgetProperties = () => {
           </Swiper>
 
           {/* Custom Navigation Buttons */}
-          <button className="custom-prev absolute top-1/2 transform -translate-y-1/2 left-12 xl:-left-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10">
+          <button className="custom-prev absolute top-1/2 transform -translate-y-1/2 left-4 xl:-left-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10">
             <FiChevronLeft size={16} />
           </button>
-          <button className="custom-next absolute top-1/2 transform -translate-y-1/2 right-12 xl:-right-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10">
+          <button className="custom-next absolute top-1/2 transform -translate-y-1/2 right-4 xl:-right-12 bg-white text-gray-800 border border-gray-300 shadow-md rounded-full p-3 hover:bg-gray-100 transition z-10">
             <FiChevronRight size={16} />
           </button>
         </div>

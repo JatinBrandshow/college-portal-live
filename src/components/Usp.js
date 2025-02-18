@@ -17,11 +17,11 @@ const features = [
 export default function HeroSection() {
   return (
     <>
-    <div className=" p-6 md:p-12 bg-gray-50 max-w-[1500px] mx-auto">
+    <div className=" p-6 md:p-12 bg-gray-50">
     <h1 className="text-5xl font-bold mb-2 md:px-12">USP</h1>
     <p className="text-md mb-2 text-gray-500 md:px-12">Hassle-Free Booking – Secure Your Perfect Student Home in <span className="font-semibold"> Just a Few Clicks! </span></p>
       {/* Left Column */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-center relative md:p-10">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 items-center relative md:p-10">
       <div className="relative z-10 shadow-lg h-full px-4 py-10 bg-white rounded-lg pl-10 border border-gray-200">
         <h1 className="text-2xl md:text-3xl font-bold font-sans text-gray-900">Where every student feels <br/> at home!</h1>
         <p className="text-gray-600 mt-4">Get personalised options with your preferences <br/> in just a few clicks.</p>
@@ -34,7 +34,7 @@ export default function HeroSection() {
           Find My Home
         </button>
         
-        <div className="mt-8 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8">
+        <div className="mt-8 flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-8 z-10">
           <div className="text-center border-b md:border-b-0 md:border-r border-gray-300 pb-6 md:pb-0 md:pe-8">
           <h2 className="text-3xl font-bold">10+</h2>
           <p className="text-gray-500 text-md">Countries</p>
@@ -53,7 +53,7 @@ export default function HeroSection() {
       <div className="relative md:absolute right-0 top-0 w-32 md:w-40 lg:w-60 xl:w-72">
         <Image src="/image/homepage/banner.png" alt="Student" width={200} height={200} className="w-full" />
       </div>
-      <div className="absolute right-0 bottom-0 w-32 md:w-40 lg:w-60 xl:w-72">
+      <div className="absolute -right-4 bottom-0 w-32 md:w-40 lg:w-60 xl:w-72 -z-10">
         <Image src="/image/homepage/student.png" alt="Student" width={300} height={300} className="w-full" />
       </div>
       

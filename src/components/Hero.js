@@ -11,11 +11,14 @@ const images = [
   "image/hero/img8.webp",
 ];
 
+
 const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("college");
   const [collegeOptions, setCollegeOptions] = useState([]);
   const [accommodationOptions, setAccommodationOptions] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
 
   // Fetch Colleges API
@@ -76,6 +79,15 @@ const Hero = () => {
       fetchAccommodations();
     }
   }, [activeTab]);
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+  
+  
 
   return (
     <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50">
@@ -160,7 +172,8 @@ const Hero = () => {
                   />
                 </div>
                 <div className="gap-3 flex md:justify-start">
-                  <button className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl">
+                  <button className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl"
+                    onClick={openModal}>
                     <span>Advanced</span>
                     <Sliders className="w-5 h-5" />
                   </button>
@@ -213,7 +226,10 @@ const Hero = () => {
                   />
                 </div>
                 <div className="gap-3 flex md:justify-start">
-                  <button className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl">
+                  <button
+                    className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl"
+                    onClick={openModal}
+                  >
                     <span>Advanced</span>
                     <Sliders className="w-5 h-5" />
                   </button>
@@ -252,6 +268,156 @@ const Hero = () => {
           />
         ))}
       </div>
+      {/* Modal for Advanced Filters */}
+      
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl max-h-[600px] overflow-y-auto no-scrollbar">
+            <h2 className="text-xl font-bold mb-4">Advanced Filters</h2>
+            {activeTab === "college" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-gray-700">Location:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>City/State Selection</option>
+                    {/* Add more options as needed */}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">Admission Criteria:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>Entrance Exam Based (JEE, NEET, CAT, etc.)</option>
+                    <option>Merit-Based</option>
+                    <option>Direct Admission</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">Fees Range:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>Less than ₹50,000</option>
+                    <option>₹50,000 - ₹1,00,000</option>
+                    <option>₹1,00,000 - ₹5,00,000</option>
+                    <option>More than ₹5,00,000</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">Facilities & Infrastructure:</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      Hostel Availability
+                    </label>
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      Library & Labs
+                    </label>
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      Sports Complex
+                    </label>
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      Wi-Fi Campus
+                    </label>
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      Placement Support
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-gray-700">Placement & Packages:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>Highest Package Offered</option>
+                    <option>Average Package</option>
+                    <option>Top Recruiters</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">Scholarship & Financial Aid:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>Merit-Based Scholarships</option>
+                    <option>Need-Based Scholarships</option>
+                    <option>Government Scholarships</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">College Ranking & Reviews:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>NIRF Ranking</option>
+                    <option>Student Ratings</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">Courses Offered:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>Engineering (B.Tech, M.Tech, etc.)</option>
+                    <option>Management (MBA, BBA, etc.)</option>
+                    <option>Medical (MBBS, BDS, Nursing, etc.)</option>
+                    <option>Law (LLB, LLM)</option>
+                    <option>Arts & Humanities</option>
+                    <option>Science & Technology</option>
+                    <option>Commerce & Finance</option>
+                    <option>Diploma Courses</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">College Type:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>Private</option>
+                    <option>Government</option>
+                    <option>Deemed University</option>
+                    <option>Autonomous</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {activeTab === "accommodation" && (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-gray-700">Location:</label>
+                  <select className="w-full p-2 border rounded">
+                    <option>City/State Selection</option>
+                    {/* Add more options as needed */}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-700">Facilities & Infrastructure:</label>
+                  <div className="space-y-2">
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      Rating
+                    </label>
+                    <label className="flex items-center">
+                      <input type="checkbox" className="mr-2" />
+                      Room Types
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+<div className="mt-6 flex justify-end">
+              <button
+                className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                onClick={closeModal}
+                >
+                  Close
+                </button>
+                <button
+                  className="ml-2 px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
+                  onClick={() => {
+                    // Handle the apply filters logic here
+                    closeModal();
+                  }}
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
     </div>
   );
 };
