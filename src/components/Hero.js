@@ -1,5 +1,5 @@
 "use client";
-import { Search, Sliders, Home, Briefcase } from "lucide-react";
+import { Search, Sliders, Home, Briefcase, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Typewriter } from "react-simple-typewriter";
 import { API_NODE_URL, API_KEY } from "../../config/config";
@@ -11,7 +11,6 @@ const images = [
   "image/hero/img8.webp",
 ];
 
-
 const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState("college");
@@ -19,21 +18,34 @@ const Hero = () => {
   const [accommodationOptions, setAccommodationOptions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // State for selected filters
+  const [collegeFilters, setCollegeFilters] = useState({
+    location: "",
+    admissionCriteria: "",
+    feesRange: "",
+    facilities: [],
+    placement: "",
+    scholarship: "",
+    ranking: "",
+    courses: "",
+    collegeType: "",
+  });
 
+  const [accommodationFilters, setAccommodationFilters] = useState({
+    location: "",
+    facilities: [],
+  });
 
   // Fetch Colleges API
   const fetchColleges = async () => {
     try {
-      const response = await fetch(
-        `${API_NODE_URL}college/all-colleges`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${API_KEY}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_NODE_URL}college/all-colleges`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+      });
       const data = await response.json();
       if (response.ok) {
         setCollegeOptions(data);
@@ -46,16 +58,13 @@ const Hero = () => {
   // Fetch Accommodations API
   const fetchAccommodations = async () => {
     try {
-      const response = await fetch(
-        `${API_NODE_URL}accommodation/all-accommodations`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${API_KEY}`,
-          },
-        }
-      );
+      const response = await fetch(`${API_NODE_URL}accommodation/all-accommodations`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+      });
       const data = await response.json();
       if (response.ok) {
         setAccommodationOptions(data);
@@ -79,15 +88,95 @@ const Hero = () => {
       fetchAccommodations();
     }
   }, [activeTab]);
-  const openModal = () => {
-    setIsModalOpen(true);
+
+  // Open and close modal
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  // Handle filter changes for College
+  const handleCollegeFilterChange = (filterType, value) => {
+    setCollegeFilters((prev) => ({ ...prev, [filterType]: value }));
   };
 
-  const closeModal = () => {
-    setIsModalOpen(false);
+  // Handle filter changes for Accommodation
+  const handleAccommodationFilterChange = (filterType, value) => {
+    setAccommodationFilters((prev) => ({ ...prev, [filterType]: value }));
   };
-  
-  
+
+  // Clear all filters
+  const clearFilters = () => {
+    if (activeTab === "college") {
+      setCollegeFilters({
+        location: "",
+        admissionCriteria: "",
+        feesRange: "",
+        facilities: [],
+        placement: "",
+        scholarship: "",
+        ranking: "",
+        courses: "",
+        collegeType: "",
+      });
+    } else if (activeTab === "accommodation") {
+      setAccommodationFilters({
+        location: "",
+        facilities: [],
+      });
+    }
+  };
+
+  // Render selected filters
+  const renderSelectedFilters = () => {
+    if (activeTab === "college") {
+      return (
+        <div className="flex flex-wrap gap-2 mt-4">
+          {Object.entries(collegeFilters).map(([key, value]) => {
+            if (value && value.length > 0) {
+              return (
+                <div
+                  key={key}
+                  className="flex items-center bg-gray-200 px-3 py-1 rounded-full text-sm"
+                >
+                  <span>{value}</span>
+                  <button
+                    onClick={() => handleCollegeFilterChange(key, "")}
+                    className="ml-2 text-gray-600 hover:text-gray-900"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            }
+            return null;
+          })}
+        </div>
+      );
+    } else if (activeTab === "accommodation") {
+      return (
+        <div className="flex flex-wrap gap-2 mt-4">
+          {Object.entries(accommodationFilters).map(([key, value]) => {
+            if (value && value.length > 0) {
+              return (
+                <div
+                  key={key}
+                  className="flex items-center bg-gray-200 px-3 py-1 rounded-full text-sm"
+                >
+                  <span>{value}</span>
+                  <button
+                    onClick={() => handleAccommodationFilterChange(key, "")}
+                    className="ml-2 text-gray-600 hover:text-gray-900"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              );
+            }
+            return null;
+          })}
+        </div>
+      );
+    }
+  };
 
   return (
     <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50">
@@ -150,9 +239,10 @@ const Hero = () => {
                   <label className="text-gray-400 text-sm">Type</label>
                   <select className="text-black outline-none rounded-xl w-full">
                     <option>All</option>
-                    {Array.isArray(collegeOptions) && collegeOptions.map(college => (
-                      <option key={index}>{item.name}</option>
-                    ))}
+                    {Array.isArray(collegeOptions) &&
+                      collegeOptions.map((college, index) => (
+                        <option key={index}>{college.name}</option>
+                      ))}
                   </select>
                 </div>
                 <div className="flex flex-col w-full md:w-1/5 border-b md:border-b-0 md:border-r lg:px-2 px-1 pb-2 md:pb-0">
@@ -172,8 +262,10 @@ const Hero = () => {
                   />
                 </div>
                 <div className="gap-3 flex md:justify-start">
-                  <button className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl"
-                    onClick={openModal}>
+                  <button
+                    className="flex items-center border border-violet-600 h-12 py-1 space-x-2 px-2 sm:px-5 bg-white hover:bg-violet-600 hover:text-white text-black font-semibold rounded-3xl"
+                    onClick={openModal}
+                  >
                     <span>Advanced</span>
                     <Sliders className="w-5 h-5" />
                   </button>
@@ -183,17 +275,25 @@ const Hero = () => {
                   </button>
                 </div>
               </div>
+              {/* Selected Filters */}
+              {renderSelectedFilters()}
               <div className="mt-2 ml-2 lg:flex items-center">
-                            <p className="text-base ml-4 lg:ml-0">Which courses are you looking for?</p>
-                            <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16">
-                                {[{ icon: Home, label: "Engineering" }, { icon: Briefcase, label: "Medical" }].map((item, index) => (
-                                    <div key={index} className="flex items-center gap-2 lg:gap-1 xl:gap-2 p-2 lg:p-0 xl:p-2 rounded-lg">
-                                        <item.icon className="w-4 h-4 text-blue-700" />
-                                        <p className="text-base whitespace-nowrap">{item.label}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                <p className="text-base ml-4 lg:ml-0">Which courses are you looking for?</p>
+                <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16">
+                  {[
+                    { icon: Home, label: "Engineering" },
+                    { icon: Briefcase, label: "Medical" },
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 lg:gap-1 xl:gap-2 p-2 lg:p-0 xl:p-2 rounded-lg"
+                    >
+                      <item.icon className="w-4 h-4 text-blue-700" />
+                      <p className="text-base whitespace-nowrap">{item.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
@@ -204,9 +304,10 @@ const Hero = () => {
                   <label className="text-gray-400 text-sm">Type</label>
                   <select className="text-black outline-none rounded-xl w-full">
                     <option>All</option>
-                    {Array.isArray(accommodationOptions) && accommodationOptions.map(accommodation => (
-                      <option key={index}>{item.name}</option>
-                    ))}
+                    {Array.isArray(accommodationOptions) &&
+                      accommodationOptions.map((accommodation, index) => (
+                        <option key={index}>{accommodation.name}</option>
+                      ))}
                   </select>
                 </div>
                 <div className="flex flex-col w-full md:w-1/5 border-b md:border-b-0 md:border-r lg:px-2 px-1 pb-2 md:pb-0">
@@ -239,17 +340,25 @@ const Hero = () => {
                   </button>
                 </div>
               </div>
+              {/* Selected Filters */}
+              {renderSelectedFilters()}
               <div className="mt-2 ml-2 lg:flex items-center">
-                            <p className="text-base ml-4 lg:ml-0">What are you looking for:</p>
-                            <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16">
-                                {[{ icon: Home, label: "House" }, { icon: Briefcase, label: "Accommodation" }].map((item, index) => (
-                                    <div key={index} className="flex items-center gap-2 lg:gap-1 xl:gap-2 p-2 lg:p-0 xl:p-2 rounded-lg">
-                                        <item.icon className="w-4 h-4 text-blue-700" />
-                                        <p className="text-base whitespace-nowrap">{item.label}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+                <p className="text-base ml-4 lg:ml-0">What are you looking for:</p>
+                <div className="flex gap-2 lg:gap-1 xl:gap-2 overflow-x-auto scrollbar-hide pr-16">
+                  {[
+                    { icon: Home, label: "House" },
+                    { icon: Briefcase, label: "Accommodation" },
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-2 lg:gap-1 xl:gap-2 p-2 lg:p-0 xl:p-2 rounded-lg"
+                    >
+                      <item.icon className="w-4 h-4 text-blue-700" />
+                      <p className="text-base whitespace-nowrap">{item.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -268,24 +377,37 @@ const Hero = () => {
           />
         ))}
       </div>
+
       {/* Modal for Advanced Filters */}
-      
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl max-h-[600px] overflow-y-auto no-scrollbar">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl max-h-[500px] overflow-y-auto no-scrollbar">
             <h2 className="text-xl font-bold mb-4">Advanced Filters</h2>
             {activeTab === "college" && (
               <div className="space-y-4">
                 <div>
                   <label className="block text-gray-700">Location:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.location}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("location", e.target.value)
+                    }
+                  >
+                    <option value="">Select Location</option>
                     <option>City/State Selection</option>
-                    {/* Add more options as needed */}
                   </select>
                 </div>
                 <div>
                   <label className="block text-gray-700">Admission Criteria:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.admissionCriteria}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("admissionCriteria", e.target.value)
+                    }
+                  >
+                    <option value="">Select Admission Criteria</option>
                     <option>Entrance Exam Based (JEE, NEET, CAT, etc.)</option>
                     <option>Merit-Based</option>
                     <option>Direct Admission</option>
@@ -293,7 +415,14 @@ const Hero = () => {
                 </div>
                 <div>
                   <label className="block text-gray-700">Fees Range:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.feesRange}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("feesRange", e.target.value)
+                    }
+                  >
+                    <option value="">Select Fees Range</option>
                     <option>Less than ₹50,000</option>
                     <option>₹50,000 - ₹1,00,000</option>
                     <option>₹1,00,000 - ₹5,00,000</option>
@@ -303,31 +432,40 @@ const Hero = () => {
                 <div>
                   <label className="block text-gray-700">Facilities & Infrastructure:</label>
                   <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      Hostel Availability
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      Library & Labs
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      Sports Complex
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      Wi-Fi Campus
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      Placement Support
-                    </label>
+                    {[
+                      "Hostel Availability",
+                      "Library & Labs",
+                      "Sports Complex",
+                      "Wi-Fi Campus",
+                      "Placement Support",
+                    ].map((facility) => (
+                      <label key={facility} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={collegeFilters.facilities.includes(facility)}
+                          onChange={(e) => {
+                            const updatedFacilities = e.target.checked
+                              ? [...collegeFilters.facilities, facility]
+                              : collegeFilters.facilities.filter((f) => f !== facility);
+                            handleCollegeFilterChange("facilities", updatedFacilities);
+                          }}
+                          className="mr-2"
+                        />
+                        {facility}
+                      </label>
+                    ))}
                   </div>
                 </div>
                 <div>
                   <label className="block text-gray-700">Placement & Packages:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.placement}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("placement", e.target.value)
+                    }
+                  >
+                    <option value="">Select Placement Option</option>
                     <option>Highest Package Offered</option>
                     <option>Average Package</option>
                     <option>Top Recruiters</option>
@@ -335,7 +473,14 @@ const Hero = () => {
                 </div>
                 <div>
                   <label className="block text-gray-700">Scholarship & Financial Aid:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.scholarship}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("scholarship", e.target.value)
+                    }
+                  >
+                    <option value="">Select Scholarship Option</option>
                     <option>Merit-Based Scholarships</option>
                     <option>Need-Based Scholarships</option>
                     <option>Government Scholarships</option>
@@ -343,14 +488,28 @@ const Hero = () => {
                 </div>
                 <div>
                   <label className="block text-gray-700">College Ranking & Reviews:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.ranking}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("ranking", e.target.value)
+                    }
+                  >
+                    <option value="">Select Ranking Option</option>
                     <option>NIRF Ranking</option>
                     <option>Student Ratings</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-gray-700">Courses Offered:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.courses}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("courses", e.target.value)
+                    }
+                  >
+                    <option value="">Select Course</option>
                     <option>Engineering (B.Tech, M.Tech, etc.)</option>
                     <option>Management (MBA, BBA, etc.)</option>
                     <option>Medical (MBBS, BDS, Nursing, etc.)</option>
@@ -363,7 +522,14 @@ const Hero = () => {
                 </div>
                 <div>
                   <label className="block text-gray-700">College Type:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={collegeFilters.collegeType}
+                    onChange={(e) =>
+                      handleCollegeFilterChange("collegeType", e.target.value)
+                    }
+                  >
+                    <option value="">Select College Type</option>
                     <option>Private</option>
                     <option>Government</option>
                     <option>Deemed University</option>
@@ -377,47 +543,61 @@ const Hero = () => {
               <div className="space-y-4">
                 <div>
                   <label className="block text-gray-700">Location:</label>
-                  <select className="w-full p-2 border rounded">
+                  <select
+                    className="w-full p-2 border rounded"
+                    value={accommodationFilters.location}
+                    onChange={(e) =>
+                      handleAccommodationFilterChange("location", e.target.value)
+                    }
+                  >
+                    <option value="">Select Location</option>
                     <option>City/State Selection</option>
-                    {/* Add more options as needed */}
                   </select>
                 </div>
                 <div>
                   <label className="block text-gray-700">Facilities & Infrastructure:</label>
                   <div className="space-y-2">
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      Rating
-                    </label>
-                    <label className="flex items-center">
-                      <input type="checkbox" className="mr-2" />
-                      Room Types
-                    </label>
+                    {["Rating", "Room Types"].map((facility) => (
+                      <label key={facility} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={accommodationFilters.facilities.includes(facility)}
+                          onChange={(e) => {
+                            const updatedFacilities = e.target.checked
+                              ? [...accommodationFilters.facilities, facility]
+                              : accommodationFilters.facilities.filter((f) => f !== facility);
+                            handleAccommodationFilterChange("facilities", updatedFacilities);
+                          }}
+                          className="mr-2"
+                        />
+                        {facility}
+                      </label>
+                    ))}
                   </div>
                 </div>
               </div>
             )}
 
-<div className="mt-6 flex justify-end">
+            <div className="mt-6 flex justify-end space-x-4">
               <button
                 className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-                onClick={closeModal}
-                >
-                  Close
-                </button>
-                <button
-                  className="ml-2 px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
-                  onClick={() => {
-                    // Handle the apply filters logic here
-                    closeModal();
-                  }}
-                >
-                  Apply Filters
-                </button>
-              </div>
+                onClick={clearFilters}
+              >
+                Clear Filters
+              </button>
+              <button
+                className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
+                onClick={() => {
+                  // Handle the apply filters logic here
+                  closeModal();
+                }}
+              >
+                Apply Filters
+              </button>
             </div>
           </div>
-        )}
+        </div>
+      )}
     </div>
   );
 };
