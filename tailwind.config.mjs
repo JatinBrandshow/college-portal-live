@@ -16,5 +16,20 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addComponents }) {
+      addComponents({
+        '.scrollbar-hidden': {
+          '&::-webkit-scrollbar': {
+            display: 'none',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: 'transparent',
+          },
+          '-ms-overflow-style': 'none',  // For Internet Explorer
+          'scrollbar-width': 'none',  // For Firefox
+        },
+      });
+    },
+  ],
 };
