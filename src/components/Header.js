@@ -1,16 +1,16 @@
-'use client';
+"use client";
+import React, { useState, useEffect } from "react";
+import { FiMenu, FiX } from "react-icons/fi";
+import Link from "next/link";
+import SearchBar from "@/components/SearchBar";
 
-import React, { useState, useEffect } from 'react';
-import { FiMenu, FiX } from 'react-icons/fi';
-import Link from 'next/link';
-
-const Header = () => {
+const Header = ({ showSearchBar = false }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
+    const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
     }
@@ -18,28 +18,46 @@ const Header = () => {
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
     setDropdownOpen(false);
   };
 
   return (
     <header className="bg-gradient-to-r from-violet-900 via-violet-700 to-violet-500 shadow-lg">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <a href="/" className="text-white text-3xl font-bold tracking-wide hover:opacity-90">
+        <a
+          href="/"
+          className="text-white text-3xl font-bold tracking-wide hover:opacity-90"
+        >
           Admi<span className="text-yellow-400">Stay</span>
         </a>
 
+        {/* Conditionally render the SearchBar */}
+        {showSearchBar && <SearchBar />}
+
         <nav className="hidden md:flex space-x-8">
-          <a href="/" className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300">
+          <a
+            href="/"
+            className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300"
+          >
             Home
           </a>
-          <a href="/about" className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300">
+          <a
+            href="/about"
+            className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300"
+          >
             About
           </a>
-          <a href="/program" className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300">
+          <a
+            href="/program"
+            className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300"
+          >
             Programs
           </a>
-          <a href="/contact" className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300">
+          <a
+            href="/contact"
+            className="text-white text-lg py-2 hover:text-yellow-400 transition duration-300"
+          >
             Contact
           </a>
 

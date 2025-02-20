@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Header from '@/components/Header';
-import SearchBar from '@/components/Searchbar';
 import AboutSection from '@/components/AboutSection';
 import ProgramsSection from '@/components/ProgramsSection';
 import EventsSection from '@/components/EventsSection';
@@ -24,7 +23,6 @@ const HomePage = () => {
     <div>
       <Header />
       <Hero />
-      {/* <SearchBar /> */}
       {/* <AboutSection /> */}
       <PopularCities />
       <PopularColleges />
