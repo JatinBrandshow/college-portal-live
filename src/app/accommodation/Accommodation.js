@@ -1,34 +1,72 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import { Search, Sliders, Home, Briefcase, X } from "lucide-react";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import Select from "react-select"; // For multi-select dropdown
 import Slider from "rc-slider"; // For budget range slider
 import "rc-slider/assets/index.css"; // Slider styles
 import { API_NODE_URL, API_KEY } from "../../../config/config";
+import dynamic from "next/dynamic";
+import { useMap } from "react-leaflet";
 
-// Custom hook to update map center & zoom dynamically
+
+
+// Dynamically import MapContainer and related components with SSR disabled
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+const Marker = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Marker),
+  { ssr: false }
+);
+const Popup = dynamic(
+  () => import("react-leaflet").then((mod) => mod.Popup),
+  { ssr: false }
+);
+
+
+// 📌 Custom hook to update map center & zoom dynamically
 const MapUpdater = ({ position }) => {
   const map = useMap();
+
   useEffect(() => {
-    if (position) {
-      map.flyTo(position, 13, { duration: 1.5 }); // Smooth zoom transition
-    }
-  }, [position, map]);
+    if (!map) return;
+
+    map.invalidateSize(); // Fixes issues with dynamic loading
+    map.flyTo(position, 13, { animate: true });
+  }, [map, position]);
+
   return null;
 };
 
-// Custom marker icon with ping effect
-const customMarker = new L.Icon({
-  iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg",
-  iconSize: [16, 16],
-  className: "ping-marker", // Apply ping effect
-});
-
+// 📌 Main Map Component
 const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
+  const [L, setLeaflet] = useState(null);
+  const [customMarker, setCustomMarker] = useState(null);
+
+  // 📌 Load Leaflet library on client-side only
+  useEffect(() => {
+    import("leaflet").then((leaflet) => {
+      setLeaflet(leaflet);
+      setCustomMarker(
+        new leaflet.Icon({
+          iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg",
+          iconSize: [16, 16],
+          className: "ping-marker", // Apply ping effect
+        })
+      );
+    });
+  }, []);
+
+  if (!L || !customMarker) return <p>Loading map...</p>; // Ensure Leaflet is loaded before rendering
+
+  // 📌 Default location for the map
   const defaultLocation = [28.679079, 77.069710]; // Default to India
   const hoveredAccommodation = accommodations.find(
     (acc) => acc._id === hoveredAccommodationId
@@ -48,9 +86,11 @@ const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
         className="w-full h-full"
       >
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        {/* 📌 Update map position smoothly */}
         <MapUpdater position={position} />
 
-        {/* Loop through all accommodations to display markers with name and price */}
+        {/* 📌 Loop through accommodations to display markers */}
         {accommodations.map((accommodation) => (
           <Marker
             key={accommodation._id}
