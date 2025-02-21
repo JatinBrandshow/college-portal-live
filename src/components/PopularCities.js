@@ -2,20 +2,22 @@
 
 import { useEffect, useState, useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { API_NODE_URL, API_KEY } from "../../config/config";
 
 const PopularCities = () => {
-  const [citiesData, setCitiesData] = useState([]);
+  const [accommodations, setAccommodations] = useState([]);
   const [cities, setCities] = useState([]);
   const [activeCity, setActiveCity] = useState("All");
   const scrollRef = useRef(null);
   const [showLeftButton, setShowLeftButton] = useState(false);
   const [showRightButton, setShowRightButton] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchCities = async () => {
+    const fetchAccommodations = async () => {
       try {
-        const response = await fetch(`${API_NODE_URL}popularCity/cities`, {
+        const response = await fetch(`${API_NODE_URL}accommodation/all-accommodations`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
@@ -23,23 +25,23 @@ const PopularCities = () => {
         });
 
         const text = await response.text();
-
         const data = JSON.parse(text);
 
         if (Array.isArray(data.data)) {
-          setCitiesData(data.data);
+          setAccommodations(data.data);
 
-          const uniqueCities = ["All", ...new Set(data.data.map((city) => city.name))];
+          // Extract unique cities from accommodations
+          const uniqueCities = ["All", ...new Set(data.data.map((acc) => acc.location.city))];
           setCities(uniqueCities);
         } else {
           console.error("Unexpected API response structure:", data);
         }
       } catch (error) {
-        console.error("Error fetching cities:", error);
+        console.error("Error fetching accommodations:", error);
       }
     };
 
-    fetchCities();
+    fetchAccommodations();
   }, []);
 
   useEffect(() => {
@@ -66,13 +68,17 @@ const PopularCities = () => {
     }
   };
 
-  const filteredCities = activeCity === "All"
-    ? citiesData
-    : citiesData.filter((city) => city.name === activeCity);
+  const handleCityClick = (city) => {
+    router.push(`/accommodation?location=${city}`);
+  };
 
-  const firstRowCount = Math.min(9, Math.ceil(filteredCities.length / 2));
-  const firstRow = filteredCities.slice(0, firstRowCount);
-  const secondRow = filteredCities.slice(firstRowCount);
+  const filteredAccommodations = activeCity === "All"
+    ? accommodations
+    : accommodations.filter((acc) => acc.location.city === activeCity);
+
+  const firstRowCount = Math.min(9, Math.ceil(filteredAccommodations.length / 2));
+  const firstRow = filteredAccommodations.slice(0, firstRowCount);
+  const secondRow = filteredAccommodations.slice(firstRowCount);
 
   return (
     <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative max-md:px-5 max-sm:px-3 max-md:py-5 max-sm:py-3 max-lg:my-8 max-md:my-6 max-sm:my-4">
@@ -111,17 +117,18 @@ const PopularCities = () => {
           <div className="flex flex-col gap-4 w-max max-sm:gap-2.5 max-md:gap-3 max-sm:grid max-sm:grid-cols-2">
             {/* First Row */}
             <div className="flex gap-4">
-              {firstRow.map((city) => (
+              {firstRow.map((acc) => (
                 <div
-                  key={city._id}
+                  key={acc._id}
                   className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
+                  onClick={() => handleCityClick(acc.location.city)}
                 >
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${city.img})` }}
+                    style={{ backgroundImage: `url(${acc.location.city_img?.[0]})` }}
                   ></div>
                   <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{city.name}</p>
+                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{acc.location.city}</p>
                   </div>
                 </div>
               ))}
@@ -129,17 +136,18 @@ const PopularCities = () => {
 
             {/* Second Row */}
             <div className="flex gap-4">
-              {secondRow.map((city) => (
+              {secondRow.map((acc) => (
                 <div
-                  key={city._id}
+                  key={acc._id}
                   className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
+                  onClick={() => handleCityClick(acc.location.city)}
                 >
                   <div
                     className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${city.img})` }}
+                    style={{ backgroundImage: `url(${acc.location.city_img?.[0]})` }}
                   ></div>
                   <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{city.name}</p>
+                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{acc.location.city}</p>
                   </div>
                 </div>
               ))}
