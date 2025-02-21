@@ -54,18 +54,18 @@ const OurTestimonial = () => {
   return (
     <section className="bg-violet-50 py-16 px-4">
       <div className="text-center mb-10">
-        <h2 className="text-xl font-semibold text-[#8070dd]">Our Testimonial</h2>
-        <p className="text-4xl text-black font-bold mt-4">What's People Say's</p>
-        <p className="text-gray-500 mt-2 max-w-3xl mx-auto">
-          <span className="font-semibold">Don’t Just Take Our Word for It – Read Reviews </span>
+        <h2 className="text-xl font-semibold text-[#8070dd] max-md:text-lg max-sm:text-base">Our Testimonial</h2>
+        <p className="text-4xl text-black font-bold mt-4 max-lg:text-3xl max-md:text-2xl max-sm:text-xl">What's People Say's</p>
+        <p className="text-base text-gray-500 mt-2 max-w-3xl mx-auto max-sm:text-sm">
+          <span className="text-base font-semibold max-sm:text-sm">Don’t Just Take Our Word for It – Read Reviews </span>
           From Students and Parents Who Successfully Used College Portal to Choose the Right Institution and Accommodation!
         </p>
       </div>
 
       <div className="relative flex flex-col justify-center">
-        {testimonials.length > 0 ? ( // ✅ Ensure Swiper renders only when testimonials exist
+        {testimonials.length > 0 ? (
           <Swiper
-            key={testimonials.length} // ✅ Forces Swiper to re-render when testimonials change
+            key={testimonials.length}
             slidesPerView={1}
             spaceBetween={10}
             breakpoints={{
@@ -81,20 +81,18 @@ const OurTestimonial = () => {
               delay: 5000,
               disableOnInteraction: false,
             }}
-            pagination={{ clickable: true }} // ✅ Removed 'el' to ensure correct behavior
+            // pagination={{ clickable: true }}
             modules={[Autoplay, Pagination]}
             className="w-full max-w-8xl"
           >
             {testimonials.map((testimonial) => (
               <SwiperSlide key={testimonial.id} className="flex justify-center">
-                <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-[350px] min-h-[350px] border border-gray-200 hover:shadow-xl hover:scale-105 transition duration-300 flex flex-col justify-between">
-                  {/* Quotation Mark */}
-                  <div className="relative text-[#8070dd] text-5xl font-bold opacity-100">
+                <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-[350px] min-h-[350px] border border-gray-200 hover:shadow-xl hover:scale-105 transition duration-300 flex flex-col justify-between max-md:p-5 max-sm:p-4 max-sm:min-h-64">
+                  <div className="relative text-[#8070dd] text-5xl font-bold opacity-100 max-md:text-4xl max-sm:text-3xl">
                     <BiSolidQuoteAltLeft />
                   </div>
 
-                  {/* Testimonial Text with Overflow Hidden */}
-                  <p className="text-gray-700 italic mb-6 line-clamp-4 overflow-hidden">
+                  <p className="text-base text-gray-700 italic mb-6 line-clamp-4 overflow-hidden max-lg:mb-5 max-md:mb-4 max-sm:mb-3 max-sm:text-sm">
                     {testimonial.text}
                   </p>
 
@@ -107,7 +105,6 @@ const OurTestimonial = () => {
                     <div>
                       <h4 className="text-lg font-semibold text-gray-800">{testimonial.name}</h4>
                       <p className="text-sm text-gray-500">{testimonial.role}</p>
-                      {/* Star Rating */}
                       <div className="mt-2 text-yellow-500 flex justify-left gap-1">
                         {[...Array(testimonial.rating)].map((_, i) => (
                           <svg

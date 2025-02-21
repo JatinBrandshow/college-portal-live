@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, Sliders, Home, Briefcase, X } from "lucide-react";
 import "leaflet/dist/leaflet.css";
@@ -9,8 +9,6 @@ import "rc-slider/assets/index.css"; // Slider styles
 import { API_NODE_URL, API_KEY } from "../../../config/config";
 import dynamic from "next/dynamic";
 import { useMap } from "react-leaflet";
-
-
 
 // Dynamically import MapContainer and related components with SSR disabled
 const MapContainer = dynamic(
@@ -29,7 +27,6 @@ const Popup = dynamic(
   () => import("react-leaflet").then((mod) => mod.Popup),
   { ssr: false }
 );
-
 
 // 📌 Custom hook to update map center & zoom dynamically
 const MapUpdater = ({ position }) => {
@@ -95,7 +92,7 @@ const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
           <Marker
             key={accommodation._id}
             position={[
-              accommodation.location.latitude,
+              accommodation.location.latitude ,
               accommodation.location.longitude,
             ]}
             icon={customMarker}
@@ -113,7 +110,7 @@ const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
             <Popup>
               <div className="text-center">
                 <p className="font-semibold">{accommodation.name}</p>
-                <p className="text-black">₹{accommodation.price}</p>
+                <p className="text-black">₹{accommodation.pricing.minPrice}/month</p>
               </div>
             </Popup>
           </Marker>
@@ -123,13 +120,14 @@ const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
   );
 };
 
+// 📌 Main Accommodation Component
 const Accommodation = () => {
   const searchParams = useSearchParams();
   const [accommodations, setAccommodations] = useState([]);
   const [filters, setFilters] = useState({
     location: searchParams.get("location") || "",
     facilities: searchParams.get("facilities")?.split(",") || [],
-    budget: [0, 10000], // Budget range (low, high)
+    budget: [0, 100000], // Budget range (low, high)
     roomType: searchParams.get("roomType") || "",
   });
   const [hoveredAccommodationId, setHoveredAccommodationId] = useState(null);
@@ -199,7 +197,7 @@ const Accommodation = () => {
     setFilters({
       location: "",
       facilities: [],
-      budget: [0, 10000],
+      budget: [0, 100000],
       roomType: "",
     });
   };
@@ -216,8 +214,8 @@ const Accommodation = () => {
       : true;
 
     const matchesBudget =
-      accommodation.price >= filters.budget[0] &&
-      accommodation.price <= filters.budget[1];
+      accommodation.pricing.minPrice >= filters.budget[0] &&
+      accommodation.pricing.maxPrice <= filters.budget[1];
 
     const matchesFacilities = filters.facilities.length
       ? filters.facilities.every((facility) =>
@@ -226,9 +224,7 @@ const Accommodation = () => {
       : true;
 
     const matchesRoomType = filters.roomType
-      ? accommodation.room_options.some(
-          (option) => option.room_type === filters.roomType
-        )
+      ? accommodation.meta.availableType.includes(filters.roomType)
       : true;
 
     return (
@@ -238,17 +234,16 @@ const Accommodation = () => {
 
   // Facilities options for multi-select dropdown
   const facilitiesOptions = [
-    { value: "Wi-Fi", label: "Wi-Fi" },
-    { value: "24/7 Reception", label: "24/7 Reception" },
-    { value: "Security", label: "Security" },
-    { value: "Power Backup", label: "Power Backup" },
+    { value: "Gym", label: "Gym" },
+    { value: "WiFi", label: "WiFi" },
+    { value: "Pool", label: "Pool" },
+    { value: "Laundry", label: "Laundry" },
   ];
 
   // Room type options for dropdown
   const roomTypeOptions = [
-    { value: "Single Room", label: "Single Room" },
-    { value: "Double Room", label: "Double Room" },
-    { value: "Shared Room", label: "Shared Room" },
+    { value: "private room", label: "Private Room" },
+    { value: "entire place", label: "Entire Place" },
   ];
 
   return (
@@ -322,7 +317,7 @@ const Accommodation = () => {
             <Slider
               range
               min={0}
-              max={10000}
+              max={100000}
               value={filters.budget}
               onChange={(value) => handleFilterChange("budget", value)}
               className="w-full"
@@ -367,7 +362,7 @@ const Accommodation = () => {
               <Slider
                 range
                 min={0}
-                max={10000}
+                max={100000}
                 value={filters.budget}
                 onChange={(value) => handleFilterChange("budget", value)}
                 className="w-full"
@@ -390,7 +385,7 @@ const Accommodation = () => {
                         value: facility,
                         label: facility,
                       }))
-                    : [{ value: "All Facilities", label: "All Facilities" }]
+                    : []
                 }
                 onChange={(selectedOptions) =>
                   handleFilterChange(
@@ -453,7 +448,7 @@ const Accommodation = () => {
                 <div className="w-full md:w-1/3">
                   <img
                     src={
-                      accommodation.images[0]?.url || "/placeholder-image.jpg"
+                      accommodation.meta.images[0] || "/placeholder-image.jpg"
                     }
                     alt={accommodation.name}
                     className="w-full h-72 object-cover rounded-lg"
@@ -465,7 +460,8 @@ const Accommodation = () => {
                   <div>
                     <h2 className="text-xl font-semibold">{accommodation.name}</h2>
                     <p className="text-gray-600 mt-1">
-                      {accommodation.location.address},{" "}
+                      {accommodation.location.streetNumber} {accommodation.location.route},{" "}
+                      {accommodation.location.locality},{" "}
                       {accommodation.location.city},{" "}
                       {accommodation.location.state},{" "}
                       {accommodation.location.country}
@@ -495,12 +491,12 @@ const Accommodation = () => {
                     <div className="mt-3">
                       <h3 className="text-lg font-semibold">Room Options:</h3>
                       <div className="flex flex-wrap gap-2 mt-1">
-                        {accommodation.room_options.map((option, index) => (
+                        {accommodation.meta.availableType.map((option, index) => (
                           <span
                             key={index}
                             className="bg-violet-100 text-violet-700 px-3 py-1 text-sm rounded-full"
                           >
-                            {option.room_type} - ₹{option.price_per_week}/month
+                            {option}
                           </span>
                         ))}
                       </div>
@@ -510,7 +506,7 @@ const Accommodation = () => {
                   {/* Price & Enquiry Button */}
                   <div className="mt-4 flex justify-between items-center">
                     <p className="text-lg font-semibold">
-                      Starting from ₹{accommodation.price}/month
+                      Starting from ₹{accommodation.pricing.minPrice}/month
                     </p>
                     <button className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700">
                       Enquire
@@ -538,4 +534,11 @@ const Accommodation = () => {
   );
 };
 
-export default Accommodation;
+// 📌 Wrap the Accommodation component in Suspense
+export default function AccommodationPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <Accommodation />
+    </Suspense>
+  );
+}
