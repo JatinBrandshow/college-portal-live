@@ -35,7 +35,6 @@ const Hero = () => {
 
   const [accommodationFilters, setAccommodationFilters] = useState({
     location: "",
-    facilities: [],
   });
 
   // Fetch Colleges API
@@ -596,25 +595,7 @@ const Hero = () => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-700">Facilities & Infrastructure:</label>
-                  <div className="space-y-2">
-                    {["Rating", "Room Types"].map((facility) => (
-                      <label key={facility} className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={accommodationFilters.facilities.includes(facility)}
-                          onChange={(e) => {
-                            const updatedFacilities = e.target.checked
-                              ? [...accommodationFilters.facilities, facility]
-                              : accommodationFilters.facilities.filter((f) => f !== facility);
-                            handleAccommodationFilterChange("facilities", updatedFacilities);
-                          }}
-                          className="mr-2"
-                        />
-                        {facility}
-                      </label>
-                    ))}
-                  </div>
+                  
                 </div>
               </div>
             )}
