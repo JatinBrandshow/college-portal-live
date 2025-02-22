@@ -57,7 +57,7 @@ const MapComponent = ({ college }) => {
     const position = [college.location.latitude, college.location.longitude];
   
     return (
-      <div className="h-[600px] bg-gray-200 rounded-lg relative">
+      <div className="h-[300px] lg:h-[600px] bg-gray-200 rounded-lg relative">
         <MapContainer center={position} zoom={13} className="w-full h-full">
           {/* 📌 OpenStreetMap Tile Layer */}
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -153,12 +153,12 @@ const CollegePages = ({ id }) => {
   }
 
   return (
-    <div className="p-6">
-    <h1 className="text-4xl font-bold mb-6 mt-2 text-center">{collegeDetails.name}</h1>
+    <div className="p-2 lg:p-6">
+    <h1 className="text-2xl md:text-4xl font-bold mb-6 mt-2 text-center">{collegeDetails.name}</h1>
   
     {/* College Details and Map Section */}
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-    <div className="lg:col-span-2 bg-white p-8 rounded-xl shadow-lg border border-gray-200">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-0">
+    <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-2">
   {/* College Image */}
   <div className="w-full mb-8">
     <img
@@ -172,20 +172,20 @@ const CollegePages = ({ id }) => {
   <div>
     {/* About College */}
     <div className="mb-8">
-      <h2 className="text-3xl font-semibold text-gray-800 mb-4">About {collegeDetails.name}</h2>
-      <p className="text-lg text-gray-700">{collegeDetails.description}</p>
+      <h2 className="text-base lg:text-3xl font-semibold text-gray-800 mb-4">About {collegeDetails.name}</h2>
+      <p className="text-sm md:text-lg text-gray-700">{collegeDetails.description}</p>
     </div>
 
     {/* Established Year */}
     <div className="grid grid-cols-2 gap-6 mb-6">
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">Established Year</h3>
+        <h3 className="text-base md:text-lg font-semibold text-gray-800">Established Year</h3>
         <p className="text-gray-600">{collegeDetails.established_year}</p>
       </div>
 
       {/* Affiliation */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">Affiliation</h3>
+        <h3 className="text-base md:text-lg font-semibold text-gray-800">Affiliation</h3>
         <p className="text-gray-600">{collegeDetails.affiliation}</p>
       </div>
     </div>
@@ -193,26 +193,26 @@ const CollegePages = ({ id }) => {
     {/* College Type */}
     <div className="grid grid-cols-2 gap-6 mb-6">
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">College Type</h3>
+        <h3 className="text-base md:text-lg font-semibold text-gray-800">College Type</h3>
         <p className="text-gray-600">{collegeDetails.college_type}</p>
       </div>
 
       {/* Address */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">Address</h3>
+        <h3 className="text-base md:text-lg font-semibold text-gray-800">Address</h3>
         <p className="text-gray-600">{collegeDetails.address}</p>
       </div>
     </div>
 
     {/* Location */}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800">Location</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-800">Location</h3>
       <p className="text-gray-600">{collegeDetails.city}, {collegeDetails.state}, {collegeDetails.country}</p>
     </div>
 
     {/* Contact Information */}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800">Contact</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-800">Contact</h3>
       <p className="text-gray-600">Phone: <span className="font-semibold">{collegeDetails.contact_number}</span></p>
       <p className="text-gray-600">Email: <a href={`mailto:${collegeDetails.email}`} className="text-blue-600 hover:text-blue-800">{collegeDetails.email}</a></p>
       <p className="text-gray-600">Website: <a href={collegeDetails.website} className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">{collegeDetails.website}</a></p>
@@ -220,12 +220,12 @@ const CollegePages = ({ id }) => {
 
     {/* Courses Offered */}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800">Courses Offered</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-800">Courses Offered</h3>
       <div className="flex flex-wrap gap-4 mt-2">
         {collegeDetails.courses_offered.map((course, index) => (
           <span
             key={index}
-            className="bg-blue-100 text-blue-700 px-4 py-2 text-sm rounded-full"
+            className="bg-blue-100 text-blue-700 px-4 py-2 text-sm md:text-base rounded-full"
           >
             {course}
           </span>
@@ -235,26 +235,26 @@ const CollegePages = ({ id }) => {
 
     {/* Placement Details */}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800">Placement Details</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-800">Placement Details</h3>
       <p className="text-gray-600">Highest Package: ₹{collegeDetails.placement_details.highest_package}</p>
       <p className="text-gray-600">Average Package: ₹{collegeDetails.placement_details.avg_package}</p>
     </div>
 
     {/* Scholarship Details */}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800">Scholarship Details</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-800">Scholarship Details</h3>
       <p className="text-gray-600">{collegeDetails.scholarship_details}</p>
     </div>
 
     {/* Hostel Availability */}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800">Hostel Availability</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-800">Hostel Availability</h3>
       <p className="text-gray-600">{collegeDetails.hostel_availability ? 'Available' : 'Not Available'}</p>
     </div>
 
     {/* Ranking */}
     <div className="mb-6">
-      <h3 className="text-lg font-semibold text-gray-800">Ranking</h3>
+      <h3 className="text-base md:text-lg font-semibold text-gray-800">Ranking</h3>
       <p className="text-gray-600">{collegeDetails.ranking}</p>
     </div>
   </div>
