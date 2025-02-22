@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { X } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import Select from "react-select"; // For multi-select dropdown
@@ -34,57 +34,59 @@ const MapUpdater = ({ position }) => {
 
 // 📌 Main Map Component for Colleges
 const MapComponent = ({ college }) => {
-  const [L, setLeaflet] = useState(null);
-  const [customMarker, setCustomMarker] = useState(null);
-
-  // 📌 Load Leaflet library on client-side only
-  useEffect(() => {
-    import("leaflet").then((leaflet) => {
-      setLeaflet(leaflet);
-      setCustomMarker(
-        new leaflet.Icon({
-          iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg", // Custom icon URL
-          iconSize: [25, 25], // Adjust the size of the marker
-          className: "ping-marker", // Apply ping effect
-        })
-      );
-    });
-  }, []);
-
-  if (!L || !customMarker) return <p>Loading map...</p>; // Ensure Leaflet is loaded before rendering
-
-  // 📌 Default location for the map based on college's latitude and longitude
-  const position = [college.location.latitude, college.location.longitude];
-
-  return (
-    <div className="h-[600px] bg-gray-200 rounded-lg relative">
-      <MapContainer center={position} zoom={13} className="w-full h-full">
-        {/* 📌 OpenStreetMap Tile Layer */}
-        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-
-        {/* 📌 Update map position smoothly */}
-        <MapUpdater position={position} />
-
-        {/* 📌 Display marker for the college */}
-        <Marker position={position} icon={customMarker}
-        >
-          <Popup>
-            <div className="text-center">
-              <p className="font-semibold">{college.name}</p>
-              {/* Optionally add more details like fees or ranking */}
-              {/* <p className="text-black">₹{college.fees.perYear}/year</p> */}
-              <p>{college.city}, {college.state}</p>
-            </div>
-          </Popup>
-        </Marker>
-      </MapContainer>
-    </div>
-  );
-};
-
-
-
-
+    const [L, setLeaflet] = useState(null);
+    const [customMarker, setCustomMarker] = useState(null);
+  
+    // 📌 Load Leaflet library on client-side only
+    useEffect(() => {
+      import("leaflet").then((leaflet) => {
+        setLeaflet(leaflet);
+        setCustomMarker(
+          new leaflet.Icon({
+            iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg", // Custom icon URL
+            iconSize: [25, 25], // Adjust the size of the marker
+            className: "ping-marker", // Apply ping effect
+          })
+        );
+      });
+    }, []);
+  
+    if (!L || !customMarker) return <p>Loading map...</p>; // Ensure Leaflet is loaded before rendering
+  
+    // 📌 Default location for the map based on college's latitude and longitude
+    const position = [college.location.latitude, college.location.longitude];
+  
+    return (
+      <div className="h-[600px] bg-gray-200 rounded-lg relative">
+        <MapContainer center={position} zoom={13} className="w-full h-full">
+          {/* 📌 OpenStreetMap Tile Layer */}
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+  
+          {/* 📌 Update map position smoothly */}
+          <MapUpdater position={position} />
+  
+          {/* 📌 Display marker for the college */}
+          <Marker
+            position={position}
+            icon={customMarker}
+            eventHandlers={{
+              add: (e) => {
+                // Open the popup as soon as the marker is added to the map
+                e.target.openPopup();
+              },
+            }}
+          >
+            <Popup autoClose={false} closeOnClick={false}>
+              <div className="text-center">
+                <p className="font-semibold">{college.name}</p>
+                <p>{college.city}, {college.state}</p>
+              </div>
+            </Popup>
+          </Marker>
+        </MapContainer>
+      </div>
+    );
+  };
 
 
 const CollegePages = ({ id }) => {
