@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { API_NODE_URL, API_KEY } from "../../config/config"
+import Link from "next/link" // Import the Link component
 
 const PopularColleges = () => {
   const [colleges, setColleges] = useState([])
@@ -105,36 +106,38 @@ const PopularColleges = () => {
             {/* First Row */}
             <div className="flex gap-4">
               {firstRow.map((college) => (
-                <div
-                  key={college._id}
-                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
-                >
+                <Link key={college._id} href={`/collegepages/${college._id}`} passHref>
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${college.img[0]})` }}
-                  ></div>
-                  <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{college.name}</p>
+                    className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
+                  >
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
+                      style={{ backgroundImage: `url(${college.img[0]})` }}
+                    ></div>
+                    <div className="absolute flex items-end p-2 bottom-0">
+                      <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{college.name}</p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
             {/* Second Row */}
             <div className="flex gap-4">
               {secondRow.map((college) => (
-                <div
-                  key={college._id}
-                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
-                >
+                <Link key={college._id} href={`/collegepages/${college._id}`} passHref>
                   <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${college.img[0]})` }}
-                  ></div>
-                  <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{college.name}</p>
+                    className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
+                  >
+                    <div
+                      className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
+                      style={{ backgroundImage: `url(${college.img[0]})` }}
+                    ></div>
+                    <div className="absolute flex items-end p-2 bottom-0">
+                      <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{college.name}</p>
+                    </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

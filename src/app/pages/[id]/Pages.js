@@ -1,214 +1,265 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import img1 from '../../../../public/image/pages/img1.avif';
 import img2 from '../../../../public/image/pages/img2.avif';
 import Image from 'next/image';
-const Pages = () => {
-    const images = [
-        img1, img2, img1
-    ];
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const goToPreviousBtn = () => {
-        setCurrentIndex((previndex) => previndex === 0 ? images.length - 1 : previndex - 1);
+import { API_NODE_URL, API_KEY } from "../../../../config/config";
+
+const Pages = ({ id }) => {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [property, setProperty] = useState(null);
+
+  // Static data
+  const images = [img1, img2, img1];
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const goToPreviousBtn = () => {
+    setCurrentIndex((previndex) => (previndex === 0 ? images.length - 1 : previndex - 1));
+  };
+  const goToNextBtn = () => {
+    setCurrentIndex((previndex) => (previndex + 1) % images.length);
+  };
+
+  const [openIndex, setOpenIndex] = useState(null);
+  const toggleAccordion = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const [showAll, setShowAll] = useState(false);
+  const offers = [
+    "Snag £200 Cashback On Select Rooms!",
+    "Snag £200 Cashback On Select Rooms!",
+    "Exclusive Cashback Of £50 For Referring A Friend On Amber!",
+    "Get An Additional £20 Cashback By Booking Via The Amber App",
+  ];
+  const visibleOffers = showAll ? offers : offers.slice(0, 2);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const propertyInfo =
+    "Strategically positioned for academic convenience, iQ East Court London at 450 Mile End Rd, E1 4GG stands as a preferred choice for student accommodation in London. Offering a variety of room types, providing a wide range of different types of studios so students have an array of options to suit their preferences. Renowned institutions like Queen Mary University of London (Mile End), Queen Mary University (Whitechapel), and Hult International Business School are easily accessible, substantiating why iQ East Court London is a prime choice.";
+
+  const tabs = [
+    {
+      id: "Studio1",
+      label: "Studio 1",
+      title: "Studio One",
+      content: "This is Studio 1 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
+      img: img1,
+      availableFrom: "15 Feb, 2025",
+      price: "389",
+      features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "14 sqm"],
+    },
+    {
+      id: "Studio2",
+      label: "Studio 2",
+      title: "Studio Two",
+      content: "This is Studio 2 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
+      img: img1,
+      availableFrom: "1 Mar, 2025",
+      price: "420",
+      features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "16 sqm"],
+    },
+    {
+      id: "Studio1",
+      label: "Studio 1",
+      title: "Studio One",
+      content: "This is Studio 1 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
+      img: img1,
+      availableFrom: "15 Feb, 2025",
+      price: "389",
+      features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "14 sqm"],
+    },
+    {
+      id: "Studio1",
+      label: "Studio 1",
+      title: "Studio One",
+      content: "This is Studio 1 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
+      img: img1,
+      availableFrom: "15 Feb, 2025",
+      price: "389",
+      features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "14 sqm"],
+    },
+  ];
+  const tenancies = [
+    { id: 1, tabId: "Studio1", duration: "29 weeks", moveIn: "15 Feb, 2025", moveOut: "6 Sept, 2025", price: "389" },
+    { id: 2, tabId: "Studio2", duration: "40 weeks", moveIn: "1 Mar, 2025", moveOut: "10 Dec, 2025", price: "420" },
+    { id: 3, tabId: "Studio2", duration: "52 weeks", moveIn: "15 Apr, 2025", moveOut: "30 Apr, 2026", price: "450" },
+    { id: 4, tabId: "Studio1", duration: "29 weeks", moveIn: "15 Feb, 2025", moveOut: "6 Sept, 2025", price: "389" },
+    { id: 5, tabId: "Studio1", duration: "29 weeks", moveIn: "15 Feb, 2025", moveOut: "6 Sept, 2025", price: "389" },
+  ];
+
+  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const [openAccordion, setOpenAccordion] = useState('Studio1');
+  const [openTenancies, setOpenTenancies] = useState(false);
+  const uniqueTabs = Array.from(new Set(tabs.map((tab) => tab.id))).map((id) => tabs.find((tab) => tab.id === id));
+  const filteredTenancies = tenancies.filter((tenancy) => tenancy.tabId === activeTab);
+
+  const [isAmenitiesModalOpen, setIsAmenitiesModalOpen] = useState(false);
+
+  const faqs = [
+    { question: "Are sites secure at iQ East Court London?", answer: "Instant booking allows you to quickly book the property by paying the amount." },
+    { question: "What payment methods are accepted?", answer: "You can pay via credit card, debit card, and bank transfer." },
+    { question: "Can I cancel my booking?", answer: "Yes, but cancellation policies vary by property. Please check the terms before booking." },
+    { question: "Is Wi-Fi included in the rent?", answer: "Yes, high-speed Wi-Fi is included in the rental price." },
+    { question: "Do I need to pay a deposit?", answer: "Yes, a security deposit is required and refundable upon lease completion." },
+    { question: "Are pets allowed?", answer: "Pets are allowed in select properties. Check the listing details." },
+    { question: "What is the minimum lease period?", answer: "Most properties require a minimum lease of 6 months." },
+    { question: "Do I need to provide any documents for booking?", answer: "Yes, ID proof and income verification may be required." },
+  ];
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [showfaqsAll, setShowfaqsAll] = useState(false);
+  const toggleFAQ = (index) => {
+    setExpandedIndex(expandedIndex === index ? null : index);
+  };
+
+  const [view, setView] = useState("map");
+  const [activeAddressTab, setAddressActiveTab] = useState("addressTab1"); // Default active tab
+
+  const ratings = [
+    { title: "Location", rating: "4.5/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
+    { title: "Staff & Management", rating: "4.0/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
+    { title: "Social Experience", rating: "4.0/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
+    { title: "Amenities", rating: "4.0/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
+  ];
+  const reviews = [
+    {
+      name: "Jacob F",
+      rating: "5.0",
+      text: "I've lived here for two years now and I am yet to encounter anything that can be deemed as a negative. The staff is incredibly helpful and very kind....",
+      images: [img1, img2],
+    },
+    {
+      name: "Vaishnavi V",
+      rating: "5.0",
+      text: "I've stayed here for the past year and I've had one of the best experiences. The rooms are bright, vibrant and of a decent size. The property has excellent facilities...",
+      images: [img1, img2],
+    },
+    {
+      name: "Mavi F",
+      rating: "4.8",
+      text: "It has been a great place to live since moving in. Every place has its issues but honestly, the team helped me when I contacted...",
+      images: [img1, img2],
+    },
+  ];
+
+  const properties = [
+    {
+      id: 1,
+      image: img1,
+      title: "GoBritanya White City Residence",
+      location: "London, England, GB",
+      price: "£495",
+    },
+    {
+      id: 2,
+      image: img2,
+      title: "GoBritanya Lewisham Residence",
+      location: "London, England, GB",
+      price: "£375",
+    },
+    {
+      id: 3,
+      image: img1,
+      title: "Host View Studios, London",
+      location: "London, England, GB",
+      price: "£355",
+    },
+    {
+      id: 4,
+      image: img2,
+      title: "North Lodge, London",
+      location: "London, England, GB",
+      price: "£250",
+    },
+    {
+      id: 5,
+      image: img1,
+      title: "Rahere Court, London",
+      location: "London, England, GB",
+      price: "£325",
+    },
+  ];
+  const [currentPropertiesIndex, setCurrentPropertiesIndex] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(4);
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (window.innerWidth < 1024) {
+        setItemsPerPage(1);
+      } else {
+        setItemsPerPage(4);
+      }
+    };
+    updateItemsPerPage();
+    window.addEventListener("resize", updateItemsPerPage);
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
+  const prevPropertiesSlide = () => {
+    setCurrentPropertiesIndex((prev) => (prev === 0 ? properties.length - itemsPerPage : prev - 1));
+  };
+  const nextPropertiesSlide = () => {
+    setCurrentPropertiesIndex((prev) => (prev >= properties.length - itemsPerPage ? 0 : prev + 1));
+  };
+
+  const mapRef = useRef(null);
+  const scrollToMap = () => {
+    console.log("Button clicked!"); // Debugging log
+    mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  // Fetch property details
+  useEffect(() => {
+    const fetchPropertyDetails = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}accommodation/all-accommodations`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+
+        const text = await response.text();
+        const data = JSON.parse(text);
+        console.log(data);
+
+        if (Array.isArray(data.data)) {
+          const foundProperty = data.data.find((item) => item._id === id);
+          console.log(foundProperty);
+          if (foundProperty) {
+            setProperty(foundProperty); // Set the entire property object
+          } else {
+            setError("Property not found");
+          }
+        } else {
+          setError("Unexpected API response structure");
+        }
+      } catch (error) {
+        setError("Error fetching property details");
+        console.error("Error fetching property details:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      fetchPropertyDetails();
     }
-    const goToNextBtn = () => {
-        setCurrentIndex((previndex) => (previndex + 1) % images.length);
-    }
+  }, [id]);
 
-    const [openIndex, setOpenIndex] = useState(null);
-    const toggleAccordion = (index) => {
-        setOpenIndex(openIndex === index ? null : index);
-    };
+  if (loading) {
+    return <div className="text-center py-10">Loading property details...</div>;
+  }
 
-    const [showAll, setShowAll] = useState(false);
-    const offers = [
-        "Snag £200 Cashback On Select Rooms!",
-        "Snag £200 Cashback On Select Rooms!",
-        "Exclusive Cashback Of £50 For Referring A Friend On Amber!",
-        "Get An Additional £20 Cashback By Booking Via The Amber App"
-    ];
-    const visibleOffers = showAll ? offers : offers.slice(0, 2);
+  if (error) {
+    return <div className="text-center py-10 text-red-500">{error}</div>;
+  }
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const propertyInfo =
-        "Strategically positioned for academic convenience, iQ East Court London at 450 Mile End Rd, E1 4GG stands as a preferred choice for student accommodation in London. Offering a variety of room types, providing a wide range of different types of studios so students have an array of options to suit their preferences. Renowned institutions like Queen Mary University of London (Mile End), Queen Mary University (Whitechapel), and Hult International Business School are easily accessible, substantiating why iQ East Court London is a prime choice.";
-
-
-    const tabs = [
-        {
-            id: "Studio1",
-            label: "Studio 1",
-            title: "Studio One",
-            content: "This is Studio 1 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
-            img: img1,
-            availableFrom: "15 Feb, 2025",
-            price: "389",
-            features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "14 sqm"]
-        },
-        {
-            id: "Studio2",
-            label: "Studio 2",
-            title: "Studio Two",
-            content: "This is Studio 2 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
-            img: img1,
-            availableFrom: "1 Mar, 2025",
-            price: "420",
-            features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "16 sqm"]
-        },
-        {
-            id: "Studio1",
-            label: "Studio 1",
-            title: "Studio One",
-            content: "This is Studio 1 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
-            img: img1,
-            availableFrom: "15 Feb, 2025",
-            price: "389",
-            features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "14 sqm"]
-        },
-        {
-            id: "Studio1",
-            label: "Studio 1",
-            title: "Studio One",
-            content: "This is Studio 1 content. All-in-one space with a bedroom, private bathroom, living area, and kitchenette — Ideal for complete independence",
-            img: img1,
-            availableFrom: "15 Feb, 2025",
-            price: "389",
-            features: ["Studio", "Entire Place", "Private Bathroom", "Private Kitchen", "14 sqm"]
-        },
-    ];
-    const tenancies = [
-        { id: 1, tabId: "Studio1", duration: "29 weeks", moveIn: "15 Feb, 2025", moveOut: "6 Sept, 2025", price: "389" },
-        { id: 2, tabId: "Studio2", duration: "40 weeks", moveIn: "1 Mar, 2025", moveOut: "10 Dec, 2025", price: "420" },
-        { id: 3, tabId: "Studio2", duration: "52 weeks", moveIn: "15 Apr, 2025", moveOut: "30 Apr, 2026", price: "450" },
-        { id: 4, tabId: "Studio1", duration: "29 weeks", moveIn: "15 Feb, 2025", moveOut: "6 Sept, 2025", price: "389" },
-        { id: 5, tabId: "Studio1", duration: "29 weeks", moveIn: "15 Feb, 2025", moveOut: "6 Sept, 2025", price: "389" },
-    ];
-
-    const [activeTab, setActiveTab] = useState(tabs[0].id);
-    const [openAccordion, setOpenAccordion] = useState('Studio1');
-    const [openTenancies, setOpenTenancies] = useState(false);
-    const uniqueTabs = Array.from(new Set(tabs.map(tab => tab.id)))
-        .map(id => tabs.find(tab => tab.id === id));
-    const filteredTenancies = tenancies.filter(tenancy => tenancy.tabId === activeTab);
-
-    const [isAmenitiesModalOpen, setIsAmenitiesModalOpen] = useState(false);
-
-    const faqs = [
-        { question: "Are sites secure at iQ East Court London?", answer: "Instant booking allows you to quickly book the property by paying the amount." },
-        { question: "What payment methods are accepted?", answer: "You can pay via credit card, debit card, and bank transfer." },
-        { question: "Can I cancel my booking?", answer: "Yes, but cancellation policies vary by property. Please check the terms before booking." },
-        { question: "Is Wi-Fi included in the rent?", answer: "Yes, high-speed Wi-Fi is included in the rental price." },
-        { question: "Do I need to pay a deposit?", answer: "Yes, a security deposit is required and refundable upon lease completion." },
-        { question: "Are pets allowed?", answer: "Pets are allowed in select properties. Check the listing details." },
-        { question: "What is the minimum lease period?", answer: "Most properties require a minimum lease of 6 months." },
-        { question: "Do I need to provide any documents for booking?", answer: "Yes, ID proof and income verification may be required." },
-    ];
-    const [expandedIndex, setExpandedIndex] = useState(null);
-    const [showfaqsAll, setShowfaqsAll] = useState(false);
-    const toggleFAQ = (index) => {
-        setExpandedIndex(expandedIndex === index ? null : index);
-    }
-
-    const [view, setView] = useState("map");
-    const [activeAddressTab, setAddressActiveTab] = useState("addressTab1"); // Default active tab
-
-    const ratings = [
-        { title: "Location", rating: "4.5/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
-        { title: "Staff & Management", rating: "4.0/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
-        { title: "Social Experience", rating: "4.0/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
-        { title: "Amenities", rating: "4.0/5", icon: <i className="fa-solid fa-star mx-2 fa-sx"></i> },
-    ];
-    const reviews = [
-        {
-            name: "Jacob F",
-            rating: "5.0",
-            text: "I've lived here for two years now and I am yet to encounter anything that can be deemed as a negative. The staff is incredibly helpful and very kind....",
-            images: [img1, img2],
-        },
-        {
-            name: "Vaishnavi V",
-            rating: "5.0",
-            text: "I've stayed here for the past year and I've had one of the best experiences. The rooms are bright, vibrant and of a decent size. The property has excellent facilities...",
-            images: [img1, img2],
-        },
-        {
-            name: "Mavi F",
-            rating: "4.8",
-            text: "It has been a great place to live since moving in. Every place has its issues but honestly, the team helped me when I contacted...",
-            images: [img1, img2],
-        },
-    ];
-
-    const properties = [
-        {
-            id: 1,
-            image: img1,
-            title: "GoBritanya White City Residence",
-            location: "London, England, GB",
-            price: "£495",
-        },
-        {
-            id: 2,
-            image: img2,
-            title: "GoBritanya Lewisham Residence",
-            location: "London, England, GB",
-            price: "£375",
-        },
-        {
-            id: 3,
-            image: img1,
-            title: "Host View Studios, London",
-            location: "London, England, GB",
-            price: "£355",
-        },
-        {
-            id: 4,
-            image: img2,
-            title: "North Lodge, London",
-            location: "London, England, GB",
-            price: "£250",
-        },
-        {
-            id: 5,
-            image: img1,
-            title: "Rahere Court, London",
-            location: "London, England, GB",
-            price: "£325",
-        },
-    ];
-    const [currentPropertiesIndex, setCurrentPropertiesIndex] = useState(0);
-    const [itemsPerPage, setItemsPerPage] = useState(4);
-    useEffect(() => {
-        const updateItemsPerPage = () => {
-            if (window.innerWidth < 1024) {
-                setItemsPerPage(1);
-            } else {
-                setItemsPerPage(4);
-            }
-        };
-        updateItemsPerPage();
-        window.addEventListener("resize", updateItemsPerPage);
-        return () => window.removeEventListener("resize", updateItemsPerPage);
-    }, []);
-    const prevPropertiesSlide = () => {
-        setCurrentPropertiesIndex((prev) =>
-            prev === 0 ? properties.length - itemsPerPage : prev - 1
-        );
-    };
-    const nextPropertiesSlide = () => {
-        setCurrentPropertiesIndex((prev) =>
-            prev >= properties.length - itemsPerPage ? 0 : prev + 1
-        );
-    };
-
-
-    const mapRef = useRef(null);
-    const scrollToMap = () => {
-        console.log("Button clicked!"); // Debugging log
-        mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    };
+  if (!property) {
+    return <div className="text-center py-10 text-red-500">Property not found.</div>;
+  }
 
 
     return (
@@ -216,7 +267,9 @@ const Pages = () => {
             <div className="grid grid-cols-12">
                 <div className="col-span-12 sm:col-span-1 md:col-span-8 lg:col-span-8 xl:col-span-8 2xl:col-span-8 overflow-y-auto max-h-[100vh] no-scrollbar">
                     <div className="border border-1 border-t-0 rounded-lg p-6 mb-3">
-                        <p className="UniColor text-l my-1">United Kingdom / England / London</p>
+                    <p className="UniColor text-l my-1">
+                        {property.location?.country || "United Kingdom"} / {property.location?.state || "England"} / {property.location?.city || "London"}
+                    </p>                        
                         <div className="grid grid-cols-12 gap-4">
                             <div className="col-span-12 sm:col-span-8 md:col-span-9 lg:col-span-9 xl:col-span-9 2xl:col-span-9 bg-white flex items-center">
                                 <div className="m-3 w-full">
