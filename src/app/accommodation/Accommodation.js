@@ -92,7 +92,7 @@ const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
           <Marker
             key={accommodation._id}
             position={[
-              accommodation.location.latitude ,
+              accommodation.location.latitude,
               accommodation.location.longitude,
             ]}
             icon={customMarker}
@@ -129,11 +129,16 @@ const Accommodation = () => {
     facilities: searchParams.get("facilities")?.split(",") || [],
     budget: [0, 100000], // Budget range (low, high)
     roomType: searchParams.get("roomType") || "",
+    sort: "all", // Sort filter: all, priceLowToHigh, priceHighToLow, newlyAdded
+    stayDuration: "all", // Stay duration: all, 0-4, 5-10, 10-25, 25+
   });
   const [hoveredAccommodationId, setHoveredAccommodationId] = useState(null);
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
   const [isLocationPopupOpen, setIsLocationPopupOpen] = useState(false);
   const [isBudgetPopupOpen, setIsBudgetPopupOpen] = useState(false);
+  const [isSortPopupOpen, setIsSortPopupOpen] = useState(false);
+  const [isStayDurationPopupOpen, setIsStayDurationPopupOpen] = useState(false);
+  const [isRoomTypePopupOpen, setIsRoomTypePopupOpen] = useState(false);
 
   // Fetch accommodations based on filters
   const fetchAccommodations = async () => {
@@ -199,38 +204,108 @@ const Accommodation = () => {
       facilities: [],
       budget: [0, 100000],
       roomType: "",
+      sort: "all",
+      stayDuration: "all",
     });
   };
 
-  // Filter accommodations based on filters
-  const filteredAccommodations = accommodations.filter((accommodation) => {
-    const matchesLocation = filters.location
-      ? accommodation.location.city
-          .toLowerCase()
-          .includes(filters.location.toLowerCase()) ||
-        accommodation.location.state
-          .toLowerCase()
-          .includes(filters.location.toLowerCase())
+  // ... (previous imports and code remain the same)
+
+// Reset individual filters
+const resetFilter = (filterType) => {
+  setFilters((prev) => ({
+    ...prev,
+    [filterType]:
+      filterType === "budget"
+        ? [0, 100000]
+        : filterType === "facilities"
+        ? []
+        : "", // Set to empty string for sort and stayDuration
+  }));
+};
+
+// ... (rest of the code remains the same)
+
+// Sort options for dropdown
+const sortOptions = [
+  { value: "", label: "Sort All" }, // Use empty string for default
+  { value: "priceLowToHigh", label: "Price: Low to High" },
+  { value: "priceHighToLow", label: "Price: High to Low" },
+  { value: "newlyAdded", label: "Newly Added" },
+];
+
+// Stay duration options for dropdown
+const stayDurationOptions = [
+  { value: "", label: "Duration All" }, // Use empty string for default
+  { value: "0-4", label: "0-4 Weeks" },
+  { value: "5-10", label: "5-10 Weeks" },
+  { value: "10-25", label: "10-25 Weeks" },
+  { value: "25+", label: "25+ Weeks" },
+];
+
+// ... (rest of the code remains the same)
+
+// Filter accommodations based on filters
+const filteredAccommodations = accommodations.filter((accommodation) => {
+  const matchesLocation = filters.location
+    ? accommodation.location.city
+        .toLowerCase()
+        .includes(filters.location.toLowerCase()) ||
+      accommodation.location.state
+        .toLowerCase()
+        .includes(filters.location.toLowerCase())
+    : true;
+
+  const matchesBudget =
+    accommodation.pricing.minPrice >= filters.budget[0] &&
+    accommodation.pricing.maxPrice <= filters.budget[1];
+
+  const matchesFacilities = filters.facilities.length
+    ? filters.facilities.every((facility) =>
+        accommodation.amenities.includes(facility)
+      )
+    : true;
+
+  const matchesRoomType = filters.roomType
+    ? accommodation.meta.availableType.includes(filters.roomType)
+    : true;
+
+  const matchesStayDuration =
+    filters.stayDuration === ""
+      ? true
+      : filters.stayDuration === "0-4"
+      ? accommodation.pricing.duration <= 4
+      : filters.stayDuration === "5-10"
+      ? accommodation.pricing.duration >= 5 && accommodation.pricing.duration <= 10
+      : filters.stayDuration === "10-25"
+      ? accommodation.pricing.duration >= 10 && accommodation.pricing.duration <= 25
+      : filters.stayDuration === "25+"
+      ? accommodation.pricing.duration >= 25
       : true;
 
-    const matchesBudget =
-      accommodation.pricing.minPrice >= filters.budget[0] &&
-      accommodation.pricing.maxPrice <= filters.budget[1];
+  return (
+    matchesLocation &&
+    matchesBudget &&
+    matchesFacilities &&
+    matchesRoomType &&
+    matchesStayDuration
+  );
+});
 
-    const matchesFacilities = filters.facilities.length
-      ? filters.facilities.every((facility) =>
-          accommodation.amenities.includes(facility)
-        )
-      : true;
+// Sort accommodations based on sort filter
+const sortedAccommodations = filteredAccommodations.sort((a, b) => {
+  if (filters.sort === "priceLowToHigh") {
+    return a.pricing.minPrice - b.pricing.minPrice;
+  } else if (filters.sort === "priceHighToLow") {
+    return b.pricing.minPrice - a.pricing.minPrice;
+  } else if (filters.sort === "newlyAdded") {
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  } else {
+    return 0; // Default: no sorting
+  }
+});
 
-    const matchesRoomType = filters.roomType
-      ? accommodation.meta.availableType.includes(filters.roomType)
-      : true;
-
-    return (
-      matchesLocation && matchesBudget && matchesFacilities && matchesRoomType
-    );
-  });
+// ... (rest of the code remains the same)
 
   // Facilities options for multi-select dropdown
   const facilitiesOptions = [
@@ -246,9 +321,11 @@ const Accommodation = () => {
     { value: "entire place", label: "Entire Place" },
   ];
 
+  
+
   return (
     <div className="p-6">
-      {/* Filter Buttons */}
+      {/* Filter Buttons and Selected Filters */}
       <div className="sticky top-0 z-40 bg-white shadow-md px-6 py-2">
         <div className="mx-auto flex gap-4 justify-start">
           {/* Location Button */}
@@ -267,6 +344,30 @@ const Accommodation = () => {
             Budget
           </button>
 
+          {/* Room Type Button */}
+          <button
+            onClick={() => setIsRoomTypePopupOpen(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
+          >
+            Room Type
+          </button>
+
+          {/* Sort Button */}
+          <button
+            onClick={() => setIsSortPopupOpen(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
+          >
+            Sort
+          </button>
+
+          {/* Stay Duration Button */}
+          <button
+            onClick={() => setIsStayDurationPopupOpen(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
+          >
+            Stay Duration
+          </button>
+
           {/* Open Filters Button */}
           <button
             onClick={() => setIsFilterPopupOpen(true)}
@@ -274,6 +375,65 @@ const Accommodation = () => {
           >
             Open Filters
           </button>
+        </div>
+
+        {/* Display Selected Filters */}
+        <div className="flex flex-wrap gap-2 mt-2">
+          {filters.location && (
+            <div className="flex items-center bg-gray-200 px-3 py-1 rounded-full">
+              <span>{filters.location}</span>
+              <button
+                onClick={() => resetFilter("location")}
+                className="ml-2 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+          {filters.budget[0] !== 0 || filters.budget[1] !== 100000 ? (
+            <div className="flex items-center bg-gray-200 px-3 py-1 rounded-full">
+              <span>₹{filters.budget[0]} - ₹{filters.budget[1]}</span>
+              <button
+                onClick={() => resetFilter("budget")}
+                className="ml-2 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          ) : null}
+          {filters.roomType && (
+            <div className="flex items-center bg-gray-200 px-3 py-1 rounded-full">
+              <span>{filters.roomType}</span>
+              <button
+                onClick={() => resetFilter("roomType")}
+                className="ml-2 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+          {filters.sort !== "all" && (
+            <div className="flex items-center bg-gray-200 px-3 py-1 rounded-full">
+              <span>{sortOptions.find((opt) => opt.value === filters.sort)?.label}</span>
+              <button
+                onClick={() => resetFilter("sort")}
+                className="ml-2 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+          {filters.stayDuration !== "all" && (
+            <div className="flex items-center bg-gray-200 px-3 py-1 rounded-full">
+              <span>{stayDurationOptions.find((opt) => opt.value === filters.stayDuration)?.label}</span>
+              <button
+                onClick={() => resetFilter("stayDuration")}
+                className="ml-2 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -297,6 +457,13 @@ const Accommodation = () => {
               onChange={(e) => handleFilterChange("location", e.target.value)}
               className="w-full p-2 border rounded"
             />
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("location")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Location
+            </button>
           </div>
         </div>
       )}
@@ -326,10 +493,112 @@ const Accommodation = () => {
               <span>₹{filters.budget[0]}</span>
               <span>₹{filters.budget[1]}</span>
             </div>
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("budget")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Budget
+            </button>
           </div>
         </div>
       )}
 
+      {/* Room Type Popup */}
+      {isRoomTypePopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsRoomTypePopupOpen(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4">Room Type</h2>
+            <Select
+              options={roomTypeOptions}
+              value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
+              onChange={(selectedOption) =>
+                handleFilterChange("roomType", selectedOption?.value || "")
+              }
+              className="w-full"
+            />
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("roomType")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Room Type
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Sort Popup */}
+      {isSortPopupOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
+      {/* Close Button */}
+      <button
+        onClick={() => setIsSortPopupOpen(false)}
+        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+      >
+        <X className="w-6 h-6" />
+      </button>
+
+      <h2 className="text-xl font-semibold mb-4">Sort By</h2>
+      <Select
+        options={sortOptions}
+        value={sortOptions.find((opt) => opt.value === filters.sort)}
+        onChange={(selectedOption) =>
+          handleFilterChange("sort", selectedOption?.value || "")
+        }
+        className="w-full"
+      />
+      {/* Reset Button */}
+      <button
+        onClick={() => resetFilter("sort")}
+        className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+      >
+        Reset Sort
+      </button>
+    </div>
+  </div>
+)}
+
+      {/* Stay Duration Popup */}
+      {isStayDurationPopupOpen && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
+      {/* Close Button */}
+      <button
+        onClick={() => setIsStayDurationPopupOpen(false)}
+        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+      >
+        <X className="w-6 h-6" />
+      </button>
+
+      <h2 className="text-xl font-semibold mb-4">Stay Duration</h2>
+      <Select
+        options={stayDurationOptions}
+        value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
+        onChange={(selectedOption) =>
+          handleFilterChange("stayDuration", selectedOption?.value || "")
+        }
+        className="w-full"
+      />
+      {/* Reset Button */}
+      <button
+        onClick={() => resetFilter("stayDuration")}
+        className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+      >
+        Reset Stay Duration
+      </button>
+    </div>
+  </div>
+)}
       {/* Open Filters Popup */}
       {isFilterPopupOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -412,12 +681,38 @@ const Accommodation = () => {
               />
             </div>
 
+            {/* Sort Dropdown */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Sort By</label>
+              <Select
+                options={sortOptions}
+                value={sortOptions.find((opt) => opt.value === filters.sort)}
+                onChange={(selectedOption) =>
+                  handleFilterChange("sort", selectedOption?.value || "all")
+                }
+                className="w-full"
+              />
+            </div>
+
+            {/* Stay Duration Dropdown */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Stay Duration</label>
+              <Select
+                options={stayDurationOptions}
+                value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
+                onChange={(selectedOption) =>
+                  handleFilterChange("stayDuration", selectedOption?.value || "all")
+                }
+                className="w-full"
+              />
+            </div>
+
             {/* Clear Filters Button */}
             <button
               onClick={clearFilters}
               className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
             >
-              Clear Filters
+              Clear All Filters
             </button>
 
             {/* Apply Filters Button */}
@@ -436,8 +731,8 @@ const Accommodation = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
         {/* Left Side: Accommodation Cards */}
         <div className="lg:col-span-2">
-          {filteredAccommodations.length > 0 ? (
-            filteredAccommodations.map((accommodation) => (
+          {sortedAccommodations.length > 0 ? (
+            sortedAccommodations.map((accommodation) => (
               <div
                 key={accommodation._id}
                 className="bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col md:flex-row items-start transition hover:shadow-xl"
@@ -524,7 +819,7 @@ const Accommodation = () => {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md sticky top-14">
             <MapComponent
-              accommodations={filteredAccommodations}
+              accommodations={sortedAccommodations}
               hoveredAccommodationId={hoveredAccommodationId}
             />
           </div>
