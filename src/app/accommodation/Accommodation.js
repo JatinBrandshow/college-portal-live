@@ -92,7 +92,7 @@ const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
           <Marker
             key={accommodation._id}
             position={[
-              accommodation.location.latitude ,
+              accommodation.location.latitude,
               accommodation.location.longitude,
             ]}
             icon={customMarker}
@@ -126,14 +126,21 @@ const Accommodation = () => {
   const [accommodations, setAccommodations] = useState([]);
   const [filters, setFilters] = useState({
     location: searchParams.get("location") || "",
+    locality: searchParams.get("locality") || "",
     facilities: searchParams.get("facilities")?.split(",") || [],
     budget: [0, 100000], // Budget range (low, high)
     roomType: searchParams.get("roomType") || "",
+    sort: "", // Sort filter: "", priceLowToHigh, priceHighToLow, newlyAdded
+    stayDuration: "", // Stay duration: "", 0-4, 5-10, 10-25, 25+
   });
   const [hoveredAccommodationId, setHoveredAccommodationId] = useState(null);
   const [isFilterPopupOpen, setIsFilterPopupOpen] = useState(false);
   const [isLocationPopupOpen, setIsLocationPopupOpen] = useState(false);
   const [isBudgetPopupOpen, setIsBudgetPopupOpen] = useState(false);
+  const [isSortPopupOpen, setIsSortPopupOpen] = useState(false);
+  const [isStayDurationPopupOpen, setIsStayDurationPopupOpen] = useState(false);
+  const [isRoomTypePopupOpen, setIsRoomTypePopupOpen] = useState(false);
+  const [isLocalityPopupOpen, setIsLocalityPopupOpen] = useState(false);
 
   // Fetch accommodations based on filters
   const fetchAccommodations = async () => {
@@ -176,12 +183,14 @@ const Accommodation = () => {
   // Update filters when URL search params change
   useEffect(() => {
     const location = searchParams.get("location") || "";
+    const locality = searchParams.get("locality") || "";
     const facilities = searchParams.get("facilities")?.split(",") || [];
     const roomType = searchParams.get("roomType") || "";
 
     setFilters((prev) => ({
       ...prev,
       location,
+      locality,
       facilities,
       roomType,
     }));
@@ -196,11 +205,75 @@ const Accommodation = () => {
   const clearFilters = () => {
     setFilters({
       location: "",
+      locality: "",
       facilities: [],
       budget: [0, 100000],
       roomType: "",
+      sort: "",
+      stayDuration: "",
     });
   };
+
+  // Reset individual filters
+  const resetFilter = (filterType) => {
+    setFilters((prev) => ({
+      ...prev,
+      [filterType]:
+        filterType === "budget"
+          ? [0, 100000]
+          : filterType === "facilities"
+          ? []
+          : "",
+    }));
+  };
+
+  // Get unique localities from accommodations
+  const getUniqueLocalities = () => {
+    const localities = new Set();
+    accommodations.forEach((acc) => {
+      if (acc.location.locality) {
+        localities.add(acc.location.locality);
+      }
+    });
+    return Array.from(localities).map((locality) => ({
+      value: locality,
+      label: locality,
+    }));
+  };
+
+  // Facilities options for multi-select dropdown
+  const facilitiesOptions = [
+    { value: "Gym", label: "Gym" },
+    { value: "WiFi", label: "WiFi" },
+    { value: "Pool", label: "Pool" },
+    { value: "Laundry", label: "Laundry" },
+  ];
+
+  // Room type options for dropdown
+  const roomTypeOptions = [
+    { value: "private room", label: "Private Room" },
+    { value: "entire place", label: "Entire Place" },
+  ];
+
+  // Sort options for dropdown
+  const sortOptions = [
+    { value: "", label: "Sort All" },
+    { value: "priceLowToHigh", label: "Price: Low to High" },
+    { value: "priceHighToLow", label: "Price: High to Low" },
+    { value: "newlyAdded", label: "Newly Added" },
+  ];
+
+  // Stay duration options for dropdown
+  const stayDurationOptions = [
+    { value: "", label: "Duration All" },
+    { value: "0-4", label: "0-4 Weeks" },
+    { value: "5-10", label: "5-10 Weeks" },
+    { value: "10-25", label: "10-25 Weeks" },
+    { value: "25+", label: "25+ Weeks" },
+  ];
+
+  // Locality options for dropdown
+  const localityOptions = getUniqueLocalities();
 
   // Filter accommodations based on filters
   const filteredAccommodations = accommodations.filter((accommodation) => {
@@ -211,6 +284,12 @@ const Accommodation = () => {
         accommodation.location.state
           .toLowerCase()
           .includes(filters.location.toLowerCase())
+      : true;
+
+    const matchesLocality = filters.locality
+      ? accommodation.location.locality
+          .toLowerCase()
+          .includes(filters.locality.toLowerCase())
       : true;
 
     const matchesBudget =
@@ -227,24 +306,41 @@ const Accommodation = () => {
       ? accommodation.meta.availableType.includes(filters.roomType)
       : true;
 
+    const matchesStayDuration =
+      filters.stayDuration === ""
+        ? true
+        : filters.stayDuration === "0-4"
+        ? accommodation.pricing.duration <= 4
+        : filters.stayDuration === "5-10"
+        ? accommodation.pricing.duration >= 5 && accommodation.pricing.duration <= 10
+        : filters.stayDuration === "10-25"
+        ? accommodation.pricing.duration >= 10 && accommodation.pricing.duration <= 25
+        : filters.stayDuration === "25+"
+        ? accommodation.pricing.duration >= 25
+        : true;
+
     return (
-      matchesLocation && matchesBudget && matchesFacilities && matchesRoomType
+      matchesLocation &&
+      matchesLocality &&
+      matchesBudget &&
+      matchesFacilities &&
+      matchesRoomType &&
+      matchesStayDuration
     );
   });
 
-  // Facilities options for multi-select dropdown
-  const facilitiesOptions = [
-    { value: "Gym", label: "Gym" },
-    { value: "WiFi", label: "WiFi" },
-    { value: "Pool", label: "Pool" },
-    { value: "Laundry", label: "Laundry" },
-  ];
-
-  // Room type options for dropdown
-  const roomTypeOptions = [
-    { value: "private room", label: "Private Room" },
-    { value: "entire place", label: "Entire Place" },
-  ];
+  // Sort accommodations based on sort filter
+  const sortedAccommodations = filteredAccommodations.sort((a, b) => {
+    if (filters.sort === "priceLowToHigh") {
+      return a.pricing.minPrice - b.pricing.minPrice;
+    } else if (filters.sort === "priceHighToLow") {
+      return b.pricing.minPrice - a.pricing.minPrice;
+    } else if (filters.sort === "newlyAdded") {
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    } else {
+      return 0; // Default: no sorting
+    }
+  });
 
   return (
     <div className="p-6">
@@ -256,7 +352,15 @@ const Accommodation = () => {
             onClick={() => setIsLocationPopupOpen(true)}
             className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
           >
-            Location
+            {filters.location || "Location"}
+          </button>
+
+          {/* Locality Button */}
+          <button
+            onClick={() => setIsLocalityPopupOpen(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
+          >
+            {filters.locality || "Locality"}
           </button>
 
           {/* Budget Button */}
@@ -264,7 +368,37 @@ const Accommodation = () => {
             onClick={() => setIsBudgetPopupOpen(true)}
             className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
           >
-            Budget
+            {filters.budget[0] !== 0 || filters.budget[1] !== 100000
+              ? `₹${filters.budget[0]} - ₹${filters.budget[1]}`
+              : "Budget"}
+          </button>
+
+          {/* Room Type Button */}
+          <button
+            onClick={() => setIsRoomTypePopupOpen(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
+          >
+            {filters.roomType || "Room Type"}
+          </button>
+
+          {/* Sort Button */}
+          <button
+            onClick={() => setIsSortPopupOpen(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
+          >
+            {filters.sort
+              ? sortOptions.find((opt) => opt.value === filters.sort)?.label
+              : "Sort"}
+          </button>
+
+          {/* Stay Duration Button */}
+          <button
+            onClick={() => setIsStayDurationPopupOpen(true)}
+            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
+          >
+            {filters.stayDuration
+              ? stayDurationOptions.find((opt) => opt.value === filters.stayDuration)?.label
+              : "Stay Duration"}
           </button>
 
           {/* Open Filters Button */}
@@ -297,6 +431,45 @@ const Accommodation = () => {
               onChange={(e) => handleFilterChange("location", e.target.value)}
               className="w-full p-2 border rounded"
             />
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("location")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Location
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Locality Popup */}
+      {isLocalityPopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsLocalityPopupOpen(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4">Locality</h2>
+            <Select
+              options={localityOptions}
+              value={localityOptions.find((opt) => opt.value === filters.locality)}
+              onChange={(selectedOption) =>
+                handleFilterChange("locality", selectedOption?.value || "")
+              }
+              className="w-full"
+            />
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("locality")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Locality
+            </button>
           </div>
         </div>
       )}
@@ -326,6 +499,109 @@ const Accommodation = () => {
               <span>₹{filters.budget[0]}</span>
               <span>₹{filters.budget[1]}</span>
             </div>
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("budget")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Budget
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Room Type Popup */}
+      {isRoomTypePopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsRoomTypePopupOpen(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4">Room Type</h2>
+            <Select
+              options={roomTypeOptions}
+              value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
+              onChange={(selectedOption) =>
+                handleFilterChange("roomType", selectedOption?.value || "")
+              }
+              className="w-full"
+            />
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("roomType")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Room Type
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Sort Popup */}
+      {isSortPopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsSortPopupOpen(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4">Sort By</h2>
+            <Select
+              options={sortOptions}
+              value={sortOptions.find((opt) => opt.value === filters.sort)}
+              onChange={(selectedOption) =>
+                handleFilterChange("sort", selectedOption?.value || "")
+              }
+              className="w-full"
+            />
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("sort")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Sort
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Stay Duration Popup */}
+      {isStayDurationPopupOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsStayDurationPopupOpen(false)}
+              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            <h2 className="text-xl font-semibold mb-4">Stay Duration</h2>
+            <Select
+              options={stayDurationOptions}
+              value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
+              onChange={(selectedOption) =>
+                handleFilterChange("stayDuration", selectedOption?.value || "")
+              }
+              className="w-full"
+            />
+            {/* Reset Button */}
+            <button
+              onClick={() => resetFilter("stayDuration")}
+              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            >
+              Reset Stay Duration
+            </button>
           </div>
         </div>
       )}
@@ -353,6 +629,19 @@ const Accommodation = () => {
                 value={filters.location}
                 onChange={(e) => handleFilterChange("location", e.target.value)}
                 className="w-full p-2 border rounded"
+              />
+            </div>
+
+            {/* Locality */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Locality</label>
+              <Select
+                options={localityOptions}
+                value={localityOptions.find((opt) => opt.value === filters.locality)}
+                onChange={(selectedOption) =>
+                  handleFilterChange("locality", selectedOption?.value || "")
+                }
+                className="w-full"
               />
             </div>
 
@@ -412,12 +701,38 @@ const Accommodation = () => {
               />
             </div>
 
+            {/* Sort Dropdown */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Sort By</label>
+              <Select
+                options={sortOptions}
+                value={sortOptions.find((opt) => opt.value === filters.sort)}
+                onChange={(selectedOption) =>
+                  handleFilterChange("sort", selectedOption?.value || "")
+                }
+                className="w-full"
+              />
+            </div>
+
+            {/* Stay Duration Dropdown */}
+            <div className="mb-4">
+              <label className="block text-gray-700">Stay Duration</label>
+              <Select
+                options={stayDurationOptions}
+                value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
+                onChange={(selectedOption) =>
+                  handleFilterChange("stayDuration", selectedOption?.value || "")
+                }
+                className="w-full"
+              />
+            </div>
+
             {/* Clear Filters Button */}
             <button
               onClick={clearFilters}
               className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
             >
-              Clear Filters
+              Clear All Filters
             </button>
 
             {/* Apply Filters Button */}
@@ -436,8 +751,8 @@ const Accommodation = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
         {/* Left Side: Accommodation Cards */}
         <div className="lg:col-span-2">
-          {filteredAccommodations.length > 0 ? (
-            filteredAccommodations.map((accommodation) => (
+          {sortedAccommodations.length > 0 ? (
+            sortedAccommodations.map((accommodation) => (
               <div
                 key={accommodation._id}
                 className="bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col md:flex-row items-start transition hover:shadow-xl"
@@ -524,7 +839,7 @@ const Accommodation = () => {
         <div className="lg:col-span-1">
           <div className="bg-white rounded-lg shadow-md sticky top-14">
             <MapComponent
-              accommodations={filteredAccommodations}
+              accommodations={sortedAccommodations}
               hoveredAccommodationId={hoveredAccommodationId}
             />
           </div>
