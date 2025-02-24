@@ -64,9 +64,17 @@ const PopularColleges = () => {
 
   const filteredColleges = activeCity === "All" ? colleges : colleges.filter((college) => college.city === activeCity)
 
-  const firstRowCount = Math.min(9, Math.ceil(filteredColleges.length / 2))
-  const firstRow = filteredColleges.slice(0, firstRowCount)
-  const secondRow = filteredColleges.slice(firstRowCount)
+  const firstRowCount = filteredColleges.length > 7 
+  ? Math.min(9, Math.max(6, filteredColleges.length - Math.floor(filteredColleges.length / 2)))
+  : filteredColleges.length;
+
+const firstRow = filteredColleges.slice(0, firstRowCount);
+const secondRow = filteredColleges.length > 7 
+  ? filteredColleges.slice(firstRowCount) 
+  : [];
+
+  const shouldShowSecondRow = filteredColleges.length > 7;
+
 
   return (
     <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative max-md:px-5 max-sm:px-3 max-md:py-5 max-sm:py-3 max-lg:my-8 max-md:my-6 max-sm:my-4">
@@ -123,6 +131,7 @@ const PopularColleges = () => {
             </div>
 
             {/* Second Row */}
+            {shouldShowSecondRow && (
             <div className="flex gap-4">
               {secondRow.map((college) => (
                 <Link key={college._id} href={`/collegepages/${college._id}`} passHref>
@@ -140,6 +149,7 @@ const PopularColleges = () => {
                 </Link>
               ))}
             </div>
+            )}
           </div>
         </div>
 

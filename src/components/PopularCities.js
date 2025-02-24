@@ -76,9 +76,16 @@ const PopularCities = () => {
     ? accommodations
     : accommodations.filter((acc) => acc.location.city === activeCity);
 
-  const firstRowCount = Math.min(9, Math.ceil(filteredAccommodations.length / 2));
-  const firstRow = filteredAccommodations.slice(0, firstRowCount);
-  const secondRow = filteredAccommodations.slice(firstRowCount);
+    const firstRowCount = filteredAccommodations.length > 7 
+  ? Math.min(9, Math.ceil(filteredAccommodations.length / 2)) 
+  : filteredAccommodations.length;
+
+const firstRow = filteredAccommodations.slice(0, firstRowCount);
+const secondRow = filteredAccommodations.length > 7 
+  ? filteredAccommodations.slice(firstRowCount) 
+  : [];
+
+const shouldShowSecondRow = filteredAccommodations.length > 7;
 
   return (
     <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative max-md:px-5 max-sm:px-3 max-md:py-5 max-sm:py-3 max-lg:my-8 max-md:my-6 max-sm:my-4">
@@ -114,45 +121,47 @@ const PopularCities = () => {
         )}
 
         <div ref={scrollRef} className="overflow-x-auto scroll-smooth w-full px-0 relative no-scrollbar">
-          <div className="flex flex-col gap-4 w-max max-sm:gap-2.5 max-md:gap-3 max-sm:grid max-sm:grid-cols-2">
-            {/* First Row */}
-            <div className="flex gap-4">
-              {firstRow.map((acc) => (
-                <div
-                  key={acc._id}
-                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
-                  onClick={() => handleCityClick(acc.location.city)}
-                >
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${acc.location.city_img?.[0]})` }}
-                  ></div>
-                  <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{acc.location.city}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="flex flex-col gap-4 w-max max-sm:gap-2.5 max-md:gap-3 max-sm:grid max-sm:grid-cols-2">
+  {/* First Row */}
+  <div className="flex gap-4">
+    {firstRow.map((acc) => (
+      <div
+        key={acc._id}
+        className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
+        onClick={() => handleCityClick(acc.location.city)}
+      >
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
+          style={{ backgroundImage: `url(${acc.location.city_img?.[0]})` }}
+        ></div>
+        <div className="absolute flex items-end p-2 bottom-0">
+          <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{acc.location.city}</p>
+        </div>
+      </div>
+    ))}
+  </div>
 
-            {/* Second Row */}
-            <div className="flex gap-4">
-              {secondRow.map((acc) => (
-                <div
-                  key={acc._id}
-                  className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
-                  onClick={() => handleCityClick(acc.location.city)}
-                >
-                  <div
-                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
-                    style={{ backgroundImage: `url(${acc.location.city_img?.[0]})` }}
-                  ></div>
-                  <div className="absolute flex items-end p-2 bottom-0">
-                    <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{acc.location.city}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+  {/* Conditionally render the second row */}
+  {shouldShowSecondRow && (
+    <div className="flex gap-4">
+      {secondRow.map((acc) => (
+        <div
+          key={acc._id}
+          className="relative w-40 h-48 min-w-[10rem] sm:min-w-[9rem] md:min-w-[10rem] lg:min-w-[14rem] rounded-lg overflow-hidden cursor-pointer"
+          onClick={() => handleCityClick(acc.location.city)}
+        >
+          <div
+            className="absolute inset-0 bg-cover bg-center transition-transform duration-500 hover:scale-110 bg-gray-400 bg-blend-darken"
+            style={{ backgroundImage: `url(${acc.location.city_img?.[0]})` }}
+          ></div>
+          <div className="absolute flex items-end p-2 bottom-0">
+            <p className="text-white font-bold mx-auto line-clamp-1 overflow-hidden">{acc.location.city}</p>
           </div>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
         </div>
 
         {showRightButton && (
