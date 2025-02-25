@@ -1,10 +1,11 @@
 import React, { useRef } from "react";
 import { FaSchool, FaBusinessTime, FaBalanceScale, FaPaintBrush, FaHeartbeat, FaArrowRight } from "react-icons/fa";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 const studyGoals = [
-  { icon: <FaSchool size={30} />, title: "Engineering", colleges: "6259 Colleges", branches: ["BE/B.Tech", "Diploma in Engineering", "ME/M.Tech"] },
-  { icon: <FaBusinessTime size={30} />, title: "Management", colleges: "7754 Colleges", branches: ["MBA/PGDM", "BBA/BMS", "Executive MBA"] },
+  { icon: <FaSchool size={30} />, title: "Engineering", colleges: "6259 Colleges", branches: ["B.Tech", "Diploma in Engineering", "M.Tech", "BE"] },
+  { icon: <FaBusinessTime size={30} />, title: "Management", colleges: "7754 Colleges", branches: ["MBA", "PGDM", "BBA" ,"BMS", "Executive MBA"] },
   { icon: <FaBalanceScale size={30} />, title: "Commerce", colleges: "4979 Colleges", branches: ["B.Com", "M.Com"] },
   { icon: <FaPaintBrush size={30} />, title: "Arts", colleges: "5617 Colleges", branches: ["BA", "MA", "BFA", "BSW"] },
   { icon: <FaHeartbeat size={30} />, title: "Medical", colleges: "4587 Colleges", branches: ["MBBS", "BDS", "BAMS"] },
@@ -13,12 +14,19 @@ const studyGoals = [
 
 const StudyGoal = () => {
   const scrollRef = useRef(null);
+  const router = useRouter(); // Initialize useRouter
 
   const scroll = (direction) => {
     if (scrollRef.current) {
       const scrollAmount = 300; // Adjust this value for smooth scrolling
       scrollRef.current.scrollBy({ left: direction === "left" ? -scrollAmount : scrollAmount, behavior: "smooth" });
     }
+  };
+
+  // Function to handle branch click
+  const handleBranchClick = (branch) => {
+    // Navigate to the college page with the selected branch as a query parameter
+    router.push(`/college?courses_offered=${encodeURIComponent(branch)}`);
   };
 
   return (
@@ -50,9 +58,15 @@ const StudyGoal = () => {
                         </div>
                       </div>
                       {goal.branches && (
-                        <ul className="mt-4 border-t pt-4 text-gray-700">
+                        <ul className="mt-4 border-t pt-4 text-gray-700 h-[200px] overflow-auto">
                           {goal.branches.map((branch, idx) => (
-                            <li key={idx} className={`hover:underline hover:text-[#5e23dd] cursor-pointer ${idx !== goal.branches.length - 1 ? "border-b" : ""} py-2`}>
+                            <li
+                              key={idx}
+                              onClick={() => handleBranchClick(branch)} // Add onClick handler
+                              className={`hover:underline hover:text-[#5e23dd] cursor-pointer ${
+                                idx !== goal.branches.length - 1 ? "border-b" : ""
+                              } py-2`}
+                            >
                               {branch}
                             </li>
                           ))}

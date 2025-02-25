@@ -1,8 +1,6 @@
 // app/college/page.js
 import College from "./College";
 
-const Page = () => {
+export default function CollegePage() {
   return <College />;
-};
-
-export default Page;
+}
