@@ -21,27 +21,26 @@ const PopularColleges = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
           },
-        })
-
-        const text = await response.text() // Read raw response
-
-        const data = JSON.parse(text) // Parse JSON manually
-
-        if (Array.isArray(data.colleges)) {
-          setColleges(data.colleges)
-
-          const uniqueCities = ["All", ...new Set(data.colleges.map((college) => college.city))]
-          setCities(uniqueCities)
+        });
+  
+        const text = await response.text(); // Read raw response
+        const data = JSON.parse(text); // Parse JSON manually
+  
+        if (Array.isArray(data.data)) {  // Corrected path to access colleges array
+          setColleges(data.data);
+  
+          const uniqueCities = ["All", ...new Set(data.data.map((college) => college.city))];
+          setCities(uniqueCities);
         } else {
-          console.error("Unexpected API response structure:", data)
+          console.error("Unexpected API response structure:", data);
         }
       } catch (error) {
-        console.error("Error fetching colleges:", error)
+        console.error("Error fetching colleges:", error);
       }
-    }
-
-    fetchColleges()
-  }, [])
+    };
+  
+    fetchColleges();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {

@@ -111,11 +111,11 @@ const CollegePages = ({ id }) => {
         const data = JSON.parse(text);
         console.log(data);
 
-        if (Array.isArray(data.colleges)) {
-          const foundCollege = data.colleges.find((item) => item._id === id);
+        if (Array.isArray(data.data)) {  // Corrected API response path
+          const foundCollege = data.data.find((item) => item._id === id);
           console.log(foundCollege);
           if (foundCollege) {
-            setCollegeDetails(foundCollege); // Set the entire college object
+            setCollegeDetails(foundCollege);
           } else {
             setError("College not found");
           }
@@ -133,7 +133,7 @@ const CollegePages = ({ id }) => {
     if (id) {
       fetchCollegeDetails();
     }
-  }, [id]); // Re-run this effect when the `id` changes
+  }, [id]);
 
   // Show loading state while fetching the data
   if (loading) {
