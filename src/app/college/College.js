@@ -8,46 +8,9 @@ import { FiFilter, FiX } from "react-icons/fi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
 import { API_NODE_URL, API_KEY } from "../../../config/config";
-import { useMap } from "react-leaflet";
 
-// Dynamically import MapContainer and related components with SSR disabled
-const MapContainer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.MapContainer),
-  { ssr: false }
-);
-const TileLayer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-const Marker = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Marker),
-  { ssr: false }
-);
-const Popup = dynamic(
-  () => import("react-leaflet").then((mod) => mod.Popup),
-  { ssr: false }
-);
-
-
-// Icon for map marker
-const markerIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/1673/1673221.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
-
-// Zoom to hovered location component
-const ZoomToCollege = ({ coordinates }) => {
-  const map = useMap();
-
-  useEffect(() => {
-    if (map && coordinates) {
-      map.flyTo(coordinates, 10, { animate: true });
-    }
-  }, [map, coordinates]);
-
-  return null;
-};
+// Dynamically import the MapComponent with SSR disabled
+const MapComponent = dynamic(() => import("./components/MapComponent"), { ssr: false });
 
 const College = () => {
   const router = useRouter();
@@ -412,36 +375,8 @@ const College = () => {
           )}
         </div>
 
-        {/* Right Section */}
-        <div className="w-1/3 px-4 py-8 sticky top-0 h-[600px]">
-          <MapContainer
-            center={[20.5937, 78.9629]} // Default center to India
-            zoom={5}
-            className="h-full rounded-lg"
-          >
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
-            />
-            {filteredColleges.map((college) => (
-              <Marker
-                position={[college.location.latitude, college.location.longitude]}
-                icon={markerIcon}
-                key={college._id}
-              >
-                <Popup>
-                  <strong>{college.name}</strong>
-                  <p>{college.city}</p>
-                </Popup>
-              </Marker>
-            ))}
-            {hoveredCollege && (
-              <ZoomToCollege
-                coordinates={[hoveredCollege.location.latitude, hoveredCollege.location.longitude]}
-              />
-            )}
-          </MapContainer>
-        </div>
+        {/* Right Section - Map */}
+        <MapComponent filteredColleges={filteredColleges} hoveredCollege={hoveredCollege} />
 
         {/* Modal for Actions */}
         <Modal
