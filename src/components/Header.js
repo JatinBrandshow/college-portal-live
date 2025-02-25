@@ -23,7 +23,7 @@ const Header = ({ showSearchBar = false }) => {
   };
 
   return (
-    <header className="bg-gradient-to-r from-violet-900 via-violet-700 to-violet-500 shadow-lg">
+    <header className="sticky top-0 bg-gradient-to-r from-violet-900 via-violet-700 to-violet-500 shadow-lg z-50">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         <a
           href="/"

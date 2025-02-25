@@ -146,6 +146,13 @@ const Accommodation = () => {
   const [isRoomTypePopupOpen, setIsRoomTypePopupOpen] = useState(false);
   const [isLocalityPopupOpen, setIsLocalityPopupOpen] = useState(false);
 
+  const locationButtonRef = useRef(null);
+  const localityButtonRef = useRef(null);
+  const budgetButtonRef = useRef(null);
+  const roomTypeButtonRef = useRef(null);
+  const sortButtonRef = useRef(null);
+  const stayDurationButtonRef = useRef(null);
+
   // Fetch accommodations based on filters
   const fetchAccommodations = async () => {
     try {
@@ -244,6 +251,16 @@ const Accommodation = () => {
       label: locality,
     }));
   };
+  const getPopupPosition = (buttonRef) => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      return {
+        top: rect.bottom + window.scrollY + 8, // 8px offset from the button
+        left: rect.left + window.scrollX,
+      };
+    }
+    return { top: 0, left: 0 };
+  };
 
   // Facilities options for multi-select dropdown
   const facilitiesOptions = [
@@ -255,8 +272,10 @@ const Accommodation = () => {
 
   // Room type options for dropdown
   const roomTypeOptions = [
-    { value: "private room", label: "Private Room" },
-    { value: "entire place", label: "Entire Place" },
+    { value: "Multifamily", label: "Multifamily" },
+    { value: "Commercial", label: "Commercial" },
+    { value: "Duplex", label: "Duplex" },
+    { value: "Apartment", label: "Apartment" },
   ];
 
   // Sort options for dropdown
@@ -361,293 +380,400 @@ const Accommodation = () => {
 
   return (
     <div className="p-6">
+    
       {/* Filter Buttons */}
-      <div className="sticky top-0 z-40 bg-white shadow-md px-6 py-2 flex items-center relative">
-      {/* Left Scroll Button */}
-      <button
-        onClick={scrollLeft}
-        className="absolute lg:hidden left-0 p-2 bg-white shadow-lg rounded-full z-50"
-      >
-        <FaChevronLeft className="w-5 h-5 text-gray-600" />
-      </button>
+<div className="sticky top-16 z-40 bg-white shadow-md px-6 py-2 flex items-center relative rounded-lg">
+  {/* Left Scroll Button */}
+  <button
+    onClick={scrollLeft}
+    className="absolute lg:hidden left-0 p-2 bg-white shadow-lg rounded-full z-50"
+  >
+    <FaChevronLeft className="w-5 h-5 text-gray-600" />
+  </button>
 
-      {/* Scrollable Buttons Container */}
-      <div
-        ref={scrollContainerRef}
-        className="mx-start flex gap-4 justify-start overflow-x-auto no-scrollbar scroll-smooth px-2"
-      >
-        <button
-          onClick={() => setIsLocationPopupOpen(true)}
-          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+  {/* Scrollable Buttons Container */}
+  <div
+    ref={scrollContainerRef}
+    className="mx-start flex gap-4 justify-start overflow-x-auto no-scrollbar scroll-smooth px-2"
+  >
+    {/* Sort Button */}
+    <button
+      ref={sortButtonRef}
+      onClick={() => setIsSortPopupOpen(true)}
+      className={`px-4 py-2 ${
+        filters.sort ? "bg-violet-700" : "bg-violet-600"
+      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+    >
+      {filters.sort
+        ? sortOptions.find((opt) => opt.value === filters.sort)?.label
+        : "Sort"}
+      {filters.sort && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent button click event
+            resetFilter("sort");
+          }}
+          className="text-white hover:text-gray-200"
         >
-          {filters.location || "Location"}
-        </button>
+          ×
+        </span>
+      )}
+    </button>
 
-        <button
-          onClick={() => setIsLocalityPopupOpen(true)}
-          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+    {/* Location Button */}
+    <button
+      ref={locationButtonRef}
+      onClick={() => setIsLocationPopupOpen(true)}
+      className={`px-4 py-2 ${
+        filters.location ? "bg-violet-700" : "bg-violet-600"
+      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+    >
+      {filters.location || "Location"}
+      {filters.location && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent button click event
+            resetFilter("location");
+          }}
+          className="text-white hover:text-gray-200"
         >
-          {filters.locality || "Locality"}
-        </button>
+          ×
+        </span>
+      )}
+    </button>
 
-        <button
-          onClick={() => setIsBudgetPopupOpen(true)}
-          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+    {/* Locality Button */}
+    <button
+      ref={localityButtonRef}
+      onClick={() => setIsLocalityPopupOpen(true)}
+      className={`px-4 py-2 ${
+        filters.locality ? "bg-violet-700" : "bg-violet-600"
+      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+    >
+      {filters.locality || "Locality"}
+      {filters.locality && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent button click event
+            resetFilter("locality");
+          }}
+          className="text-white hover:text-gray-200"
         >
-          {filters.budget[0] !== 0 || filters.budget[1] !== 100000
-            ? `₹${filters.budget[0]} - ₹${filters.budget[1]}`
-            : "Budget"}
-        </button>
+          ×
+        </span>
+      )}
+    </button>
 
-        <button
-          onClick={() => setIsRoomTypePopupOpen(true)}
-          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+    {/* Budget Button */}
+    <button
+      ref={budgetButtonRef}
+      onClick={() => setIsBudgetPopupOpen(true)}
+      className={`px-4 py-2 ${
+        filters.budget[0] !== 0 || filters.budget[1] !== 100000
+          ? "bg-violet-700"
+          : "bg-violet-600"
+      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+    >
+      {filters.budget[0] !== 0 || filters.budget[1] !== 100000
+        ? `₹${filters.budget[0]} - ₹${filters.budget[1]}`
+        : "Budget"}
+      {(filters.budget[0] !== 0 || filters.budget[1] !== 100000) && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent button click event
+            resetFilter("budget");
+          }}
+          className="text-white hover:text-gray-200"
         >
-          {filters.roomType || "Room Type"}
-        </button>
+          ×
+        </span>
+      )}
+    </button>
 
-        <button
-          onClick={() => setIsSortPopupOpen(true)}
-          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+    {/* Room Type Button */}
+    <button
+      ref={roomTypeButtonRef}
+      onClick={() => setIsRoomTypePopupOpen(true)}
+      className={`px-4 py-2 ${
+        filters.roomType ? "bg-violet-700" : "bg-violet-600"
+      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+    >
+      {filters.roomType || "Room Type"}
+      {filters.roomType && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent button click event
+            resetFilter("roomType");
+          }}
+          className="text-white hover:text-gray-200"
         >
-          {filters.sort
-            ? sortOptions.find((opt) => opt.value === filters.sort)?.label
-            : "Sort"}
-        </button>
+          ×
+        </span>
+      )}
+    </button>
 
-        <button
-          onClick={() => setIsStayDurationPopupOpen(true)}
-          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+    {/* Stay Duration Button */}
+    <button
+      ref={stayDurationButtonRef}
+      onClick={() => setIsStayDurationPopupOpen(true)}
+      className={`px-4 py-2 ${
+        filters.stayDuration ? "bg-violet-700" : "bg-violet-600"
+      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+    >
+      {filters.stayDuration
+        ? stayDurationOptions.find((opt) => opt.value === filters.stayDuration)
+            ?.label
+        : "Stay Duration"}
+      {filters.stayDuration && (
+        <span
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent button click event
+            resetFilter("stayDuration");
+          }}
+          className="text-white hover:text-gray-200"
         >
-          {filters.stayDuration
-            ? stayDurationOptions.find((opt) => opt.value === filters.stayDuration)?.label
-            : "Stay Duration"}
-        </button>
+          ×
+        </span>
+      )}
+    </button>
 
-        <button
-          onClick={() => setIsFilterPopupOpen(true)}
-          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
-        >
-          Open Filters
-        </button>
-      </div>
+    {/* Open Filters Button */}
+    <button
+      onClick={() => setIsFilterPopupOpen(true)}
+      className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+    >
+      Open Filters
+    </button>
 
-      {/* Right Scroll Button */}
-      <button
-        onClick={scrollRight}
-        className="absolute lg:hidden right-0 p-2 bg-white shadow-lg rounded-full z-50"
-      >
-        <FaChevronRight className="w-5 h-5 text-gray-600" />
-      </button>
-    </div>
+    {/* Reset Filters Button */}
+    <button
+      onClick={clearFilters}
+      className="px-4 py-2 bg-gray-100 text-red-600 font-semibold rounded-3xl text-nowrap"
+    >
+      Reset Filters
+    </button>
+  </div>
+
+  {/* Right Scroll Button */}
+  <button
+    onClick={scrollRight}
+    className="absolute lg:hidden right-0 p-2 bg-white shadow-lg rounded-full z-50"
+  >
+    <FaChevronRight className="w-5 h-5 text-gray-600" />
+  </button>
+</div>
 
       {/* Location Popup */}
       {isLocationPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsLocationPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Location</h2>
-            <input
-              type="text"
-              placeholder="Search Location (City or State)"
-              value={filters.location}
-              onChange={(e) => handleFilterChange("location", e.target.value)}
-              className="w-full p-2 border rounded"
-            />
-            {/* Reset Button */}
-            <button
-              onClick={() => resetFilter("location")}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Reset Location
-            </button>
-          </div>
+        <div
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
+          style={{
+            top: getPopupPosition(locationButtonRef).top,
+            left: getPopupPosition(locationButtonRef).left,
+          }}
+        >
+          <button
+            onClick={() => setIsLocationPopupOpen(false)}
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Location</h2>
+          <input
+            type="text"
+            placeholder="Search Location (City or State)"
+            value={filters.location}
+            onChange={(e) => handleFilterChange("location", e.target.value)}
+            className="w-full p-2 border rounded"
+          />
+          <button
+            onClick={() => resetFilter("location")}
+            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Reset Location
+          </button>
         </div>
       )}
 
       {/* Locality Popup */}
       {isLocalityPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsLocalityPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Locality</h2>
-            <Select
-              options={localityOptions}
-              value={localityOptions.find((opt) => opt.value === filters.locality)}
-              onChange={(selectedOption) =>
-                handleFilterChange("locality", selectedOption?.value || "")
-              }
-              className="w-full"
-            />
-            {/* Reset Button */}
-            <button
-              onClick={() => resetFilter("locality")}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Reset Locality
-            </button>
-          </div>
+        <div
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
+          style={{
+            top: getPopupPosition(localityButtonRef).top,
+            left: getPopupPosition(localityButtonRef).left,
+          }}
+        >
+          <button
+            onClick={() => setIsLocalityPopupOpen(false)}
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Locality</h2>
+          <Select
+            options={localityOptions}
+            value={localityOptions.find((opt) => opt.value === filters.locality)}
+            onChange={(selectedOption) =>
+              handleFilterChange("locality", selectedOption?.value || "")
+            }
+            className="w-full"
+          />
+          <button
+            onClick={() => resetFilter("locality")}
+            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Reset Locality
+          </button>
         </div>
       )}
 
       {/* Budget Popup */}
       {isBudgetPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsBudgetPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Budget (₹)</h2>
-            <Slider
-              range
-              min={0}
-              max={100000}
-              value={filters.budget}
-              onChange={(value) => handleFilterChange("budget", value)}
-              className="w-full"
-            />
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>₹{filters.budget[0]}</span>
-              <span>₹{filters.budget[1]}</span>
-            </div>
-            {/* Reset Button */}
-            <button
-              onClick={() => resetFilter("budget")}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Reset Budget
-            </button>
+        <div
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
+          style={{
+            top: getPopupPosition(budgetButtonRef).top,
+            left: getPopupPosition(budgetButtonRef).left,
+          }}
+        >
+          <button
+            onClick={() => setIsBudgetPopupOpen(false)}
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Budget (₹)</h2>
+          <Slider
+            range
+            min={0}
+            max={100000}
+            value={filters.budget}
+            onChange={(value) => handleFilterChange("budget", value)}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-gray-600">
+            <span>₹{filters.budget[0]}</span>
+            <span>₹{filters.budget[1]}</span>
           </div>
+          <button
+            onClick={() => resetFilter("budget")}
+            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Reset Budget
+          </button>
         </div>
       )}
 
       {/* Room Type Popup */}
       {isRoomTypePopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsRoomTypePopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Room Type</h2>
-            <Select
-              options={roomTypeOptions}
-              value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
-              onChange={(selectedOption) =>
-                handleFilterChange("roomType", selectedOption?.value || "")
-              }
-              className="w-full"
-            />
-            {/* Reset Button */}
-            <button
-              onClick={() => resetFilter("roomType")}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Reset Room Type
-            </button>
-          </div>
+        <div
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
+          style={{
+            top: getPopupPosition(roomTypeButtonRef).top,
+            left: getPopupPosition(roomTypeButtonRef).left,
+          }}
+        >
+          <button
+            onClick={() => setIsRoomTypePopupOpen(false)}
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Room Type</h2>
+          <Select
+            options={roomTypeOptions}
+            value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
+            onChange={(selectedOption) =>
+              handleFilterChange("roomType", selectedOption?.value || "")
+            }
+            className="w-full"
+          />
+          <button
+            onClick={() => resetFilter("roomType")}
+            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Reset Room Type
+          </button>
         </div>
       )}
 
       {/* Sort Popup */}
       {isSortPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsSortPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Sort By</h2>
-            <Select
-              options={sortOptions}
-              value={sortOptions.find((opt) => opt.value === filters.sort)}
-              onChange={(selectedOption) =>
-                handleFilterChange("sort", selectedOption?.value || "")
-              }
-              className="w-full"
-            />
-            {/* Reset Button */}
-            <button
-              onClick={() => resetFilter("sort")}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Reset Sort
-            </button>
-          </div>
+        <div
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
+          style={{
+            top: getPopupPosition(sortButtonRef).top,
+            left: getPopupPosition(sortButtonRef).left,
+          }}
+        >
+          <button
+            onClick={() => setIsSortPopupOpen(false)}
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Sort By</h2>
+          <Select
+            options={sortOptions}
+            value={sortOptions.find((opt) => opt.value === filters.sort)}
+            onChange={(selectedOption) =>
+              handleFilterChange("sort", selectedOption?.value || "")
+            }
+            className="w-full"
+          />
+          <button
+            onClick={() => resetFilter("sort")}
+            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Reset Sort
+          </button>
         </div>
       )}
 
       {/* Stay Duration Popup */}
       {isStayDurationPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-md relative">
-            {/* Close Button */}
-            <button
-              onClick={() => setIsStayDurationPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-xl font-semibold mb-4">Stay Duration</h2>
-            <Select
-              options={stayDurationOptions}
-              value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
-              onChange={(selectedOption) =>
-                handleFilterChange("stayDuration", selectedOption?.value || "")
-              }
-              className="w-full"
-            />
-            {/* Reset Button */}
-            <button
-              onClick={() => resetFilter("stayDuration")}
-              className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-            >
-              Reset Stay Duration
-            </button>
-          </div>
+        <div
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
+          style={{
+            top: getPopupPosition(stayDurationButtonRef).top,
+            left: getPopupPosition(stayDurationButtonRef).left,
+          }}
+        >
+          <button
+            onClick={() => setIsStayDurationPopupOpen(false)}
+            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+          >
+            <X className="w-6 h-6" />
+          </button>
+          <h2 className="text-xl font-semibold mb-4">Stay Duration</h2>
+          <Select
+            options={stayDurationOptions}
+            value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
+            onChange={(selectedOption) =>
+              handleFilterChange("stayDuration", selectedOption?.value || "")
+            }
+            className="w-full"
+          />
+          <button
+            onClick={() => resetFilter("stayDuration")}
+            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Reset Stay Duration
+          </button>
         </div>
       )}
 
       {/* Open Filters Popup */}
       {isFilterPopupOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg w-11/12 max-w-2xl relative">
-            {/* Close Button */}
+          <div className="bg-white p-6 rounded-lg h-2/3 overflow-auto no-scrollbar w-11/12 max-w-2xl relative">
             <button
               onClick={() => setIsFilterPopupOpen(false)}
               className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
             >
               <X className="w-6 h-6" />
             </button>
-
             <h2 className="text-xl font-semibold mb-4">Filters</h2>
 
             {/* Location */}
@@ -775,7 +901,7 @@ const Accommodation = () => {
           </div>
         </div>
       )}
-
+    
       <h1 className="text-3xl font-bold mb-6 mt-2">Accommodation</h1>
       {/* Accommodation List and Map Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-0">
@@ -875,7 +1001,7 @@ const Accommodation = () => {
 
         {/* Right Side: Map */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md sticky top-14">
+          <div className="bg-white rounded-lg shadow-md sticky top-28">
             <MapComponent
               accommodations={sortedAccommodations}
               hoveredAccommodationId={hoveredAccommodationId}
