@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense ,useRef} from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, Sliders, Home, Briefcase, X } from "lucide-react";
 import "leaflet/dist/leaflet.css";
@@ -9,6 +9,10 @@ import "rc-slider/assets/index.css"; // Slider styles
 import { API_NODE_URL, API_KEY } from "../../../config/config";
 import dynamic from "next/dynamic";
 import { useMap } from "react-leaflet";
+import Link from 'next/link';
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+
+
 
 // Dynamically import MapContainer and related components with SSR disabled
 const MapContainer = dynamic(
@@ -341,75 +345,101 @@ const Accommodation = () => {
       return 0; // Default: no sorting
     }
   });
+  const scrollContainerRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 200, behavior: "smooth" });
+    }
+  };
 
   return (
     <div className="p-6">
       {/* Filter Buttons */}
-      <div className="sticky top-0 z-40 bg-white shadow-md px-6 py-2">
-        <div className="mx-auto flex gap-4 justify-start">
-          {/* Location Button */}
-          <button
-            onClick={() => setIsLocationPopupOpen(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
-          >
-            {filters.location || "Location"}
-          </button>
+      <div className="sticky top-0 z-40 bg-white shadow-md px-6 py-2 flex items-center relative">
+      {/* Left Scroll Button */}
+      <button
+        onClick={scrollLeft}
+        className="absolute lg:hidden left-0 p-2 bg-white shadow-lg rounded-full z-50"
+      >
+        <FaChevronLeft className="w-5 h-5 text-gray-600" />
+      </button>
 
-          {/* Locality Button */}
-          <button
-            onClick={() => setIsLocalityPopupOpen(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
-          >
-            {filters.locality || "Locality"}
-          </button>
+      {/* Scrollable Buttons Container */}
+      <div
+        ref={scrollContainerRef}
+        className="mx-start flex gap-4 justify-start overflow-x-auto no-scrollbar scroll-smooth px-2"
+      >
+        <button
+          onClick={() => setIsLocationPopupOpen(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+        >
+          {filters.location || "Location"}
+        </button>
 
-          {/* Budget Button */}
-          <button
-            onClick={() => setIsBudgetPopupOpen(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
-          >
-            {filters.budget[0] !== 0 || filters.budget[1] !== 100000
-              ? `₹${filters.budget[0]} - ₹${filters.budget[1]}`
-              : "Budget"}
-          </button>
+        <button
+          onClick={() => setIsLocalityPopupOpen(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+        >
+          {filters.locality || "Locality"}
+        </button>
 
-          {/* Room Type Button */}
-          <button
-            onClick={() => setIsRoomTypePopupOpen(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
-          >
-            {filters.roomType || "Room Type"}
-          </button>
+        <button
+          onClick={() => setIsBudgetPopupOpen(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+        >
+          {filters.budget[0] !== 0 || filters.budget[1] !== 100000
+            ? `₹${filters.budget[0]} - ₹${filters.budget[1]}`
+            : "Budget"}
+        </button>
 
-          {/* Sort Button */}
-          <button
-            onClick={() => setIsSortPopupOpen(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
-          >
-            {filters.sort
-              ? sortOptions.find((opt) => opt.value === filters.sort)?.label
-              : "Sort"}
-          </button>
+        <button
+          onClick={() => setIsRoomTypePopupOpen(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+        >
+          {filters.roomType || "Room Type"}
+        </button>
 
-          {/* Stay Duration Button */}
-          <button
-            onClick={() => setIsStayDurationPopupOpen(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
-          >
-            {filters.stayDuration
-              ? stayDurationOptions.find((opt) => opt.value === filters.stayDuration)?.label
-              : "Stay Duration"}
-          </button>
+        <button
+          onClick={() => setIsSortPopupOpen(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+        >
+          {filters.sort
+            ? sortOptions.find((opt) => opt.value === filters.sort)?.label
+            : "Sort"}
+        </button>
 
-          {/* Open Filters Button */}
-          <button
-            onClick={() => setIsFilterPopupOpen(true)}
-            className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700"
-          >
-            Open Filters
-          </button>
-        </div>
+        <button
+          onClick={() => setIsStayDurationPopupOpen(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+        >
+          {filters.stayDuration
+            ? stayDurationOptions.find((opt) => opt.value === filters.stayDuration)?.label
+            : "Stay Duration"}
+        </button>
+
+        <button
+          onClick={() => setIsFilterPopupOpen(true)}
+          className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
+        >
+          Open Filters
+        </button>
       </div>
+
+      {/* Right Scroll Button */}
+      <button
+        onClick={scrollRight}
+        className="absolute lg:hidden right-0 p-2 bg-white shadow-lg rounded-full z-50"
+      >
+        <FaChevronRight className="w-5 h-5 text-gray-600" />
+      </button>
+    </div>
 
       {/* Location Popup */}
       {isLocationPopupOpen && (
@@ -753,82 +783,90 @@ const Accommodation = () => {
         <div className="lg:col-span-2">
           {sortedAccommodations.length > 0 ? (
             sortedAccommodations.map((accommodation) => (
-              <div
+              <Link
                 key={accommodation._id}
-                className="bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col md:flex-row items-start transition hover:shadow-xl"
-                onMouseEnter={() => setHoveredAccommodationId(accommodation._id)}
-                onMouseLeave={() => setHoveredAccommodationId(null)}
+                href={`/pages/${accommodation._id}`} // Navigate to the property's detail page
+                passHref
               >
-                {/* Left Side: Image */}
-                <div className="w-full md:w-1/3">
-                  <img
-                    src={
-                      accommodation.meta.images[0] || "/placeholder-image.jpg"
-                    }
-                    alt={accommodation.name}
-                    className="w-full h-72 object-cover rounded-lg"
-                  />
-                </div>
+                <div
+                  className="bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col md:flex-row items-start transition hover:shadow-xl cursor-pointer"
+                  onMouseEnter={() => setHoveredAccommodationId(accommodation._id)}
+                  onMouseLeave={() => setHoveredAccommodationId(null)}
+                >
+                  {/* Left Side: Image */}
+                  <div className="w-full md:w-1/3">
+                    <img
+                      src={
+                        accommodation.meta.images[0] || "/placeholder-image.jpg"
+                      }
+                      alt={accommodation.name}
+                      className="w-full h-72 object-cover rounded-lg"
+                    />
+                  </div>
 
-                {/* Right Side: Details */}
-                <div className="w-full md:w-2/3 md:pl-6 flex flex-col justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold">{accommodation.name}</h2>
-                    <p className="text-gray-600 mt-1">
-                      {accommodation.location.streetNumber} {accommodation.location.route},{" "}
-                      {accommodation.location.locality},{" "}
-                      {accommodation.location.city},{" "}
-                      {accommodation.location.state},{" "}
-                      {accommodation.location.country}
-                    </p>
-
-                    {/* Facilities (Horizontal Badges) */}
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {accommodation.amenities.map((amenity, index) => (
-                        <span
-                          key={index}
-                          className="bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full"
-                        >
-                          {amenity}
-                        </span>
-                      ))}
-                    </div>
-
-                    {/* Description (Only Short) */}
-                    <div className="mt-3">
-                      <h3 className="text-lg font-semibold">Description:</h3>
-                      <p className="text-gray-600">
-                        {accommodation.description.short_description}
+                  {/* Right Side: Details */}
+                  <div className="w-full md:w-2/3 md:pl-6 flex flex-col justify-between">
+                    <div>
+                      <h2 className="text-xl font-semibold">{accommodation.name}</h2>
+                      <p className="text-gray-600 mt-1">
+                        {accommodation.location.streetNumber} {accommodation.location.route},{" "}
+                        {accommodation.location.locality},{" "}
+                        {accommodation.location.city},{" "}
+                        {accommodation.location.state},{" "}
+                        {accommodation.location.country}
                       </p>
-                    </div>
 
-                    {/* Room Options */}
-                    <div className="mt-3">
-                      <h3 className="text-lg font-semibold">Room Options:</h3>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        {accommodation.meta.availableType.map((option, index) => (
+                      {/* Facilities (Horizontal Badges) */}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {accommodation.amenities.map((amenity, index) => (
                           <span
                             key={index}
-                            className="bg-violet-100 text-violet-700 px-3 py-1 text-sm rounded-full"
+                            className="bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full"
                           >
-                            {option}
+                            {amenity}
                           </span>
                         ))}
                       </div>
+
+                      {/* Description (Only Short) */}
+                      <div className="mt-3">
+                        <h3 className="text-lg font-semibold">Description:</h3>
+                        <p className="text-gray-600">
+                          {accommodation.description.short_description}
+                        </p>
+                      </div>
+
+                      {/* Room Options */}
+                      <div className="mt-3">
+                        <h3 className="text-lg font-semibold">Room Options:</h3>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {accommodation.meta.availableType.map((option, index) => (
+                            <span
+                              key={index}
+                              className="bg-violet-100 text-violet-700 px-3 py-1 text-sm rounded-full"
+                            >
+                              {option}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Price & Enquiry Button */}
+                    <div className="mt-4 flex justify-between items-center">
+                      <p className="text-lg font-semibold">
+                        Starting from ₹{accommodation.pricing.minPrice}/month
+                      </p>
+                      <button
+                        className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
+                        onClick={(e) => e.preventDefault()} // Prevent the button from triggering the Link
+                      >
+                        Enquire
+                      </button>
                     </div>
                   </div>
-
-                  {/* Price & Enquiry Button */}
-                  <div className="mt-4 flex justify-between items-center">
-                    <p className="text-lg font-semibold">
-                      Starting from ₹{accommodation.pricing.minPrice}/month
-                    </p>
-                    <button className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700">
-                      Enquire
-                    </button>
-                  </div>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <p className="text-gray-600">No accommodations found.</p>

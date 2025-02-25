@@ -1,5 +1,5 @@
+// app/college/components/FilterSection.js
 "use client";
-
 import React, { useState } from "react";
 import { FiFilter } from "react-icons/fi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -289,7 +289,7 @@ const FilterSection = ({ filters, setFilters }) => {
                   )}
 
                   <div className="flex justify-between mt-4">
-                  <button
+                    <button
                       className="px-4 py-2 bg-red-50 text-red-500 rounded-full"
                       onClick={() => clearIndividualFilter(filter.id)}
                     >
