@@ -1,8 +1,7 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
 import Modal from "react-modal";
 import { FiFilter, FiX } from "react-icons/fi";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
@@ -10,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { API_NODE_URL, API_KEY } from "../../../config/config";
 import { useMap } from "react-leaflet";
 
-// Dynamically import MapContainer and related components with SSR disabled
+// Dynamically import Leaflet and related components with SSR disabled
 const MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
   { ssr: false }
@@ -29,12 +28,16 @@ const Popup = dynamic(
 );
 
 
-// Icon for map marker
-const markerIcon = new L.Icon({
-  iconUrl: "https://cdn-icons-png.flaticon.com/512/1673/1673221.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-});
+const markerIcon = typeof window !== "undefined" 
+  ? (() => {
+      const L = require("leaflet"); // Dynamically require Leaflet
+      return new L.Icon({
+        iconUrl: "https://cdn-icons-png.flaticon.com/512/1673/1673221.png",
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+      });
+    })()
+  : null;
 
 // Zoom to hovered location component
 const ZoomToCollege = ({ coordinates }) => {
@@ -62,6 +65,7 @@ const College = () => {
       max: parseInt(searchParams.get("max_budget")) || Infinity,
     },
   });
+  const [isAllFiltersOpen, setIsAllFiltersOpen] = useState(false);
   const [hoveredCollege, setHoveredCollege] = useState(null);
   const [modalData, setModalData] = useState({
     isOpen: false,
@@ -110,9 +114,12 @@ const College = () => {
 
         const text = await response.text();
         const data = JSON.parse(text);
+        console.log(data);
 
-        if (Array.isArray(data.colleges)) {
-          setColleges(data.colleges);
+        if (Array.isArray(data.data)) { // Corrected API response path
+          setColleges(data.data);
+        } else {
+          console.error("Unexpected API response structure");
         }
       } catch (error) {
         console.error("Failed to fetch colleges:", error);
@@ -121,6 +128,7 @@ const College = () => {
 
     fetchColleges();
   }, []);
+
 
   // Autoplay functionality for slider
   useEffect(() => {
@@ -178,11 +186,15 @@ const College = () => {
   };
 
   const isFormValid = modalData.name.trim() && /^[0-9]{10}$/.test(modalData.mobile);
+  const applyFilters = () => {
+    setIsAllFiltersOpen(false); // Close the "All Filters" popup
+    // Add logic to apply filters (e.g., filter data, update state, etc.)
+  };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-white min-h-screen">
       {/* Slider Section */}
-      <section className="relative overflow-hidden rounded-xl mb-10">
+      {/*<section className="relative overflow-hidden rounded-xl mb-10">
         <div className="relative w-full h-[450px]">
           {slides.map((slide, index) => (
             <div
@@ -204,7 +216,7 @@ const College = () => {
           ))}
         </div>
 
-        {/* Custom Navigation */}
+        {/* Custom Navigation 
         <div className="absolute bottom-4 left-2/4 z-40 flex -translate-x-2/4 gap-2">
           {slides.map((_, i) => (
             <span
@@ -217,150 +229,265 @@ const College = () => {
           ))}
         </div>
       </section>
+      */}
 
       {/* Filter Section */}
-      <section className="bg-white shadow-md py-4 px-6">
-        <div className="container mx-auto">
-          <div className="flex flex-wrap gap-4 items-center justify-between">
-            {[
-              { id: "city", label: "City" },
-              { id: "college_type", label: "College Type" },
-              { id: "courses_offered", label: "Courses Offered" },
-              { id: "budget", label: "Budget" },
-            ].map((filter) => (
-              <div key={filter.id} className="relative" ref={filterRef}>
-                {/* Filter Button */}
-                <button
-  className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-md transition-all ${
-    filters[filter.id]
-      ? "bg-blue-500 text-white"
-      : "bg-blue-50 text-blue-900 hover:bg-blue-100"
-  }`}
-  onClick={() => setActiveFilter(filter.id === activeFilter ? null : filter.id)}
->
-  {filter.label}
-  {filters[filter.id] && (
-    <span
-      onClick={(e) => {
-        e.stopPropagation(); // Prevent the filter button from toggling
-        setFilters((prev) => ({ ...prev, [filter.id]: "" }));
-      }}
-      className="ml-2 p-1 rounded-full hover:bg-blue-600"
-    >
-      <FiX className="w-4 h-4" />
-    </span>
-  )}
-  <span className="transition-transform duration-300">
-    {activeFilter === filter.id ? <FaChevronUp /> : <FaChevronDown />}
-  </span>
-</button>
-
-                {/* Filter Pop-up */}
-                {activeFilter === filter.id && (
-  <div
-    className="absolute left-0 top-full mt-2 w-64 bg-white border shadow-lg rounded-lg z-[1000] p-4"
-  >
-    {/* Cross Button to Close Pop-up */}
-    <button
-      onClick={() => setActiveFilter(null)} // Close pop-up when clicked
-      className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100"
-    >
-      <FiX className="w-4 h-4" />
-    </button>
-
-    {/* Filter Content */}
-    {filter.id === "city" && (
-      <>
-        <input
-          type="text"
-          placeholder="Search city..."
-          value={filters.city}
-          onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
-          className="w-full px-4 py-2 mb-4 border rounded-lg"
-        />
-      </>
-    )}
-
-    {filter.id === "college_type" && (
-      <>
-        <select
-          value={filters.college_type}
-          onChange={(e) => setFilters((prev) => ({ ...prev, college_type: e.target.value }))}
-          className="w-full px-4 py-2 mb-4 border rounded-lg"
-        >
-          <option value="">Select College Type</option>
-          <option value="Government">Government</option>
-          <option value="Private">Private</option>
-        </select>
-      </>
-    )}
-
-    {filter.id === "courses_offered" && (
-      <>
-        <input
-          type="text"
-          placeholder="Search courses..."
-          value={filters.courses_offered}
-          onChange={(e) => setFilters((prev) => ({ ...prev, courses_offered: e.target.value }))}
-          className="w-full px-4 py-2 mb-4 border rounded-lg"
-        />
-      </>
-    )}
-
-    {filter.id === "budget" && (
-      <>
-        <h4 className="text-sm font-bold mb-2">Select Range</h4>
-        <div className="flex gap-4">
-          <input
-            type="number"
-            value={filters.budgetRange.min}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                budgetRange: { ...prev.budgetRange, min: parseInt(e.target.value, 10) || 0 },
-              }))
-            }
-            className="w-1/2 px-2 py-1 border rounded-lg"
-            placeholder="Min"
-          />
-          <input
-            type="number"
-            value={filters.budgetRange.max}
-            onChange={(e) =>
-              setFilters((prev) => ({
-                ...prev,
-                budgetRange: { ...prev.budgetRange, max: parseInt(e.target.value, 10) || Infinity },
-              }))
-            }
-            className="w-1/2 px-2 py-1 border rounded-lg"
-            placeholder="Max"
-          />
-        </div>
-      </>
-    )}
-  </div>
-)}
-              </div>
-            ))}
+      <section className="sticky top-16 bg-white shadow-md py-4 px-6 z-50">
+      <div className="container">
+        <div className="flex flex-wrap gap-10 items-center justify-start">
+          {/* All Filters Button */}
+          <div className="relative" ref={filterRef}>
             <button
-              onClick={resetFilters}
-              className="px-4 py-2 bg-red-500 text-white rounded-full"
+              className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-md transition-all ${
+                isAllFiltersOpen ? "bg-gray-100 text-violet-600" : "bg-violet-600 text-white"
+              }`}
+              onClick={() => setIsAllFiltersOpen(!isAllFiltersOpen)}
             >
-              Reset Filters
+              <FiFilter className="w-4 h-4" />
+              All Filters
+              <span className="transition-transform duration-300">
+                {isAllFiltersOpen ? <FaChevronUp /> : <FaChevronDown />}
+              </span>
             </button>
+
+            {/* All Filters Pop-up */}
+            {isAllFiltersOpen && (
+              <div className="absolute left-0 top-full mt-2 w-96 bg-white border shadow-lg rounded-lg z-[1000] p-4">
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsAllFiltersOpen(false)}
+                  className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100"
+                >
+                  <FiX className="w-4 h-4" />
+                </button>
+
+                {/* Heading */}
+                <h2 className="text-lg font-semibold mb-4">All Filters</h2>
+
+                {/* City Filter */}
+                <div className="mb-4">
+                  <h4 className="text-sm font-bold mb-2">City</h4>
+                  <input
+                    type="text"
+                    placeholder="Search city..."
+                    value={filters.city}
+                    onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+
+                {/* College Type Filter */}
+                <div className="mb-4">
+                  <h4 className="text-sm font-bold mb-2">College Type</h4>
+                  <select
+                    value={filters.college_type}
+                    onChange={(e) => setFilters((prev) => ({ ...prev, college_type: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  >
+                    <option value="">Select College Type</option>
+                    <option value="Government">Government</option>
+                    <option value="Private">Private</option>
+                  </select>
+                </div>
+
+                {/* Courses Offered Filter */}
+                <div className="mb-4">
+                  <h4 className="text-sm font-bold mb-2">Courses Offered</h4>
+                  <input
+                    type="text"
+                    placeholder="Search courses..."
+                    value={filters.courses_offered}
+                    onChange={(e) => setFilters((prev) => ({ ...prev, courses_offered: e.target.value }))}
+                    className="w-full px-4 py-2 border rounded-lg"
+                  />
+                </div>
+
+                {/* Budget Filter */}
+                <div className="mb-4">
+                  <h4 className="text-sm font-bold mb-2">Budget</h4>
+                  <div className="flex gap-4">
+                    <input
+                      type="number"
+                      value={filters.budgetRange.min}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          budgetRange: { ...prev.budgetRange, min: parseInt(e.target.value, 10) || 0 },
+                        }))
+                      }
+                      className="w-1/2 px-2 py-1 border rounded-lg"
+                      placeholder="Min"
+                    />
+                    <input
+                      type="number"
+                      value={filters.budgetRange.max}
+                      onChange={(e) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          budgetRange: { ...prev.budgetRange, max: parseInt(e.target.value, 10) || Infinity },
+                        }))
+                      }
+                      className="w-1/2 px-2 py-1 border rounded-lg"
+                      placeholder="Max"
+                    />
+                  </div>
+                </div>
+
+                {/* Apply and Reset Buttons */}
+                <div className="flex gap-4 mt-6">
+                  <button
+                    onClick={resetFilters}
+                    className="px-4 py-2 bg-gray-300 text-black rounded-lg hover:bg-gray-400"
+                  >
+                    Reset All
+                  </button>
+                  <button
+                    onClick={applyFilters}
+                    className="px-4 py-2 bg-violet-600 text-white rounded-lg hover:bg-violet-700"
+                  >
+                    Apply Filters
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
+
+          {/* Individual Filter Buttons */}
+          {[
+            { id: "city", label: "City" },
+            { id: "college_type", label: "College Type" },
+            { id: "courses_offered", label: "Courses Offered" },
+            { id: "budget", label: "Budget" },
+          ].map((filter) => (
+            <div key={filter.id} className="relative" ref={filterRef}>
+              {/* Filter Button */}
+              <button
+                className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-md transition-all ${
+                  filters[filter.id]
+                    ? "bg-gray-100 text-violet-600"
+                    : "bg-violet-600 text-white"
+                }`}
+                onClick={() => setActiveFilter(filter.id === activeFilter ? null : filter.id)}
+              >
+                {filter.label}
+                {filters[filter.id] && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the filter button from toggling
+                      setFilters((prev) => ({ ...prev, [filter.id]: "" }));
+                    }}
+                    className="ml-2 p-1 rounded-full hover:bg-blue-600"
+                  >
+                    <FiX className="w-4 h-4" />
+                  </span>
+                )}
+                <span className="transition-transform duration-300">
+                  {activeFilter === filter.id ? <FaChevronUp /> : <FaChevronDown />}
+                </span>
+              </button>
+
+              {/* Filter Pop-up */}
+              {activeFilter === filter.id && (
+                <div className="absolute left-0 top-full mt-2 w-64 bg-white border shadow-lg rounded-lg z-[1000] p-4">
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setActiveFilter(null)}
+                    className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100"
+                  >
+                    <FiX className="w-4 h-4" />
+                  </button>
+
+                  {/* Heading */}
+                  <h4 className="text-sm font-bold mb-4">{filter.label}</h4>
+
+                  {/* Filter Content */}
+                  {filter.id === "city" && (
+                    <input
+                      type="text"
+                      placeholder="Search city..."
+                      value={filters.city}
+                      onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
+                      className="w-full px-4 py-2 mb-4 border rounded-lg"
+                    />
+                  )}
+
+                  {filter.id === "college_type" && (
+                    <select
+                      value={filters.college_type}
+                      onChange={(e) => setFilters((prev) => ({ ...prev, college_type: e.target.value }))}
+                      className="w-full px-4 py-2 mb-4 border rounded-lg"
+                    >
+                      <option value="">Select College Type</option>
+                      <option value="Government">Government</option>
+                      <option value="Private">Private</option>
+                    </select>
+                  )}
+
+                  {filter.id === "courses_offered" && (
+                    <input
+                      type="text"
+                      placeholder="Search courses..."
+                      value={filters.courses_offered}
+                      onChange={(e) => setFilters((prev) => ({ ...prev, courses_offered: e.target.value }))}
+                      className="w-full px-4 py-2 mb-4 border rounded-lg"
+                    />
+                  )}
+
+                  {filter.id === "budget" && (
+                    <>
+                      <div className="flex gap-4">
+                        <input
+                          type="number"
+                          value={filters.budgetRange.min}
+                          onChange={(e) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              budgetRange: { ...prev.budgetRange, min: parseInt(e.target.value, 10) || 0 },
+                            }))
+                          }
+                          className="w-1/2 px-2 py-1 border rounded-lg"
+                          placeholder="Min"
+                        />
+                        <input
+                          type="number"
+                          value={filters.budgetRange.max}
+                          onChange={(e) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              budgetRange: { ...prev.budgetRange, max: parseInt(e.target.value, 10) || Infinity },
+                            }))
+                          }
+                          className="w-1/2 px-2 py-1 border rounded-lg"
+                          placeholder="Max"
+                        />
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* Reset Filters Button */}
+          <button
+            onClick={resetFilters}
+            className="px-4 py-2 bg-red-500 text-white rounded-full"
+          >
+            Reset Filters
+          </button>
         </div>
-      </section>
+      </div>
+    </section>
 
       {/* College List */}
-      <div className="flex bg-gray-50 min-h-screen">
+      <div className="flex min-h-screen ">
         {/* Left Section */}
         <div className="w-2/3 p-4">
           {filteredColleges.length > 0 ? (
             filteredColleges.map((college) => (
               <div
                 key={college._id}
-                className="flex h-64 mb-6 p-4 bg-white shadow-lg rounded-lg hover:shadow-xl transition-transform transform hover:scale-105"
+                className="flex h-64 mb-6 p-4 bg-white shadow-lg rounded-lg hover:shadow-xl transition-transform transform"
                 onMouseEnter={() => setHoveredCollege(college)}
                 onMouseLeave={() => setHoveredCollege(null)}
               >
@@ -369,7 +496,7 @@ const College = () => {
                   <img
                     src={college.img[0]}
                     alt={college.name}
-                    className="w-full h-full object-cover rounded-lg hover:scale-105"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 </div>
 
@@ -413,7 +540,7 @@ const College = () => {
         </div>
 
         {/* Right Section */}
-        <div className="w-1/3 px-4 py-8 sticky top-0 h-[600px]">
+        <div className="w-1/3 px-4 sticky top-20 h-[600px]">
           <MapContainer
             center={[20.5937, 78.9629]} // Default center to India
             zoom={5}
@@ -523,4 +650,10 @@ const College = () => {
   );
 };
 
-export default College;
+export default function CollegePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <College />
+    </Suspense>
+  );
+}
