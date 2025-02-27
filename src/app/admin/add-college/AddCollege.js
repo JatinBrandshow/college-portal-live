@@ -3,14 +3,12 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
-import { API_KEY } from '../../../../config/config';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+import { API_NODE_URL, API_KEY } from "../../../../config/config";
 
 function AddCollege() {
   const [formData, setFormData] = useState({
     name: "",
+    address:"",
     city: "",
     state: "",
     established_year: "",
@@ -68,7 +66,7 @@ function AddCollege() {
 
     try {
       const response = await fetch(
-        `${BASE_URL}college/add-college`,
+        `${API_NODE_URL}college/add-college`,
         {
           method: "POST",
           headers: {
@@ -80,6 +78,7 @@ function AddCollege() {
       );
 
       const result = await response.json();
+      console.log("Result:", result);
 
       if (response.ok) {
         toast.success("College data uploaded successfully!", {
@@ -127,10 +126,10 @@ function AddCollege() {
             />
           </div>
           <div>
-            <label className="block text-sm mb-2 font-medium text-gray-700">City</label>
+            <label className="block text-sm mb-2 font-medium text-gray-700">Address</label>
             <input
               type="text"
-              name="city"
+              name="address"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
               placeholder="Enter city"
@@ -140,20 +139,20 @@ function AddCollege() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <label className="block text-sm mb-2 font-medium text-gray-700">State</label>
+            <label className="block text-sm mb-2 font-medium text-gray-700">City</label>
             <input
               type="text"
-              name="state"
+              name="city"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
               placeholder="Enter state"
             />
           </div>
           <div>
-            <label className="block text-sm mb-2 font-medium text-gray-700">Established Year</label>
+            <label className="block text-sm mb-2 font-medium text-gray-700">State</label>
             <input
-              type="number"
-              name="established_year"
+              type="text"
+              name="state"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
               placeholder="Enter year"
@@ -188,10 +187,10 @@ function AddCollege() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <label className="block text-sm mb-2 font-medium text-gray-700">Ranking</label>
+            <label className="block text-sm mb-2 font-medium text-gray-700">Established Year</label>
             <input
               type="number"
-              name="ranking"
+              name="established_year"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
               placeholder="Enter ranking"
@@ -233,6 +232,7 @@ function AddCollege() {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <label className="flex items-center text-sm mb-2 font-medium text-gray-700">
             <input
@@ -243,6 +243,17 @@ function AddCollege() {
             />
             <span className="ml-2">Hostel Availability</span>
           </label>
+        </div>
+        <div>
+            <label className="block text-sm mb-2 font-medium text-gray-700">Ranking</label>
+            <input
+              type="number"
+              name="ranking"
+              onChange={handleChange}
+              className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
+              placeholder="Enter ranking"
+            />
+          </div>
         </div>
 
         <div>

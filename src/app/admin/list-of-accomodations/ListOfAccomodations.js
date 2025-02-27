@@ -19,9 +19,12 @@ const ListOfAccommodations = () => {
           },
         });
         const result = await response.json();
-        if (Array.isArray(result)) {
-          setData(result);
-          setFilteredData(result);
+        console.log("result", result);
+
+        // Check if the response contains the expected 'data' field
+        if (result.status && Array.isArray(result.data)) {
+          setData(result.data);  // Set the accommodations data
+          setFilteredData(result.data);  // Set the filtered data
         } else {
           console.error("Unexpected response format:", result);
           setData([]);
@@ -76,8 +79,7 @@ const ListOfAccommodations = () => {
               filteredData.map((Accomo, index) => (
                 <tr
                   key={Accomo.id}
-                  className={`border-t ${index % 2 === 0 ? "bg-gray-50" : "bg-white"
-                    }`}
+                  className={`border-t ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                 >
                   <td className="px-4 py-2 text-sm font-medium text-gray-700 truncate">
                     {Accomo.name}
@@ -99,6 +101,9 @@ const ListOfAccommodations = () => {
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
                     {Accomo.price}
+                  </td>
+                  <td className="px-4 py-2 text-sm text-gray-600 truncate">
+                    {Accomo.amenities}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
                     {Accomo.phone}
@@ -134,7 +139,6 @@ const ListOfAccommodations = () => {
         </table>
       </div>
     </div>
-
   );
 };
 

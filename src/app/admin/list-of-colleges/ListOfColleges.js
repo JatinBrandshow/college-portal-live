@@ -22,6 +22,7 @@ const ListOfColleges = () => {
         });
 
         const result = await response.json();
+        console.log("result", result);
 
         if (result.status && result.data && Array.isArray(result.data)) {
           setData(result.data);
@@ -65,6 +66,7 @@ const ListOfColleges = () => {
           <thead className="bg-[#1c2333] text-white">
             <tr>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Name</th>
+              <th className="px-4 py-2 font-semibold text-left border border-gray-300">Name</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">City</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">State</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Established</th>
@@ -85,6 +87,7 @@ const ListOfColleges = () => {
                     } hover:bg-gray-200`}
                 >
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.name}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.address}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.city}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.state}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.establishedYear}</td>
