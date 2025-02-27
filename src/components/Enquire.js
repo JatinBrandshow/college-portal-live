@@ -4,17 +4,18 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import Link from "next/link";
 
-const Enquire = () => {
-    const [isOpen, setIsOpen] = useState(true); // State to handle modal visibility
-
-    const closeModal = () => {
-        setIsOpen(false); // Close modal when X button is clicked
+const Enquire = ({ isOpen, setIsOpen }) => {
+    const closeModal = (event) => {
+        event.preventDefault();  // Prevents default navigation behavior
+        event.stopPropagation(); // Stops the event from bubbling up to the Link
+        setIsOpen(false);
     };
 
+    if (!isOpen) return null;
     return (
         <>
             {isOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg w-full max-w-[800px] flex justify-between overflow-hidden">
                         <div className="p-6 space-y-6 w-7/12">
                             <div className="flex items-start justify-between">
