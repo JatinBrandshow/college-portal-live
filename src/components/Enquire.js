@@ -105,19 +105,19 @@ const Enquire = ({ isOpen, setIsOpen }) => {
 
                             <div className="grid grid-cols-1 gap-4 bg-white p-4 rounded-xl shadow-md mt-4">
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">💰</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">💰</span>
                                     Lowest Price Guarantee
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">✓</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">✓</span>
                                     Verified Properties
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">💬</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">💬</span>
                                     24x7 Personal Assistance
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">⭐</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">⭐</span>
                                     5.8k+ Reviews
                                 </div>
                             </div>
