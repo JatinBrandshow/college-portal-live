@@ -16,7 +16,7 @@ const PopularColleges = () => {
   useEffect(() => {
     const fetchColleges = async () => {
       try {
-        const response = await fetch(`${API_NODE_URL}popularCollege/colleges`, {
+        const response = await fetch(`${API_NODE_URL}college/popular-colleges`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
@@ -26,10 +26,10 @@ const PopularColleges = () => {
         const text = await response.text(); // Read raw response
         const data = JSON.parse(text); // Parse JSON manually
   
-        if (Array.isArray(data.data)) {  // Corrected path to access colleges array
-          setColleges(data.data);
+        if (Array.isArray(data)) {  // Directly checking if the response is an array
+          setColleges(data);  // Assign the array to colleges state
   
-          const uniqueCities = ["All", ...new Set(data.data.map((college) => college.city))];
+          const uniqueCities = ["All", ...new Set(data.map((college) => college.city))];
           setCities(uniqueCities);
         } else {
           console.error("Unexpected API response structure:", data);
@@ -41,6 +41,7 @@ const PopularColleges = () => {
   
     fetchColleges();
   }, []);
+  
 
   useEffect(() => {
     const handleScroll = () => {
