@@ -105,7 +105,7 @@ const College = () => {
   useEffect(() => {
     const fetchColleges = async () => {
       try {
-        const response = await fetch(`${API_NODE_URL}popularCollege/colleges`, {
+        const response = await fetch(`${API_NODE_URL}college/all-colleges`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
@@ -494,7 +494,7 @@ const College = () => {
                 {/* College Image */}
                 <div className="h-full w-1/3">
                   <img
-                    src={college.img[0]}
+                    src={college.images[0]}
                     alt={college.name}
                     className="w-full h-full object-cover rounded-lg"
                   />
@@ -550,24 +550,24 @@ const College = () => {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution="&copy; <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors"
             />
-            {filteredColleges.map((college) => (
-              <Marker
-                position={[college.location.latitude, college.location.longitude]}
-                icon={markerIcon}
-                key={college._id}
-              >
-                <Popup>
-                  <strong>{college.name}</strong>
-                  <p>{college.city}</p>
-                </Popup>
-              </Marker>
-            ))}
-            {hoveredCollege && (
-              <ZoomToCollege
-                coordinates={[hoveredCollege.location.latitude, hoveredCollege.location.longitude]}
-              />
+            {filteredColleges.map((college) => {
+              const lat = college.location.latitude ?? 20.5937; // Default latitude (India)
+              const lng = college.location.longitude ?? 78.9629; // Default longitude (India)
+
+              return (
+                <Marker position={[lat, lng]} icon={markerIcon} key={college._id}>
+                  <Popup>
+                    <strong>{college.name}</strong>
+                    <p>{college.city}</p>
+                  </Popup>
+                </Marker>
+              );
+            })}
+            {hoveredCollege && hoveredCollege.location.latitude !== null && hoveredCollege.location.longitude !== null && (
+              <ZoomToCollege coordinates={[hoveredCollege.location.latitude, hoveredCollege.location.longitude]} />
             )}
           </MapContainer>
+
         </div>
 
         {/* Modal for Actions */}

@@ -4,17 +4,18 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import Link from "next/link";
 
-const Enquire = () => {
-    const [isOpen, setIsOpen] = useState(true); // State to handle modal visibility
-
-    const closeModal = () => {
-        setIsOpen(false); // Close modal when X button is clicked
+const Enquire = ({ isOpen, setIsOpen }) => {
+    const closeModal = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsOpen(false);
     };
 
+    if (!isOpen) return null;
     return (
         <>
             {isOpen && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+                <div className="fixed inset-0 bg-black/30 flex items-center justify-center p-4 z-50">
                     <div className="bg-white rounded-lg w-full max-w-[800px] flex justify-between overflow-hidden">
                         <div className="p-6 space-y-6 w-7/12">
                             <div className="flex items-start justify-between">
@@ -104,19 +105,19 @@ const Enquire = () => {
 
                             <div className="grid grid-cols-1 gap-4 bg-white p-4 rounded-xl shadow-md mt-4">
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">💰</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">💰</span>
                                     Lowest Price Guarantee
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">✓</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">✓</span>
                                     Verified Properties
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">💬</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">💬</span>
                                     24x7 Personal Assistance
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                    <span className="w-6 h-6 flex items-center justify-center bg-gray-200 rounded-full">⭐</span>
+                                    <span className="w-4 h-4 flex items-center justify-center rounded-full">⭐</span>
                                     5.8k+ Reviews
                                 </div>
                             </div>

@@ -33,39 +33,39 @@ const Sidebar = ({ isOpen }) => {
         { name: "List Of Accommodations", route: "/admin/list-of-accomodations" },
       ],
     },
-    {
-      title: "Department",
-      icon: <FaSection />,
-      subList: [
-        { name: "Add Department", route: "/admin/add-department" },
-        { name: "List Of Departments", route: "/admin/list-of-departments" },
-      ],
-    },
-    {
-      title: "Program",
-      icon: <FiBook />,
-      subList: [
-        { name: "Add Program", route: "/admin/add-program" },
-        { name: "List Of Programs", route: "/admin/list-of-programmes" },
-      ],
-    },
-    {
-      title: "Stream",
-      icon: <FaStream />,
-      subList: [
-        { name: "Add Stream", route: "/admin/add-stream" },
-        { name: "List Of Streams", route: "/admin/list-of-streams" },
-      ],
-    },
-    {
-      title: "Affiliation",
-      icon: <MdOutlineAppRegistration />,
-      subList: [
-        { name: "Add Affiliation", route: "/admin/add-affiliation" },
-        { name: "List Of Affiliations", route: "/admin/list-of-affiliations" },
-      ],
-    },
-    { title: "Mapping", icon: <PiMapPinSimpleBold />, route: "/admin/mapping", subList: [] },
+    // {
+    //   title: "Department",
+    //   icon: <FaSection />,
+    //   subList: [
+    //     { name: "Add Department", route: "/admin/add-department" },
+    //     { name: "List Of Departments", route: "/admin/list-of-departments" },
+    //   ],
+    // },
+    // {
+    //   title: "Program",
+    //   icon: <FiBook />,
+    //   subList: [
+    //     { name: "Add Program", route: "/admin/add-program" },
+    //     { name: "List Of Programs", route: "/admin/list-of-programmes" },
+    //   ],
+    // },
+    // {
+    //   title: "Stream",
+    //   icon: <FaStream />,
+    //   subList: [
+    //     { name: "Add Stream", route: "/admin/add-stream" },
+    //     { name: "List Of Streams", route: "/admin/list-of-streams" },
+    //   ],
+    // },
+    // {
+    //   title: "Affiliation",
+    //   icon: <MdOutlineAppRegistration />,
+    //   subList: [
+    //     { name: "Add Affiliation", route: "/admin/add-affiliation" },
+    //     { name: "List Of Affiliations", route: "/admin/list-of-affiliations" },
+    //   ],
+    // },
+    // { title: "Mapping", icon: <PiMapPinSimpleBold />, route: "/admin/mapping", subList: [] },
   ];
 
   const toggleSublist = (index) => {

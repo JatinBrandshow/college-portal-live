@@ -14,6 +14,7 @@ function AddCollege() {
     established_year: "",
     affiliated_university: "",
     college_type: "Public",
+    courses_offered: [],
     ranking: "",
     accreditation: "",
     placement_details: {
@@ -60,51 +61,63 @@ function AddCollege() {
       setFormData({ ...formData, [name]: value });
     }
   };
-
+  console.log(formData);
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    try {
-      const response = await fetch(
-        `${API_NODE_URL}college/add-college`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
-
-      const result = await response.json();
-      console.log("Result:", result);
-
-      if (response.ok) {
-        toast.success("College data uploaded successfully!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
+  
+    setFormData((prevData) => {
+    // Ensure courses_offered is properly formatted as an array of strings
+    const updatedFormData = {
+      ...formData,
+      courses_offered: Array.isArray(formData.courses_offered) 
+        ? formData.courses_offered.map(course => String(course).trim()) 
+        : [], // Ensure it's always an array
+    };  
+      console.log("Submitting Data:", JSON.stringify(updatedFormData, null, 2));
+  
+      fetch(`${API_NODE_URL}college/add-college`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify(updatedFormData),
+      })
+        .then((response) => response.json())
+        .then((result) => {
+          console.log("Result:", result);
+          if (result.status) {
+            toast.success("College data uploaded successfully!");
+          } else {
+            toast.error(result.msg || "Error uploading data.");
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          toast.error("An error occurred while uploading data.");
         });
-      } else {
-        toast.error(result.message || "Error uploading data.", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("An error occurred while uploading data.", {
-        position: "top-right",
-        autoClose: 3000,
-      });
-    }
+  
+      return prevData; // Prevent unnecessary re-renders
+    });
   };
+  const [newCourse, setNewCourse] = useState(""); // Track input value
 
+const addCourse = () => {
+  if (newCourse.trim()) {
+    setFormData((prev) => ({
+      ...prev,
+      courses_offered: [...prev.courses_offered, newCourse.trim()],
+    }));
+    setNewCourse(""); // Clear input
+  }
+};
+
+const removeCourse = (index) => {
+  setFormData((prev) => ({
+    ...prev,
+    courses_offered: prev.courses_offered.filter((_, i) => i !== index),
+  }));
+};
   return (
     <div className="container p-4">
       <ToastContainer />
@@ -207,6 +220,43 @@ function AddCollege() {
             />
           </div>
         </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <label className="block text-sm mb-2 font-medium text-gray-700">Courses Offered</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={newCourse}
+                onChange={(e) => setNewCourse(e.target.value)}
+                className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
+                placeholder="Enter course name"
+              />
+              <button
+                type="button"
+                onClick={addCourse}
+                className="px-4 py-2 bg-blue-500 text-white text-xs rounded-lg hover:bg-blue-600"
+              >
+                Add
+              </button>
+            </div>
+
+            {/* Show added courses */}
+            <ul className="mt-2">
+              {formData.courses_offered.map((course, index) => (
+                <li key={index} className="flex justify-between items-center bg-gray-100 px-2 py-1 rounded-lg mt-1">
+                  <span className="text-xs">{course}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeCourse(index)}
+                    className="text-red-500 text-xs"
+                  >
+                    ❌
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
 
         <h6 className="text-2xl font-semibold text-gray-800 mt-6">Placement Details</h6>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -295,7 +345,7 @@ function AddCollege() {
             <label className="block text-sm mb-2 font-medium text-gray-700">Latitude</label>
             <input
               type="text"
-              name="latitude"
+              name="location.latitude"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
               placeholder="Enter latitude"
@@ -305,7 +355,7 @@ function AddCollege() {
             <label className="block text-sm mb-2 font-medium text-gray-700">Longitude</label>
             <input
               type="text"
-              name="longitude"
+              name="location.longitude"
               onChange={handleChange}
               className="w-full p-2 border border-gray-300 text-xs rounded-lg focus:ring focus:ring-blue-300 placeholder-gray-400"
               placeholder="Enter longitude"

@@ -3,9 +3,7 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { API_KEY } from '../../../../config/config';
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+import { API_NODE_URL, API_KEY } from "../../../../config/config";
 
 function AddAffiliation() {
   const [formData, setFormData] = useState({
@@ -17,25 +15,7 @@ function AddAffiliation() {
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
 
-    if (name.includes("placement_details")) {
-      const key = name.split(".")[1];
-      setFormData({
-        ...formData,
-        placement_details: {
-          ...formData.placement_details,
-          [key]: value,
-        },
-      });
-    } else if (name.includes("location")) {
-      const key = name.split(".")[1];
-      setFormData({
-        ...formData,
-        location: {
-          ...formData.location,
-          [key]: value,
-        },
-      });
-    } else if (type === "checkbox") {
+    if (type === "checkbox") {
       setFormData({ ...formData, [name]: checked });
     } else {
       setFormData({ ...formData, [name]: value });
@@ -46,29 +26,22 @@ function AddAffiliation() {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        `${BASE_URL}affiliation/add-affiliation`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${API_NODE_URL}affiliation/add-affiliation`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
-      const result = await response.json();
+      const text = await response.text();
+      const result = JSON.parse(text);
 
       if (response.ok) {
         toast.success("Affiliation data uploaded successfully!", {
           position: "top-right",
           autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
         });
       } else {
         toast.error(result.message || "Error uploading data.", {

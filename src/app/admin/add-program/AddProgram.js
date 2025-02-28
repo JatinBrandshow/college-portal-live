@@ -1,11 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { API_KEY } from "../../../../config/config";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
+import { API_NODE_URL, API_KEY } from "../../../../config/config";
 
 function AddProgram() {
   const [formData, setFormData] = useState({
@@ -19,26 +17,26 @@ function AddProgram() {
 
     if (name.includes("placement_details")) {
       const key = name.split(".")[1];
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         placement_details: {
-          ...formData.placement_details,
+          ...prev.placement_details,
           [key]: value,
         },
-      });
+      }));
     } else if (name.includes("location")) {
       const key = name.split(".")[1];
-      setFormData({
-        ...formData,
+      setFormData((prev) => ({
+        ...prev,
         location: {
-          ...formData.location,
+          ...prev.location,
           [key]: value,
         },
-      });
+      }));
     } else if (type === "checkbox") {
-      setFormData({ ...formData, [name]: checked });
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -46,29 +44,22 @@ function AddProgram() {
     e.preventDefault();
 
     try {
-      const response = await fetch(
-        `${BASE_URL}program/add`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`,
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const response = await fetch(`${API_NODE_URL}program/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+        body: JSON.stringify(formData),
+      });
 
-      const result = await response.json();
+      const text = await response.text();
+      const result = JSON.parse(text);
 
       if (response.ok) {
         toast.success("Program data uploaded successfully!", {
           position: "top-right",
           autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
         });
       } else {
         toast.error(result.message || "Error uploading data.", {
