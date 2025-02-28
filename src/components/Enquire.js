@@ -1,14 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
 import { X } from "lucide-react";
 import Link from "next/link";
 
 const Enquire = ({ isOpen, setIsOpen }) => {
+    const router = useRouter(); // Initialize router
+
     const closeModal = (event) => {
         event.preventDefault();
         event.stopPropagation();
         setIsOpen(false);
+    };
+
+    const handleSubmit = (event) => {
+        event.preventDefault();
+        router.push("/booking-form"); // Navigate to booking form
     };
 
     if (!isOpen) return null;
@@ -27,7 +35,7 @@ const Enquire = ({ isOpen, setIsOpen }) => {
                                 </div>
                             </div>
 
-                            <form className="space-y-4 flex flex-col justify-between">
+                            <form onSubmit={handleSubmit} className="space-y-4 flex flex-col justify-between">
                                 <div>
                                     <div className="space-y-2">
                                         <label htmlFor="fullName" className="block font-medium">

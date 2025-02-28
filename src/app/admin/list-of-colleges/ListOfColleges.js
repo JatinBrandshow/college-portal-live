@@ -13,7 +13,7 @@ const ListOfColleges = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${API_NODE_URL}college/all-colleges`, {
+        const response = await fetch(`${API_NODE_URL}college/colleges`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -24,9 +24,9 @@ const ListOfColleges = () => {
         const result = await response.json();
         console.log("result", result);
 
-        if (result.status && result.data && Array.isArray(result.data)) {
-          setData(result.data);
-          setFilteredData(result.data);
+        if (Array.isArray(result)) {
+          setData(result);
+          setFilteredData(result);
         } else {
           console.error("Unexpected response format:", result);
           setData([]);
@@ -82,7 +82,7 @@ const ListOfColleges = () => {
             {Array.isArray(filteredData) && filteredData.length > 0 ? (
               filteredData.map((college, index) => (
                 <tr
-                  key={college.id}
+                  key={college._id}
                   className={`border border-gray-300 ${index % 2 === 0 ? "bg-gray-50" : "bg-gray-100"
                     } hover:bg-gray-200`}
                 >
