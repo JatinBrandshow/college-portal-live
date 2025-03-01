@@ -1,12 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { API_KEY, API_NODE_URL } from "../../../../config/config";
 
 const ListOfAccommodations = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false); // Modal state
+  const [accommodationToDelete, setAccommodationToDelete] = useState(null); // Accommodation to delete
+  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,13 +48,45 @@ const ListOfAccommodations = () => {
     const filtered = data.filter(
       (item) =>
         item.name.toLowerCase().includes(filter) ||
-        item.city.toLowerCase().includes(filter) ||
-        item.state.toLowerCase().includes(filter) ||
-        item.university.toLowerCase().includes(filter) ||
-        item.phone.includes(filter) ||
-        item.email.toLowerCase().includes(filter)
+        item.location.city.toLowerCase().includes(filter) ||
+        item.location.state.toLowerCase().includes(filter) ||
+        item.location.university?.toLowerCase().includes(filter) ||
+        item.phone?.includes(filter) ||
+        item.email?.toLowerCase().includes(filter)
     );
     setFilteredData(filtered);
+  };
+
+  const handleEdit = (id) => {
+    router.push(`/admin/edit-accommodation/${id}`);
+  };
+
+  const handleDelete = async () => {
+    if (!accommodationToDelete) return;
+
+    try {
+      const response = await fetch(`${API_NODE_URL}accommodation/accommodations/${accommodationToDelete}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`,
+        },
+      });
+      const result = await response.json();
+      if (result.status) {
+        // Remove the deleted accommodation from the state
+        setData(data.filter(item => item._id !== accommodationToDelete));
+        setFilteredData(filteredData.filter(item => item._id !== accommodationToDelete));
+        alert("Accommodation deleted successfully");
+        setDeleteModalOpen(false);  // Close the modal after deletion
+        setAccommodationToDelete(null); // Clear the accommodation to delete
+      } else {
+        alert("Failed to delete accommodation");
+      }
+    } catch (error) {
+      console.error("Error deleting accommodation:", error);
+      alert("An error occurred while deleting the accommodation");
+    }
   };
 
   return (
@@ -69,58 +105,69 @@ const ListOfAccommodations = () => {
               <th className="px-2 py-1 text-left border border-gray-300">Price</th>
               <th className="px-2 py-1 text-left border border-gray-300">Amenities</th>
               <th className="px-2 py-1 text-left border border-gray-300">Ratings</th>
-              {/* <th className="px-2 py-1 text-left border border-gray-300">Email</th> */}
               <th className="px-2 py-1 text-left border border-gray-300">Image</th>
               <th className="px-2 py-1 text-center border border-gray-300">Actions</th>
+              <th className="px-2 py-1 text-center border border-gray-300">Delete</th>
             </tr>
           </thead>
           <tbody>
             {Array.isArray(filteredData) && filteredData.length > 0 ? (
-              filteredData.map((Accomo, index) => (
+              filteredData.map((accommodation, index) => (
                 <tr
-                  key={Accomo.id}
+                  key={accommodation._id || index} // Use accommodation._id if available, otherwise fallback to index
                   className={`border-t ${index % 2 === 0 ? "bg-gray-50" : "bg-white"}`}
                 >
                   <td className="px-4 py-2 text-sm font-medium text-gray-700 truncate">
-                    {Accomo.name}
+                    {accommodation.name}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.type}
+                    {accommodation.type}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.location.route}
+                    {accommodation.location.route}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.location.city}
+                    {accommodation.location.city}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.location.state}
+                    {accommodation.location.state}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.location.postalCode}
+                    {accommodation.location.postalCode}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.meta.averagePropertyPrice}
+                    {accommodation.meta.averagePropertyPrice}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.amenities}
+                    {accommodation.amenities.join(", ")}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.reviewsRating}
+                    {accommodation.reviewsRating}
                   </td>
-                  {/* <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.email}
-                  </td> */}
                   <td className="px-4 py-2 text-sm text-gray-600">
                     <img
-                      src={Accomo.image}
-                      alt={Accomo.name}
+                      src={accommodation.image}
+                      alt={accommodation.name}
                       className="w-16 h-16 object-cover rounded"
                     />
                   </td>
                   <td className="px-4 py-2 text-sm text-center">
-                    <button className="bg-blue-500 text-white px-2 py-1 rounded-lg flex items-center">
+                    <button
+                      onClick={() => handleEdit(accommodation._id)}
+                      className="bg-blue-500 text-white px-2 py-1 rounded-lg flex items-center"
+                    >
                       <span className="material-icons">edit</span>
+                    </button>
+                  </td>
+                  <td className="px-4 py-2 text-sm text-center">
+                    <button
+                      onClick={() => {
+                        setAccommodationToDelete(accommodation._id); // Set the accommodation to delete
+                        setDeleteModalOpen(true); // Open the delete confirmation modal
+                      }}
+                      className="bg-red-500 text-white px-2 py-1 rounded-lg flex items-center"
+                    >
+                      <span className="material-icons">delete</span>
                     </button>
                   </td>
                 </tr>
@@ -138,6 +185,38 @@ const ListOfAccommodations = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Delete Confirmation Popup */}
+      {isDeleteModalOpen && accommodationToDelete && (
+        <div
+          className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
+          onClick={() => setDeleteModalOpen(false)}
+        >
+          <div
+            className="bg-white p-6 rounded-lg shadow-md w-80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-center">Confirm Deletion</h3>
+            <p className="text-center text-sm mb-4">
+              Are you sure you want to delete this accommodation?
+            </p>
+            <div className="flex justify-between">
+              <button
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                onClick={() => setDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
