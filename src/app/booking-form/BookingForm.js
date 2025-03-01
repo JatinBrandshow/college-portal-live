@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { BadgeCheck, Building, Check, ChevronDown, ChevronRight, ChevronUp, Headphones, Pencil, ShieldCheck, Star, Tag, X, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
@@ -777,4 +777,11 @@ const BookingForm = () => {
     );
 };
 
-export default BookingForm;
+// 📌 Wrap the Accommodation component in Suspense
+export default function BookingFormPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <BookingForm />
+    </Suspense>
+  );
+}
