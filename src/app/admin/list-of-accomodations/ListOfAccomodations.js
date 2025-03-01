@@ -64,12 +64,12 @@ const ListOfAccommodations = () => {
               <th className="px-2 py-1 text-left border border-gray-300">Type</th>
               <th className="px-2 py-1 text-left border border-gray-300">Address</th>
               <th className="px-2 py-1 text-left border border-gray-300">City</th>
-              <th className="px-2 py-1 text-left border border-gray-300">Country</th>
+              <th className="px-2 py-1 text-left border border-gray-300">State</th>
               <th className="px-2 py-1 text-left border border-gray-300">Pincode</th>
               <th className="px-2 py-1 text-left border border-gray-300">Price</th>
               <th className="px-2 py-1 text-left border border-gray-300">Amenities</th>
-              <th className="px-2 py-1 text-left border border-gray-300">Phone</th>
-              <th className="px-2 py-1 text-left border border-gray-300">Email</th>
+              <th className="px-2 py-1 text-left border border-gray-300">Ratings</th>
+              {/* <th className="px-2 py-1 text-left border border-gray-300">Email</th> */}
               <th className="px-2 py-1 text-left border border-gray-300">Image</th>
               <th className="px-2 py-1 text-center border border-gray-300">Actions</th>
             </tr>
@@ -88,29 +88,29 @@ const ListOfAccommodations = () => {
                     {Accomo.type}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.address}
+                    {Accomo.location.route}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.city}
+                    {Accomo.location.city}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.country}
+                    {Accomo.location.state}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.pincode}
+                    {Accomo.location.postalCode}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.price}
+                    {Accomo.meta.averagePropertyPrice}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
                     {Accomo.amenities}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {Accomo.phone}
+                    {Accomo.reviewsRating}
                   </td>
-                  <td className="px-4 py-2 text-sm text-gray-600 truncate">
+                  {/* <td className="px-4 py-2 text-sm text-gray-600 truncate">
                     {Accomo.email}
-                  </td>
+                  </td> */}
                   <td className="px-4 py-2 text-sm text-gray-600">
                     <img
                       src={Accomo.image}

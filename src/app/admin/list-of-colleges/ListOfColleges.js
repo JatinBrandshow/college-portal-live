@@ -66,7 +66,7 @@ const ListOfColleges = () => {
           <thead className="bg-[#1c2333] text-white">
             <tr>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Name</th>
-              <th className="px-4 py-2 font-semibold text-left border border-gray-300">Name</th>
+              <th className="px-4 py-2 font-semibold text-left border border-gray-300">Address</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">City</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">State</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Established</th>
@@ -74,7 +74,6 @@ const ListOfColleges = () => {
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Type</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Phone</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Email</th>
-              <th className="px-4 py-2 font-semibold text-left border border-gray-300">Image</th>
               <th className="px-4 py-2 font-semibold text-center border border-gray-300">Actions</th>
             </tr>
           </thead>
@@ -90,14 +89,11 @@ const ListOfColleges = () => {
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.address}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.city}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.state}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.establishedYear}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.university}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.type}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.established_year}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.affiliated_university}</td>
+                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.college_type}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.phone}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.email}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">
-                    <img src={college.image} alt={college.name} className="w-12 h-12 object-cover rounded-md" />
-                  </td>
                   <td className="px-4 py-3 text-center text-sm text-gray-700 align-middle truncate">
                     <Link href={`/admin/edit-college/${college.id}`}>
                       <button className="bg-blue-500 text-white px-2 py-1 mx-auto rounded-lg flex items-center">

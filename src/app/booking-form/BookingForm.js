@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_NODE_URL, API_KEY } from "../../../config/config";
+import { useSearchParams } from 'next/navigation';
+
 
 const bookingSideBarData = {
     "Payment Policy": {
@@ -165,47 +167,109 @@ const BookingForm = () => {
     const [editableStep, setEditableStep] = useState(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [expandedSections, setExpandedSections] = useState({});
+    const [isThankYouPopupOpen, setIsThankYouPopupOpen] = useState(false); // State for the popup
+    const searchParams = useSearchParams();
+
+    const accommodationImage = decodeURIComponent(searchParams.get('accommodationImage') || '');
+    const accommodationName = decodeURIComponent(searchParams.get('accommodationName') || '');
+    const accommodationAddress = decodeURIComponent(searchParams.get('accommodationAddress') || '');
+    const accommodationIdd = decodeURIComponent(searchParams.get('accommodationId') || '');
+    const enquiryIdd = decodeURIComponent(searchParams.get('enquiryId') || '');
+    const name = decodeURIComponent(searchParams.get('name') || '');
+
+
+    
+
     const [formData, setFormData] = useState({
-        roomType: "",
-        stayDuration: "",
-        moveInDate: "",
-        title: "",
-        fullName: "",
-        birthDate: "",
-        gender: "",
-        code: "",
-        mobileNumber: "",
-        email: "",
-        alternateEmail: "",
+        // Personal Information
+        accommodationId: "",
+        enquiryId: "",
+        dateOfBirth: "",
         nationality: "",
-        address: "",
+        gender: "",
         country: "",
+        pincode: "",
+        fullAddress: "",
         city: "",
-        zipcode: "",
+        state: "",
+
+        // University Details
         universityName: "",
-        courseName: "",
-        enrolmentStatus: "",
-        relation: "",
-        guarantorTitle: "",
-        guarantorName: "",
-        guarantorBirthDate: "",
-        guarantorEmail: "",
-        guarantorCode: "",
-        guarantorMobile: "",
-        guarantorAddress: "",
-        guarantorCountry: "",
-        guarantorCity: "",
-        guarantorZipcode: "",
+        enrollmentStatus: "",
+
+        // Room & Stay Details
+        room: "",
+        stayDuration: "",
+        moveIn: "",
+        moveOut: "",
+
+        // Guarantor Details
+        guarantorDetails: {
+            relation: "",
+            guarantorTitle: "",
+            guarantorName: "",
+            guarantorBirthDate: "",
+            guarantorEmail: "",
+            guarantorCode: "",
+            guarantorMobiles: [""],
+            guarantorCode: "",
+            guarantorAddress: "",
+            guarantorCountry: "",
+            guarantorCity: "",
+            guarantorZipcode: "",
+        },
     });
 
     const handleEdit = (step) => {
         setEditableStep(step);
         setCurrentStep(step);
     };
+    
+    // Use useEffect to update formData when accommodationIdd or enquiryIdd changes
+    useEffect(() => {
+        setFormData((prev) => ({
+            ...prev,
+            accommodationId: accommodationIdd,
+            enquiryId: enquiryIdd,
+        }));
+    }, [accommodationIdd, enquiryIdd]);
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+    
+        if (name.startsWith("guarantorDetails.")) {
+            const keys = name.split("."); // Split the name into parts
+            const field = keys[1]; // Get the field name (e.g., "relation", "guarantorTitle", etc.)
+    
+            if (field === "guarantorMobiles[0]") {
+                // Handle the guarantorMobiles array separately
+                setFormData((prev) => ({
+                    ...prev,
+                    guarantorDetails: {
+                        ...prev.guarantorDetails,
+                        guarantorMobiles: [value], // Update the first element of the array
+                    },
+                }));
+            } else {
+                // Handle other guarantorDetails fields
+                setFormData((prev) => ({
+                    ...prev,
+                    guarantorDetails: {
+                        ...prev.guarantorDetails,
+                        [field]: value, // Update the specific field
+                    },
+                }));
+            }
+        } else {
+            // Handle non-guarantorDetails fields
+            setFormData((prev) => ({
+                ...prev,
+                [name]: value,
+            }));
+        }
     };
+
+    
 
     useEffect(() => {
         if (selectedCategory && bookingSideBarData[selectedCategory]?.data.length > 0) {
@@ -232,8 +296,67 @@ const BookingForm = () => {
         setExpandedSections((prev) => ({ ...prev, [index]: !prev[index] }));
     };
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        console.log("Form Data:", JSON.stringify(formData, null, 2));
+
+        try {
+            console.log("Sending request to:", `${API_NODE_URL}accommodationBook/create`);
+
+            const response = await fetch(`${API_NODE_URL}accommodationBook/create`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${API_KEY}`,
+                },
+                body: JSON.stringify(formData),
+            });
+
+            console.log("Raw Response:", response);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log("API Response:", result);
+
+            if (result.status === "success") {
+                toast.success(result.message || "Booking created successfully!");
+
+                // Open the "Thank You" popup after the toast
+                setTimeout(() => {
+                    setIsThankYouPopupOpen(true);
+                }, 2000); // Delay to allow the toast to be visible
+            } else {
+                toast.error(result.message || "Error creating booking.");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+            toast.error("An error occurred while creating the booking.");
+        }
+    };
+    
+
     return (
         <section className="bg-[#f7f7f7]">
+            <ToastContainer />
+            {/* Thank You Popup */}
+            {isThankYouPopupOpen && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+                    <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg text-center">
+                        <h2 className="text-2xl font-bold mb-4">Thank You!</h2>
+                        <p className="text-gray-700 mb-6">Your booking has been successfully created.</p>
+                        <button
+                            onClick={() => setIsThankYouPopupOpen(false)}
+                            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
             <div className="max-w-6xl mx-auto px-2 py-10">
                 <div className="flex gap-6 max-sm:flex-col">
                     <div className="flex-1">
@@ -263,7 +386,7 @@ const BookingForm = () => {
                                 </motion.div>
 
                                 <div>
-                                    <h2 className="text-lg font-semibold text-green-900 max-md:text-base max-sm:text-sm">Thanks Jatin!</h2>
+                                    <h2 className="text-lg font-semibold text-green-900 max-md:text-base max-sm:text-sm">Thanks {name}</h2>
                                     <p className="text-green-800 text-sm">We're excited to receive your request! Fasten up the booking by filling out the details.</p>
                                 </div>
                             </div>
@@ -288,48 +411,43 @@ const BookingForm = () => {
                                         <label className="text-sm font-medium">
                                             Room Type <span className="text-red-500">*</span>
                                         </label>
-                                        <select name="roomType" value={formData.roomType} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required>
+                                        <select name="room" value={formData.room} onChange={handleChange} className="w-full px-3 py-2 border rounded-md" required>
                                             <option value="" hidden>
                                                 Click to Select
                                             </option>
-                                            <option value="single">Single Room</option>
-                                            <option value="double">Double Room</option>
-                                            <option value="suite">Suite</option>
+                                            <option value="Single">Single Room</option>
+                                            <option value="Double">Double Room</option>
+                                            <option value="Suite">Suite</option>
                                         </select>
                                     </div>
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">
-                                            Stay Duration <span className="text-red-500">*</span>
+                                            Stay Duration (Months) <span className="text-red-500">*</span>
                                         </label>
-                                        <select name="stayDuration" value={formData.stayDuration} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-muted/50" required>
-                                            <option value="" hidden>
-                                                Click to Select
-                                            </option>
-                                            <option value="1-month">1 Month</option>
-                                            <option value="3-months">3 Months</option>
-                                            <option value="6-months">6 Months</option>
-                                            <option value="12-months">12 Months</option>
-                                        </select>
+                                        <input
+                                            type="number"
+                                            name="stayDuration"
+                                            value={formData.stayDuration}
+                                            onChange={handleChange}
+                                            className="w-full px-3 py-2 border rounded-md bg-muted/50"
+                                            placeholder="Enter stay duration"
+                                            required
+                                        />
                                     </div>
 
                                     <div className="space-y-2">
                                         <label className="text-sm font-medium">
                                             Move In Date <span className="text-red-500">*</span>
                                         </label>
-                                        <select name="moveInDate" value={formData.moveInDate} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-muted/50">
-                                            <option value="" hidden>
-                                                Click to Select
-                                            </option>
-                                            <option value="date1">Jan 1, 2024</option>
-                                            <option value="date2">Jan 15, 2024</option>
-                                            <option value="date3">Feb 1, 2024</option>
-                                        </select>
+                                        <input type="date" name="moveIn" value={formData.moveIn} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-muted/50" required />
                                     </div>
 
-                                    <div className="flex flex-col space-y-2">
-                                        <label className="text-sm font-medium">Move Out Date</label>
-                                        <input type="text" placeholder="Move Out Date" className="px-3 py-2 border rounded-md bg-muted/50" disabled />
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium">
+                                            Move Out Date <span className="text-red-500">*</span>
+                                        </label>
+                                        <input type="date" name="moveOut" value={formData.moveOut} onChange={handleChange} className="w-full px-3 py-2 border rounded-md bg-muted/50" required />
                                     </div>
 
                                     <button type="submit" className="mt-6 p-4 gap-2 bg-purple-600 text-white rounded-md flex items-center text-base w-fit">
@@ -356,115 +474,91 @@ const BookingForm = () => {
                             {(currentStep === 2 || editableStep === 2) && (
                                 <form onSubmit={(e) => handleNextStep(e, 3)} className="space-y-4">
                                     <div className="grid grid-cols-12 gap-4">
-                                        <div className="col-span-2">
-                                            <label className="block text-sm font-medium">Title *</label>
-                                            <div className="flex space-x-2">
-                                                <select name="title" value={formData.title} onChange={handleChange} className="border rounded-md p-2" required>
-                                                    <option value="" hidden>
-                                                        Title
-                                                    </option>
-                                                    <option value="Mr">Mr.</option>
-                                                    <option value="Ms">Ms.</option>
-                                                    <option value="Miss">Miss</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="col-span-4">
-                                            <label className="block text-sm font-medium">Your Full Name *</label>
-                                            <input name="fullName" value={formData.fullName} onChange={handleChange} type="text" className="w-full border rounded-md p-2" required />
+                                        <div className="col-span-6">
+                                            <label className="block text-sm font-medium">
+                                                Date of Birth <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full border rounded-md p-2" required />
                                         </div>
                                         <div className="col-span-6">
-                                            <label className="block text-sm font-medium">Your Date of Birth *</label>
-                                            <input name="birthDate" value={formData.birthDate} onChange={handleChange} type="date" className="w-full border rounded-md p-2" required />
+                                            <label className="block text-sm font-medium">
+                                                Nationality <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} className="w-full border rounded-md p-2" required />
                                         </div>
                                     </div>
 
                                     <div className="grid grid-cols-12 gap-4">
                                         <div className="col-span-4">
-                                            <label className="block text-sm font-medium">Gender *</label>
-                                            <select name="gender" value={formData.gender} onChange={handleChange} className="w-full border rounded-md p-2">
-                                                <option>Male</option>
-                                                <option>Female</option>
-                                                <option>Other</option>
+                                            <label className="block text-sm font-medium">
+                                                Gender <span className="text-red-500">*</span>
+                                            </label>
+                                            <select name="gender" value={formData.gender} onChange={handleChange} className="w-full border rounded-md p-2" required>
+                                                <option value="" hidden>
+                                                    Select Gender
+                                                </option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
                                             </select>
                                         </div>
-                                        <div className="col-span-2">
-                                            <label className="block text-sm font-medium">Code *</label>
-                                            <div className="flex space-x-2">
-                                                <select name="countryCode" value={formData.countryCode} onChange={handleChange} className="border rounded-md p-2">
-                                                    <option value="+1">+1</option>
-                                                    <option value="+44">+44</option>
-                                                    <option value="+91">+91</option>
-                                                    <option value="+61">+61</option>
-                                                    <option value="+81">+81</option>
-                                                </select>
-                                            </div>
+                                        <div className="col-span-4">
+                                            <label className="block text-sm font-medium">
+                                                Country <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="country" value={formData.country} onChange={handleChange} className="w-full border rounded-md p-2" required />
                                         </div>
-
-                                        <div className="col-span-6">
-                                            <label className="block text-sm font-medium">Your Mobile Number *</label>
-                                            <input name="mobileNumber" value={formData.mobileNumber} onChange={handleChange} type="text" className="w-full border rounded-md p-2" required />
+                                        <div className="col-span-4">
+                                            <label className="block text-sm font-medium">
+                                                Pincode <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} className="w-full border rounded-md p-2" required />
                                         </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Your Email Address *</label>
-                                            <input name="email" value={formData.email} onChange={handleChange} type="email" className="w-full border rounded-md p-2" required />
-                                        </div>
-
-                                        <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Alternate Email Address</label>
-                                            <input name="alternateEmail" value={formData.alternateEmail} onChange={handleChange} type="email" className="w-full border rounded-md p-2" />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">Nationality *</label>
-                                        <input name="nationality" value={formData.nationality} onChange={handleChange} type="text" className="w-full border rounded-md p-2" required />
                                     </div>
 
                                     <div>
-                                        <label className="block text-sm font-medium">Your Full Address *</label>
-                                        <textarea name="address" value={formData.address} onChange={handleChange} className="w-full border rounded-md p-2" rows="1" required></textarea>
+                                        <label className="block text-sm font-medium">
+                                            Full Address <span className="text-red-500">*</span>
+                                        </label>
+                                        <textarea name="fullAddress" value={formData.fullAddress} onChange={handleChange} className="w-full border rounded-md p-2" rows="1" required></textarea>
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Country of Residence *</label>
-                                            <input name="country" type="text" value={formData.country} onChange={handleChange} className="w-full border rounded-md p-2" required />
+                                            <label className="block text-sm font-medium">
+                                                City <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="city" value={formData.city} onChange={handleChange} className="w-full border rounded-md p-2" required />
                                         </div>
-
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">City *</label>
-                                            <input name="city" value={formData.city} onChange={handleChange} type="text" className="w-full border rounded-md p-2" required />
+                                            <label className="block text-sm font-medium">
+                                                State <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="state" value={formData.state} onChange={handleChange} className="w-full border rounded-md p-2" required />
                                         </div>
-                                    </div>
-
-                                    <div className="flex flex-col">
-                                        <label className="block text-sm font-medium">Zipcode/Pincode *</label>
-                                        <input name="zipcode" value={formData.zipcode} onChange={handleChange} type="text" className="border rounded-md p-2 w-4/12" required />
                                     </div>
 
                                     <h3 className="font-semibold text-lg mt-6">University Details</h3>
 
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">University Name *</label>
-                                            <input name="universityName" value={formData.universityName} onChange={handleChange} type="text" className="w-full border rounded-md p-2" required />
+                                            <label className="block text-sm font-medium">
+                                                University Name <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="universityName" value={formData.universityName} onChange={handleChange} className="w-full border rounded-md p-2" required />
                                         </div>
-
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Course Name</label>
-                                            <input name="courseName" value={formData.courseName} onChange={handleChange} type="text" className="w-full border rounded-md p-2" />
+                                            <label className="block text-sm font-medium">
+                                                Enrollment Status <span className="text-red-500">*</span>
+                                            </label>
+                                            <select name="enrollmentStatus" value={formData.enrollmentStatus} onChange={handleChange} className="w-full border rounded-md p-2" required>
+                                                <option value="" hidden>
+                                                    Select Status
+                                                </option>
+                                                <option value="Enrolled">Enrolled</option>
+                                                <option value="Not Enrolled">Not Enrolled</option>
+                                            </select>
                                         </div>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium">Enrolment Status *</label>
-                                        <select name="enrolmentStatus" value={formData.enrolmentStatus} onChange={handleChange} className="border rounded-md p-2 w-5/12">
-                                            <option>Enrolled</option>
-                                            <option>Not Enrolled</option>
-                                        </select>
                                     </div>
 
                                     <button type="submit" className="mt-6 p-4 gap-2 bg-purple-600 text-white rounded-md flex items-center text-base">
@@ -484,15 +578,19 @@ const BookingForm = () => {
                                 </div>
                             </div>
                             {currentStep === 3 && (
-                                <form className="space-y-4">
+                                <form onSubmit={handleSubmit} className="space-y-4">
                                     <div className="grid grid-cols-12 gap-3">
                                         <div className="col-span-6">
-                                            <label className="block text-sm font-medium">Your Relation With Them *</label>
-                                            <input name="relation" value={formData.relation} onChange={handleChange} type="text" className="w-full border p-2 rounded" required />
+                                            <label className="block text-sm font-medium">
+                                                Your Relation With Them <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="guarantorDetails.relation" value={formData.guarantorDetails.relation} onChange={handleChange} className="w-full border p-2 rounded" required />
                                         </div>
                                         <div className="col-span-2">
-                                            <label className="block text-sm font-medium">Title *</label>
-                                            <select name="guarantorTitle" value={formData.guarantorTitle} onChange={handleChange} className="border rounded-md p-2" required>
+                                            <label className="block text-sm font-medium">
+                                                Title <span className="text-red-500">*</span>
+                                            </label>
+                                            <select name="guarantorDetails.guarantorTitle" value={formData.guarantorDetails.guarantorTitle} onChange={handleChange} className="border rounded-md p-2" required>
                                                 <option value="" hidden>
                                                     Title
                                                 </option>
@@ -502,24 +600,32 @@ const BookingForm = () => {
                                             </select>
                                         </div>
                                         <div className="col-span-4">
-                                            <label className="block text-sm font-medium">Your Guarantor's Name *</label>
-                                            <input name="guarantorName" value={formData.guarantorName} onChange={handleChange} type="text" className="w-full border p-2 rounded" required />
+                                            <label className="block text-sm font-medium">
+                                                Your Guarantor's Name <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="guarantorDetails.guarantorName" value={formData.guarantorDetails.guarantorName} onChange={handleChange} className="w-full border p-2 rounded" required />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Their Date of Birth *</label>
-                                            <input name="guarantorBirthDate" value={formData.guarantorBirthDate} onChange={handleChange} type="date" className="w-full border p-2 rounded" required />
+                                            <label className="block text-sm font-medium">
+                                                Their Date of Birth <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="date" name="guarantorDetails.guarantorBirthDate" value={formData.guarantorDetails.guarantorBirthDate} onChange={handleChange} className="w-full border p-2 rounded" required />
                                         </div>
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Their Email Address *</label>
-                                            <input name="guarantorEmail" value={formData.guarantorEmail} onChange={handleChange} type="email" className="w-full border p-2 rounded" required />
+                                            <label className="block text-sm font-medium">
+                                                Their Email Address <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="email" name="guarantorDetails.guarantorEmail" value={formData.guarantorDetails.guarantorEmail} onChange={handleChange} className="w-full border p-2 rounded" required />
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-4 gap-3">
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Code *</label>
-                                            <select name="guarantorCode" value={formData.guarantorCode} onChange={handleChange} type="text" className="w-full border p-2 rounded" required>
+                                            <label className="block text-sm font-medium">
+                                                Code <span className="text-red-500">*</span>
+                                            </label>
+                                            <select name="guarantorDetails.guarantorCode" value={formData.guarantorDetails.guarantorCode} onChange={handleChange} className="w-full border p-2 rounded" required>
                                                 <option value="+1">+1</option>
                                                 <option value="+44">+44</option>
                                                 <option value="+91">+91</option>
@@ -528,18 +634,37 @@ const BookingForm = () => {
                                             </select>
                                         </div>
                                         <div className="col-span-3">
-                                            <label className="block text-sm font-medium">Their Mobile Number *</label>
-                                            <input name="guarantorMobile" value={formData.guarantorMobile} onChange={handleChange} type="tel" className="w-full border p-2 rounded" required />
-                                        </div>
+                                        <label className="block text-sm font-medium">
+                                            Their Mobile Number <span className="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            name="guarantorDetails.guarantorMobiles[0]"
+                                            value={formData.guarantorDetails.guarantorMobiles[0] || ""}
+                                            onChange={handleChange}
+                                            className="w-full border p-2 rounded"
+                                            required
+                                        />
+                                    </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Their Full Address *</label>
-                                        <textarea name="guarantorAddress" value={formData.guarantorAddress} onChange={handleChange} className="w-full border p-2 rounded" required></textarea>
+                                        <label className="block text-sm font-medium">
+                                            Their Full Address <span className="text-red-500">*</span>
+                                        </label>
+                                        <textarea name="guarantorDetails.guarantorAddress" value={formData.guarantorDetails.guarantorAddress} onChange={handleChange} className="w-full border p-2 rounded" required></textarea>
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-medium">
+                                            Code <span className="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="guarantorDetails.guarantorCode" value={formData.guarantorDetails.guarantorCode} onChange={handleChange} className="w-full border p-2 rounded" required />
+                                        </div>
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">Country of Residence *</label>
-                                            <select name="guarantorCountry" value={formData.guarantorCountry} onChange={handleChange} className="w-full border p-2 rounded" required>
+                                            <label className="block text-sm font-medium">
+                                                Country of Residence <span className="text-red-500">*</span>
+                                            </label>
+                                            <select name="guarantorDetails.guarantorCountry" value={formData.guarantorDetails.guarantorCountry} onChange={handleChange} className="w-full border p-2 rounded" required>
                                                 <option value="" hidden>
                                                     Select Country
                                                 </option>
@@ -556,15 +681,18 @@ const BookingForm = () => {
                                                 <option value="South Africa">South Africa</option>
                                             </select>
                                         </div>
-
                                         <div className="col-span-1">
-                                            <label className="block text-sm font-medium">City *</label>
-                                            <input name="guarantorCity" value={formData.guarantorCity} onChange={handleChange} type="text" className="w-full border p-2 rounded" required />
+                                            <label className="block text-sm font-medium">
+                                                City <span className="text-red-500">*</span>
+                                            </label>
+                                            <input type="text" name="guarantorDetails.guarantorCity" value={formData.guarantorDetails.guarantorCity} onChange={handleChange} className="w-full border p-2 rounded" required />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium">Zipcode/Pincode *</label>
-                                        <input name="guarantorZipcode" value={formData.guarantorZipcode} onChange={handleChange} type="text" className="w-full border p-2 rounded" required />
+                                        <label className="block text-sm font-medium">
+                                            Zipcode/Pincode <span className="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" name="guarantorDetails.guarantorZipcode" value={formData.guarantorDetails.guarantorZipcode} onChange={handleChange} className="w-full border p-2 rounded" required />
                                     </div>
                                     <button type="submit" className="w-full bg-green-500 text-white p-2 rounded">
                                         Submit
@@ -576,10 +704,20 @@ const BookingForm = () => {
                     <div className="lg:w-[400px]">
                         <div className="overflow-hidden gap-6">
                             <div className="relative bg-white rounded-3xl border flex flex-col gap-3 p-4">
-                                <img src="/image/contact-us/contact-bg.jpg" alt="Beckett House" className="w-full h-48 object-cover rounded-3xl" />
-                                <div>
-                                    <h2 className="font-semibold text-lg">Beckett House, Dublin</h2>
-                                    <p className="text-muted-foreground text-sm">Dublin 1, County Dublin, IE</p>
+                            <img 
+                                src={accommodationImage || "/image/contact-us/contact-bg.jpg"} // Fallback to default image if accommodationImage is not available
+                                alt={accommodationName || "Accommodation Image"} // Use accommodationName as alt text
+                                className="w-full h-48 object-cover rounded-3xl"
+                            />
+                            <div>
+                                {/* Use the accommodationName from query parameters */}
+                                <h2 className="font-semibold text-lg">
+                                    {accommodationName || "Beckett House, Dublin"} {/* Fallback to default text if accommodationName is not available */}
+                                </h2>
+                                {/* Use the accommodationAddress from query parameters */}
+                                <p className="text-muted-foreground text-sm">
+                                    {accommodationAddress || "Dublin 1, County Dublin, IE"} {/* Fallback to default text if accommodationAddress is not available */}
+                                </p>
                                 </div>
                             </div>
 
