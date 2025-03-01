@@ -6,7 +6,7 @@ import Link from "next/link";
 import { API_NODE_URL, API_KEY } from "../../config/config";
 import { toast } from "react-toastify";
 
-const Enquire = ({ isOpen, setIsOpen }) => {
+const Enquire = ({ isOpen, setIsOpen, accommodationImage, accommodationName, accommodationAddress, accommodationId , accommodationPrice}) => {
     const [isChecked, setIsChecked] = useState(false);
     const closeModal = (event) => {
         event.preventDefault();
@@ -74,9 +74,18 @@ const Enquire = ({ isOpen, setIsOpen }) => {
                 });
                 setIsChecked(false); // Reset checkbox
     
-                // Redirect after successful submission
+                // Redirect after successful submission with query parameters
+                const queryParams = new URLSearchParams({
+                    accommodationImage: encodeURIComponent(accommodationImage),
+                    accommodationName: encodeURIComponent(accommodationName),
+                    accommodationAddress: encodeURIComponent(accommodationAddress),
+                    accommodationId: encodeURIComponent(accommodationId),
+                    enquiryId: encodeURIComponent(result.data._id), // Assuming result.data._id is the enquiry ID
+                    name: encodeURIComponent(result.data.fullName),
+                }).toString();
+    
                 setTimeout(() => {
-                    window.location.href = "/booking-form";
+                    window.location.href = `/booking-form?${queryParams}`;
                 }, 1000);
             } else {
                 toast.error(result.msg || "Error submitting enquiry.");
@@ -164,17 +173,17 @@ const Enquire = ({ isOpen, setIsOpen }) => {
                     <div className="flex flex-col mt-6 border rounded-xl">
                         <div className="bg-white rounded-tr-xl rounded-tl-xl p-3">
                             <div className="overflow-hidden relative gap-3 flex flex-col">
-                                <img src="/image/contact-us/contact-bg.jpg" alt="Property interior showing a modern bedroom" className="w-full h-40 rounded-xl" />
+                                <img src={accommodationImage} alt="Property interior showing a modern bedroom" className="w-full h-40 rounded-xl" />
                                 <div className="">
-                                    <h3 className="text-lg font-semibold">Beckett House, Dublin</h3>
-                                    <p className="text-sm text-gray-600">Dublin 1, County Dublin, IE</p>
+                                    <h3 className="text-lg font-semibold">{accommodationName}</h3>
+                                    <p className="text-sm text-gray-600">{accommodationAddress}</p>
                                 </div>
                             </div>
                         </div>
                         <div className="border-b-2" />
                         <div className="bg-white rounded-br-xl rounded-bl-xl px-4 py-2">
                             <div className="text-sm text-gray-500">Rent</div>
-                            <div className="text-lg font-semibold">€284 / week</div>
+                            <div className="text-lg font-semibold">₹{accommodationPrice}/ month</div>
                         </div>
                     </div>
 
