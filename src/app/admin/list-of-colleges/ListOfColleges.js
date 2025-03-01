@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { API_KEY, API_NODE_URL } from "../../../../config/config";
 
 const ListOfColleges = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
   const [filteredData, setFilteredData] = useState([]);
+  const [isDeleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [collegeToDelete, setCollegeToDelete] = useState(null); // Track the college to delete
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +58,37 @@ const ListOfColleges = () => {
     setFilteredData(filtered);
   };
 
+  const handleDelete = async () => {
+    if (!collegeToDelete || !collegeToDelete._id) {
+      console.error("College object or ID is undefined!");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_NODE_URL}college/delete-college/${collegeToDelete._id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${API_KEY}`,
+        },
+      });
+
+      if (response.ok) {
+        setDeleteModalOpen(false);
+        alert("College deleted successfully!");
+        setCollegeToDelete(null); // Clear the college to delete
+        // Update the state by removing the deleted college
+        setData((prevData) => prevData.filter((college) => college._id !== collegeToDelete._id));
+        setFilteredData((prevData) => prevData.filter((college) => college._id !== collegeToDelete._id));
+      } else {
+        alert("Failed to delete the college.");
+      }
+    } catch (error) {
+      console.error("Error deleting college:", error);
+      alert("Error deleting college.");
+    }
+  };
+
   return (
     <div className="w-full">
       <h1 className="text-lg font-semibold mb-4 text-center text-[#1c2333]">
@@ -95,11 +128,24 @@ const ListOfColleges = () => {
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.phone}</td>
                   <td className="px-4 py-3 text-sm text-gray-700 align-middle truncate">{college.email}</td>
                   <td className="px-4 py-3 text-center text-sm text-gray-700 align-middle truncate">
-                    <Link href={`/admin/edit-college/${college.id}`}>
-                      <button className="bg-blue-500 text-white px-2 py-1 mx-auto rounded-lg flex items-center">
-                        <FaEdit />
-                      </button>
+                    <Link href={`/admin/edit-college/${college._id}`}>
+                      <div className="flex items-center space-x-2">
+                        {/* Edit button */}
+                        <button className="bg-blue-500 text-white px-2 py-1 rounded-lg flex items-center">
+                          <FaEdit />
+                        </button>
+                      </div>
                     </Link>
+                    {/* Delete button */}
+                    <button
+                      className="bg-red-500 text-white px-2 py-1 rounded-lg flex items-center"
+                      onClick={() => {
+                        setCollegeToDelete(college); // Set the college object to delete
+                        setDeleteModalOpen(true); // Open the delete confirmation modal
+                      }}
+                    >
+                      <FaTrashAlt />
+                    </button>
                   </td>
                 </tr>
               ))
@@ -116,8 +162,39 @@ const ListOfColleges = () => {
           </tbody>
         </table>
       </div>
-    </div>
 
+      {/* Confirmation Popup */}
+      {isDeleteModalOpen && collegeToDelete && (
+        <div
+          className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center"
+          onClick={() => setDeleteModalOpen(false)}
+        >
+          <div
+            className="bg-white p-6 rounded-lg shadow-md w-80"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 className="text-lg font-semibold text-center">Confirm Deletion</h3>
+            <p className="text-center text-sm mb-4">
+              Are you sure you want to delete {collegeToDelete.name}?
+            </p>
+            <div className="flex justify-between">
+              <button
+                className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+                onClick={() => setDeleteModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded"
+                onClick={handleDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
