@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { BadgeCheck, Building, Check, ChevronDown, ChevronRight, ChevronUp, Headphones, Pencil, ShieldCheck, Star, Tag, X, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { API_NODE_URL, API_KEY } from "../../../config/config";
 
 const bookingSideBarData = {
     "Payment Policy": {

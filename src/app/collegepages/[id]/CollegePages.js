@@ -97,7 +97,7 @@ const CollegePages = ({ id }) => {
   useEffect(() => {
     const fetchCollegeDetails = async () => {
       try {
-        const response = await fetch(`${API_NODE_URL}popularCollege/colleges`, {
+        const response = await fetch(`${API_NODE_URL}college/popular-colleges`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
@@ -108,8 +108,8 @@ const CollegePages = ({ id }) => {
         const data = JSON.parse(text);
         console.log(data);
 
-        if (Array.isArray(data.data)) {  // Corrected API response path
-          const foundCollege = data.data.find((item) => item._id === id);
+        if (Array.isArray(data)) {  // Corrected API response path
+          const foundCollege = data.find((item) => item._id === id);
           console.log(foundCollege);
           if (foundCollege) {
             setCollegeDetails(foundCollege);

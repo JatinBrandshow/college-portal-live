@@ -26,8 +26,8 @@ const PopularColleges = () => {
         const text = await response.text(); // Read raw response
         const data = JSON.parse(text); // Parse JSON manually
   
-        if (Array.isArray(data)) {  // Directly checking if the response is an array
-          setColleges(data);  // Assign the array to colleges state
+        if (Array.isArray(data)) {  // Corrected path to access colleges array
+          setColleges(data);
   
           const uniqueCities = ["All", ...new Set(data.map((college) => college.city))];
           setCities(uniqueCities);
