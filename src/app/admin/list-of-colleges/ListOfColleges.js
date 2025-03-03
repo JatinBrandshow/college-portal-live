@@ -108,6 +108,7 @@ const ListOfColleges = () => {
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Phone</th>
               <th className="px-4 py-2 font-semibold text-left border border-gray-300">Email</th>
               <th className="px-4 py-2 font-semibold text-center border border-gray-300">Actions</th>
+              <th className="px-4 py-2 font-semibold text-center border border-gray-300">Delete</th>
             </tr>
           </thead>
           <tbody>
@@ -136,6 +137,8 @@ const ListOfColleges = () => {
                         </button>
                       </div>
                     </Link>
+                  </td>
+                  <td className="px-4 py-3 text-center text-sm text-gray-700 align-middle truncate">
                     {/* Delete button */}
                     <button
                       className="bg-red-500 text-white px-2 py-1 rounded-lg flex items-center"

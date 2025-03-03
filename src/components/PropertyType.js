@@ -1,38 +1,107 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import React from "react";
 import { FaHouseUser, FaBuilding, FaWarehouse, FaHotel } from "react-icons/fa";
+import { API_NODE_URL, API_KEY } from "../../config/config";
 
-const propertyTypes = [
-  {
-    icon: <FaHouseUser size={60} className="text-[#8070dd]" />,
-    title: "Multifamily Homes",
-    properties: "13",
-    availableType: "Multifamily",
-  },
-  {
-    icon: <FaBuilding size={60} className="text-[#8070dd]" />,
-    title: "Duplex Homes",
-    properties: "15",
-    availableType: "Duplex",
-  },
-  {
-    icon: <FaWarehouse size={60} className="text-[#8070dd]" />,
-    title: "Commercial House",
-    properties: "16",
-    availableType: "Commercial",
-  },
-  {
-    icon: <FaHotel size={60} className="text-[#8070dd]" />,
-    title: "Sweet Apartments",
-    properties: "12",
-    availableType: "Apartment",
-  },
-];
+const fetchAccommodations = async () => {
+  try {
+    const response = await fetch(`${API_NODE_URL}accommodation/all-accommodations`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${API_KEY}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch accommodations: ${response.status}`);
+    }
+
+    const result = await response.json();
+    return result.data; // Extract the `data` array from the response
+  } catch (error) {
+    console.error("Error fetching accommodations:", error);
+    return []; // Return an empty array in case of error
+  }
+};
+
+const countAvailableTypes = (accommodations) => {
+  const counts = {
+    Multifamily: 0,
+    Duplex: 0,
+    Commercial: 0,
+    Apartment: 0,
+  };
+
+  // Ensure accommodations is an array
+  if (!Array.isArray(accommodations)) {
+    console.error("Expected accommodations to be an array, but got:", accommodations);
+    return counts;
+  }
+
+  accommodations.forEach((accommodation) => {
+    // Ensure accommodation.meta.availableType exists and is an array
+    if (accommodation?.meta?.availableType && Array.isArray(accommodation.meta.availableType)) {
+      accommodation.meta.availableType.forEach((type) => {
+        if (counts.hasOwnProperty(type)) {
+          counts[type]++;
+        }
+      });
+    }
+  });
+
+  return counts;
+};
 
 const PropertyType = () => {
   const router = useRouter();
+  const [propertyTypes, setPropertyTypes] = useState([
+    {
+      icon: <FaHouseUser size={60} className="text-[#8070dd]" />,
+      title: "Multifamily Homes",
+      properties: "0",
+      availableType: "Multifamily",
+    },
+    {
+      icon: <FaBuilding size={60} className="text-[#8070dd]" />,
+      title: "Duplex Homes",
+      properties: "0",
+      availableType: "Duplex",
+    },
+    {
+      icon: <FaWarehouse size={60} className="text-[#8070dd]" />,
+      title: "Commercial House",
+      properties: "0",
+      availableType: "Commercial",
+    },
+    {
+      icon: <FaHotel size={60} className="text-[#8070dd]" />,
+      title: "Sweet Apartments",
+      properties: "0",
+      availableType: "Apartment",
+    },
+  ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const accommodations = await fetchAccommodations();
+      console.log("Fetched accommodations:", accommodations); // Debugging: Log the fetched data
+
+      const counts = countAvailableTypes(accommodations);
+      console.log("Counts:", counts); // Debugging: Log the counts
+
+      setPropertyTypes((prevTypes) =>
+        prevTypes.map((type) => ({
+          ...type,
+          properties: counts[type.availableType]?.toString() || "0",
+        }))
+      );
+    };
+
+    fetchData();
+  }, []);
 
   const handleAvailableTypeClick = (roomType) => {
     router.push(`/accommodation?roomType=${roomType}`);
@@ -44,13 +113,14 @@ const PropertyType = () => {
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 max-md:mb-8 max-sm:mb-6">
           <div className="lg:w-1/2">
             <div className="flex items-center text-[#5e23dd] space-x-2">
-              <FaHouseUser size={24} className="max-sm:w-4 max-sm:h-4"/>
+              <FaHouseUser size={24} className="max-sm:w-4 max-sm:h-4" />
               <span className="uppercase font-semibold text-sm tracking-wider max-sm:text-xs">
                 Trusted Real Estate Care
               </span>
             </div>
-            <h2 className="text-3xl font-bold text-gray-800 mt-2 max-md:text-2xl
-            max-sm:text-xl">Property By Type</h2>
+            <h2 className="text-3xl font-bold text-gray-800 mt-2 max-md:text-2xl max-sm:text-xl">
+              Property By Type
+            </h2>
             <p className="text-base text-gray-600 mt-2 text-left max-sm:text-sm">
               Different Stays for Different Needs –{" "}
               <span className="font-semibold">Pick What Suits You</span>!
@@ -73,9 +143,7 @@ const PropertyType = () => {
               <h3 className="text-lg font-semibold text-gray-800 mt-4 text-center max-md:text-base max-sm:text-sm">
                 {property.title}
               </h3>
-              <p className="text-violet-700 text-base text-center max-md:text-sm max-sm:text-xs">
-                {property.properties}
-              </p>
+              
             </div>
           ))}
         </div>

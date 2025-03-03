@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { API_KEY, API_NODE_URL } from "../../../../config/config";
 
 const ListOfAccommodations = () => {
@@ -156,7 +157,7 @@ const ListOfAccommodations = () => {
                       onClick={() => handleEdit(accommodation._id)}
                       className="bg-blue-500 text-white px-2 py-1 rounded-lg flex items-center"
                     >
-                      <span className="material-icons">edit</span>
+                      <FaEdit />
                     </button>
                   </td>
                   <td className="px-4 py-2 text-sm text-center">
@@ -167,7 +168,7 @@ const ListOfAccommodations = () => {
                       }}
                       className="bg-red-500 text-white px-2 py-1 rounded-lg flex items-center"
                     >
-                      <span className="material-icons">delete</span>
+                      <FaTrashAlt />
                     </button>
                   </td>
                 </tr>

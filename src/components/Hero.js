@@ -40,7 +40,7 @@ const Hero = () => {
   // Fetch Colleges API
   const fetchColleges = async () => {
     try {
-      const response = await fetch(`${API_NODE_URL}college/all-colleges`, {
+      const response = await fetch(`${API_NODE_URL}college/colleges`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

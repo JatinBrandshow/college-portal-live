@@ -168,6 +168,7 @@ const BookingForm = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [expandedSections, setExpandedSections] = useState({});
     const [isThankYouPopupOpen, setIsThankYouPopupOpen] = useState(false); // State for the popup
+    const [accommodationDetails, setAccommodationDetails] = useState(null); // State to store accommodation details
     const searchParams = useSearchParams();
 
     const accommodationImage = decodeURIComponent(searchParams.get('accommodationImage') || '');
@@ -184,14 +185,19 @@ const BookingForm = () => {
         // Personal Information
         accommodationId: "",
         enquiryId: "",
+        title: "", // New field
+        fullName: name || "", // New field
         dateOfBirth: "",
-        nationality: "",
         gender: "",
-        country: "",
-        pincode: "",
+        code: "", // New field
+        mobileNumber: "", // New field
+        emailAddress: "", // New field
+        alternateEmailAddress: "", // New field
+        nationality: "",
         fullAddress: "",
+        countryOfResidence: "", // New field
         city: "",
-        state: "",
+        pincode: "",
 
         // University Details
         universityName: "",
@@ -225,6 +231,18 @@ const BookingForm = () => {
         setCurrentStep(step);
     };
     
+    // Automatically calculate Move Out Date when stayDuration or moveIn changes
+    useEffect(() => {
+        if (formData.stayDuration && formData.moveIn) {
+            const moveInDate = new Date(formData.moveIn);
+            const moveOutDate = new Date(moveInDate.setMonth(moveInDate.getMonth() + parseInt(formData.stayDuration)));
+            setFormData((prev) => ({
+                ...prev,
+                moveOut: moveOutDate.toISOString().split('T')[0], // Format as YYYY-MM-DD
+            }));
+        }
+    }, [formData.stayDuration, formData.moveIn]);
+
     // Use useEffect to update formData when accommodationIdd or enquiryIdd changes
     useEffect(() => {
         setFormData((prev) => ({
@@ -279,6 +297,15 @@ const BookingForm = () => {
 
     const handleNextStep = (e, step) => {
         e.preventDefault();
+        if (step === 2) {
+            // Save accommodation details to display on the right side
+            setAccommodationDetails({
+                room: formData.room,
+                stayDuration: formData.stayDuration,
+                moveIn: formData.moveIn,
+                moveOut: formData.moveOut,
+            });
+        }
         setCurrentStep(step);
         setEditableStep(null);
     };
@@ -473,46 +500,161 @@ const BookingForm = () => {
                             </div>
                             {(currentStep === 2 || editableStep === 2) && (
                                 <form onSubmit={(e) => handleNextStep(e, 3)} className="space-y-4">
+                                    {/* New Fields */}
+                                    <div className="grid grid-cols-12 gap-4">
+                                        <div className="col-span-3">
+                                            <label className="block text-sm font-medium">
+                                                Title <span className="text-red-500">*</span>
+                                            </label>
+                                            <select
+                                                name="title"
+                                                value={formData.title}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            >
+                                                <option value="" hidden>Select Title</option>
+                                                <option value="Mr">Mr.</option>
+                                                <option value="Mrs">Mrs.</option>
+                                                <option value="Miss">Miss</option>
+                                                <option value="Dr">Dr.</option>
+                                            </select>
+                                        </div>
+                                        <div className="col-span-9">
+                                            <label className="block text-sm font-medium">
+                                                Full Name <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="fullName"
+                                                value={formData.fullName}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
                                     <div className="grid grid-cols-12 gap-4">
                                         <div className="col-span-6">
                                             <label className="block text-sm font-medium">
                                                 Date of Birth <span className="text-red-500">*</span>
                                             </label>
-                                            <input type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} className="w-full border rounded-md p-2" required />
+                                            <input
+                                                type="date"
+                                                name="dateOfBirth"
+                                                value={formData.dateOfBirth}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
                                         </div>
                                         <div className="col-span-6">
                                             <label className="block text-sm font-medium">
-                                                Nationality <span className="text-red-500">*</span>
-                                            </label>
-                                            <input type="text" name="nationality" value={formData.nationality} onChange={handleChange} className="w-full border rounded-md p-2" required />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-12 gap-4">
-                                        <div className="col-span-4">
-                                            <label className="block text-sm font-medium">
                                                 Gender <span className="text-red-500">*</span>
                                             </label>
-                                            <select name="gender" value={formData.gender} onChange={handleChange} className="w-full border rounded-md p-2" required>
-                                                <option value="" hidden>
-                                                    Select Gender
-                                                </option>
+                                            <select
+                                                name="gender"
+                                                value={formData.gender}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            >
+                                                <option value="" hidden>Select Gender</option>
                                                 <option value="Male">Male</option>
                                                 <option value="Female">Female</option>
                                                 <option value="Other">Other</option>
                                             </select>
                                         </div>
-                                        <div className="col-span-4">
+                                    </div>
+
+                                    <div className="grid grid-cols-12 gap-4">
+                                    <div className="col-span-3">
                                             <label className="block text-sm font-medium">
-                                                Country <span className="text-red-500">*</span>
+                                                Code <span className="text-red-500">*</span>
                                             </label>
-                                            <input type="text" name="country" value={formData.country} onChange={handleChange} className="w-full border rounded-md p-2" required />
+                                            <select
+                                                name="code"
+                                                value={formData.code}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            >
+                                                <option value="" hidden>Select Code</option>
+                                                <option value="Male">+91</option>
+                                                <option value="Female">+1</option>
+                                                <option value="Other">+99</option>
+                                            </select>
                                         </div>
-                                        <div className="col-span-4">
+                                        <div className="col-span-9">
                                             <label className="block text-sm font-medium">
-                                                Pincode <span className="text-red-500">*</span>
+                                                Mobile Number <span className="text-red-500">*</span>
                                             </label>
-                                            <input type="text" name="pincode" value={formData.pincode} onChange={handleChange} className="w-full border rounded-md p-2" required />
+                                            <input
+                                                type="tel"
+                                                name="mobileNumber"
+                                                value={formData.mobileNumber}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-12 gap-4">
+                                        <div className="col-span-6">
+                                            <label className="block text-sm font-medium">
+                                                Email Address <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="email"
+                                                name="emailAddress"
+                                                value={formData.emailAddress}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="col-span-6">
+                                            <label className="block text-sm font-medium">
+                                                Alternate Email Address
+                                            </label>
+                                            <input
+                                                type="email"
+                                                name="alternateEmailAddress"
+                                                value={formData.alternateEmailAddress}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-12 gap-4">
+                                        <div className="col-span-6">
+                                            <label className="block text-sm font-medium">
+                                                Nationality <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="nationality"
+                                                value={formData.nationality}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
+                                        </div>
+                                        <div className="col-span-6">
+                                            <label className="block text-sm font-medium">
+                                                Country of Residence <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="countryOfResidence"
+                                                value={formData.countryOfResidence}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -520,21 +662,42 @@ const BookingForm = () => {
                                         <label className="block text-sm font-medium">
                                             Full Address <span className="text-red-500">*</span>
                                         </label>
-                                        <textarea name="fullAddress" value={formData.fullAddress} onChange={handleChange} className="w-full border rounded-md p-2" rows="1" required></textarea>
+                                        <textarea
+                                            name="fullAddress"
+                                            value={formData.fullAddress}
+                                            onChange={handleChange}
+                                            className="w-full border rounded-md p-2"
+                                            rows="2"
+                                            required
+                                        ></textarea>
                                     </div>
 
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="col-span-1">
+                                    <div className="grid grid-cols-12 gap-4">
+                                        <div className="col-span-6">
                                             <label className="block text-sm font-medium">
                                                 City <span className="text-red-500">*</span>
                                             </label>
-                                            <input type="text" name="city" value={formData.city} onChange={handleChange} className="w-full border rounded-md p-2" required />
+                                            <input
+                                                type="text"
+                                                name="city"
+                                                value={formData.city}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
                                         </div>
-                                        <div className="col-span-1">
+                                        <div className="col-span-6">
                                             <label className="block text-sm font-medium">
-                                                State <span className="text-red-500">*</span>
+                                                Pincode <span className="text-red-500">*</span>
                                             </label>
-                                            <input type="text" name="state" value={formData.state} onChange={handleChange} className="w-full border rounded-md p-2" required />
+                                            <input
+                                                type="text"
+                                                name="pincode"
+                                                value={formData.pincode}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
                                         </div>
                                     </div>
 
@@ -545,16 +708,27 @@ const BookingForm = () => {
                                             <label className="block text-sm font-medium">
                                                 University Name <span className="text-red-500">*</span>
                                             </label>
-                                            <input type="text" name="universityName" value={formData.universityName} onChange={handleChange} className="w-full border rounded-md p-2" required />
+                                            <input
+                                                type="text"
+                                                name="universityName"
+                                                value={formData.universityName}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            />
                                         </div>
                                         <div className="col-span-1">
                                             <label className="block text-sm font-medium">
                                                 Enrollment Status <span className="text-red-500">*</span>
                                             </label>
-                                            <select name="enrollmentStatus" value={formData.enrollmentStatus} onChange={handleChange} className="w-full border rounded-md p-2" required>
-                                                <option value="" hidden>
-                                                    Select Status
-                                                </option>
+                                            <select
+                                                name="enrollmentStatus"
+                                                value={formData.enrollmentStatus}
+                                                onChange={handleChange}
+                                                className="w-full border rounded-md p-2"
+                                                required
+                                            >
+                                                <option value="" hidden>Select Status</option>
                                                 <option value="Enrolled">Enrolled</option>
                                                 <option value="Not Enrolled">Not Enrolled</option>
                                             </select>
@@ -720,6 +894,32 @@ const BookingForm = () => {
                                 </p>
                                 </div>
                             </div>
+
+                            {/* Display Accommodation Details */}
+                            {accommodationDetails && (
+                            <div className="mt-4 bg-white rounded-xl border p-4">
+                                <h3 className="font-semibold text-lg mb-4">Selected Accommodation Details</h3>
+                                <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <p className="font-semibold">Room Type</p>
+                                    <p>{accommodationDetails.room}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Duration</p>
+                                    <p>{accommodationDetails.stayDuration} months</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Move In Date</p>
+                                    <p>{accommodationDetails.moveIn}</p>
+                                </div>
+                                <div>
+                                    <p className="font-semibold">Move Out Date</p>
+                                    <p>{accommodationDetails.moveOut}</p>
+                                </div>
+                                </div>
+                            </div>
+                            )}
+
 
                             <div className="mt-2 bg-white rounded-xl border">
                                 <div className="flex flex-col">

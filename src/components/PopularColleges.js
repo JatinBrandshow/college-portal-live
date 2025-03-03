@@ -63,16 +63,16 @@ const PopularColleges = () => {
 
   const filteredColleges = activeCity === "All" ? colleges : colleges.filter((college) => college.city === activeCity)
 
-  const firstRowCount = filteredColleges.length > 7 
+  const firstRowCount = filteredColleges.length > 6 
   ? Math.min(9, Math.max(6, filteredColleges.length - Math.floor(filteredColleges.length / 2)))
   : filteredColleges.length;
 
 const firstRow = filteredColleges.slice(0, firstRowCount);
-const secondRow = filteredColleges.length > 7 
+const secondRow = filteredColleges.length > 6 
   ? filteredColleges.slice(firstRowCount) 
   : [];
 
-  const shouldShowSecondRow = filteredColleges.length > 7;
+  const shouldShowSecondRow = filteredColleges.length > 6;
 
 
   return (
