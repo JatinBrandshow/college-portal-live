@@ -1,6 +1,6 @@
 "use client";
-import { useState } from "react";
-import { User, Building, Home, LayoutDashboard } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Building, Home, LayoutDashboard, Loader2 } from "lucide-react"; // Added Loader2 for loading spinner
 import {
   LineChart,
   Line,
@@ -14,6 +14,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { API_NODE_URL, API_KEY } from "../../../../config/config"; // Import your API URL and key
 
 const userActivityData = [
   { day: "Mon", users: 50, active: 30 },
@@ -34,6 +35,74 @@ const COLORS = ["#4F46E5", "#60A5FA"];
 
 const AdminDashBoard = () => {
   const [darkMode, setDarkMode] = useState(false);
+  const [collegesCount, setCollegesCount] = useState(null); // Use null to indicate loading state
+  const [accommodationsCount, setAccommodationsCount] = useState(null); // Use null to indicate loading state
+  const [isLoadingColleges, setIsLoadingColleges] = useState(true); // Loading state for colleges
+  const [isLoadingAccommodations, setIsLoadingAccommodations] = useState(true); // Loading state for accommodations
+
+  // Fetch colleges data
+  useEffect(() => {
+    const fetchColleges = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}college/colleges`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+
+        const result = await response.json();
+        console.log("Colleges result:", result);
+
+        if (Array.isArray(result)) {
+          setCollegesCount(result.length); // Set the count of colleges
+        } else {
+          console.error("Unexpected response format for colleges:", result);
+          setCollegesCount(0);
+        }
+      } catch (error) {
+        console.error("Error fetching colleges data:", error);
+        setCollegesCount(0);
+      } finally {
+        setIsLoadingColleges(false); // Stop loading after fetch completes
+      }
+    };
+
+    fetchColleges();
+  }, []);
+
+  // Fetch accommodations data
+  useEffect(() => {
+    const fetchAccommodations = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}accommodation/all-accommodations`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+
+        const result = await response.json();
+        console.log("Accommodations result:", result);
+
+        if (result.status && Array.isArray(result.data)) {
+          setAccommodationsCount(result.data.length); // Set the count of accommodations
+        } else {
+          console.error("Unexpected response format for accommodations:", result);
+          setAccommodationsCount(0);
+        }
+      } catch (error) {
+        console.error("Error fetching accommodations data:", error);
+        setAccommodationsCount(0);
+      } finally {
+        setIsLoadingAccommodations(false); // Stop loading after fetch completes
+      }
+    };
+
+    fetchAccommodations();
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -43,10 +112,11 @@ const AdminDashBoard = () => {
   return (
     <>
       <div
-        className={`min-h-screen p-6 ${darkMode
+        className={`min-h-screen p-6 ${
+          darkMode
             ? "bg-gradient-to-br from-gray-900 via-gray-800 to-gray-700 text-white"
             : "bg-gradient-to-br from-blue-50 via-white to-gray-100 text-gray-900"
-          }`}
+        }`}
       >
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -61,22 +131,40 @@ const AdminDashBoard = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
           {[
             { title: "Total Users", value: "1,250", icon: <User className="w-6 h-6" /> },
-            { title: "Colleges Added", value: "35", icon: <Building className="w-6 h-6" /> },
-            { title: "Accommodations Added", value: "12", icon: <Home className="w-6 h-6" /> },
+            {
+              title: "Colleges Added",
+              value: isLoadingColleges ? (
+                <Loader2 className="w-6 h-6 animate-spin" /> // Loading spinner for colleges
+              ) : (
+                collegesCount
+              ),
+              icon: <Building className="w-6 h-6" />,
+            },
+            {
+              title: "Accommodations Added",
+              value: isLoadingAccommodations ? (
+                <Loader2 className="w-6 h-6 animate-spin" /> // Loading spinner for accommodations
+              ) : (
+                accommodationsCount
+              ),
+              icon: <Home className="w-6 h-6" />,
+            },
             { title: "Departments Added", value: "20", icon: <LayoutDashboard className="w-6 h-6" /> },
           ].map((item, idx) => (
             <div
               key={idx}
-              className={`rounded-lg shadow-lg p-6 flex items-center justify-between ${darkMode ? "bg-gray-800" : "bg-white"
-                }`}
+              className={`rounded-lg shadow-lg p-6 flex items-center justify-between ${
+                darkMode ? "bg-gray-800" : "bg-white"
+              }`}
             >
               <div>
                 <h2 className="text-lg font-semibold">{item.title}</h2>
                 <p className="text-2xl font-bold">{item.value}</p>
               </div>
               <div
-                className={`p-2 rounded-lg ${darkMode ? "bg-indigo-500" : "bg-indigo-100 text-indigo-800"
-                  }`}
+                className={`p-2 rounded-lg ${
+                  darkMode ? "bg-indigo-500" : "bg-indigo-100 text-indigo-800"
+                }`}
               >
                 {item.icon}
               </div>
@@ -157,8 +245,9 @@ const AdminDashBoard = () => {
               ].map((notice, idx) => (
                 <li key={idx} className="mb-2">
                   <span
-                    className={`block p-2 rounded-lg ${darkMode ? "bg-gray-700" : "bg-gray-100"
-                      }`}
+                    className={`block p-2 rounded-lg ${
+                      darkMode ? "bg-gray-700" : "bg-gray-100"
+                    }`}
                   >
                     {notice}
                   </span>
@@ -177,8 +266,9 @@ const AdminDashBoard = () => {
               ].map((task, idx) => (
                 <li key={idx} className="mb-2">
                   <span
-                    className={`block p-2 rounded-lg ${darkMode ? "bg-gray-700" : "bg-gray-100"
-                      }`}
+                    className={`block p-2 rounded-lg ${
+                      darkMode ? "bg-gray-700" : "bg-gray-100"
+                    }`}
                   >
                     {task}
                   </span>

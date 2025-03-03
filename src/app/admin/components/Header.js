@@ -20,7 +20,7 @@ const Header = ({ toggleSidebar }) => {
 
         {/* Profile Image */}
         <img
-          src="https://via.placeholder.com/40"
+          src="/image/dashboard/profile.webp"
           alt="Profile"
           className="w-10 h-10 rounded-full object-cover"
         />
