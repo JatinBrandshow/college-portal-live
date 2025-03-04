@@ -218,7 +218,6 @@ const BookingForm = () => {
             guarantorEmail: "",
             guarantorCode: "",
             guarantorMobiles: [""],
-            guarantorCode: "",
             guarantorAddress: "",
             guarantorCountry: "",
             guarantorCity: "",
@@ -827,12 +826,7 @@ const BookingForm = () => {
                                         </label>
                                         <textarea name="guarantorDetails.guarantorAddress" value={formData.guarantorDetails.guarantorAddress} onChange={handleChange} className="w-full border p-2 rounded" required></textarea>
                                     </div>
-                                    <div>
-                                        <label className="block text-sm font-medium">
-                                            Code <span className="text-red-500">*</span>
-                                        </label>
-                                        <input type="text" name="guarantorDetails.guarantorCode" value={formData.guarantorDetails.guarantorCode} onChange={handleChange} className="w-full border p-2 rounded" required />
-                                        </div>
+                                    
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="col-span-1">
                                             <label className="block text-sm font-medium">
