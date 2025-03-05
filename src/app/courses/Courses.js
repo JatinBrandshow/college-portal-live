@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { Search, Filter } from "lucide-react";
 
 const courses = [
-  { title: "Full-Stack Web Development", instructor: "John Doe", image: "/courses/webdev.jpg", category: "Technology" },
-  { title: "Machine Learning & AI", instructor: "Jane Smith", image: "/courses/ai.jpg", category: "Technology" },
-  { title: "Digital Marketing Mastery", instructor: "Alice Brown", image: "/courses/marketing.jpg", category: "Business" },
-  { title: "Graphic Design Essentials", instructor: "David Lee", image: "/courses/design.jpg", category: "Design" },
-  { title: "Cybersecurity Basics", instructor: "Emily White", image: "/courses/cybersecurity.jpg", category: "Technology" },
+  { title: "Full-Stack Web Development", instructor: "John Doe", image: "/image/demo/web.webp", category: "Technology" },
+  { title: "Machine Learning & AI", instructor: "Jane Smith", image: "/image/demo/ai.webp", category: "Technology" },
+  { title: "Digital Marketing Mastery", instructor: "Alice Brown", image: "/image/demo/dm.webp", category: "Business" },
+  { title: "Graphic Design Essentials", instructor: "David Lee", image: "/image/demo/wh.webp", category: "Design" },
+  { title: "Cybersecurity Basics", instructor: "Emily White", image: "/image/demo/cs.webp", category: "Technology" },
 ];
 
 const categories = ["All", "Technology", "Business", "Design"];
@@ -80,7 +80,7 @@ export default function Courses() {
                 className="bg-white shadow-md rounded-lg p-4 transform transition-transform hover:scale-105"
                 whileHover={{ scale: 1.05 }}
               >
-                <img src={course.image} alt={course.title} className="w-full h-52 object-cover rounded-lg mb-4" />
+                <img src={course.image} alt={course.title} className="w-full h-52 object-contain rounded-lg mb-4" />
                 <h2 className="text-lg font-semibold">{course.title}</h2>
                 <p className="text-gray-600">{course.instructor}</p>
                 <span className="text-sm text-blue-500">{course.category}</span>

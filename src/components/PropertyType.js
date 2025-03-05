@@ -20,7 +20,7 @@ const fetchAccommodations = async () => {
     }
 
     const result = await response.json();
-    return result.data; // Extract the `data` array from the response
+    return result.accommodations || []; // Corrected extraction of accommodations array
   } catch (error) {
     console.error("Error fetching accommodations:", error);
     return []; // Return an empty array in case of error
@@ -35,15 +35,13 @@ const countAvailableTypes = (accommodations) => {
     Apartment: 0,
   };
 
-  // Ensure accommodations is an array
   if (!Array.isArray(accommodations)) {
     console.error("Expected accommodations to be an array, but got:", accommodations);
     return counts;
   }
 
   accommodations.forEach((accommodation) => {
-    // Ensure accommodation.meta.availableType exists and is an array
-    if (accommodation?.meta?.availableType && Array.isArray(accommodation.meta.availableType)) {
+    if (Array.isArray(accommodation?.meta?.availableType)) { 
       accommodation.meta.availableType.forEach((type) => {
         if (counts.hasOwnProperty(type)) {
           counts[type]++;

@@ -31,25 +31,23 @@ const BudgetProperties = () => {
   
         const text = await response.text();
         const data = JSON.parse(text);
-  
-        if (Array.isArray(data.data)) {
-          const mappedProperties = data.data.map((item) => ({
+
+        if (Array.isArray(data.accommodations)) { // Correctly accessing accommodations array
+          const mappedProperties = data.accommodations.map((item) => ({
             id: item._id,
             title: item.name || "No Name",
-            city: item.location.city || "Unknown City",
-            country: item.location.country || "Unknown Country",
-            price: item.pricing ? `₹${item.pricing.minPrice}` : "N/A", // Use `pricing.minPrice`
-            rating: item.reviewsRating || "No Rating", // Use `reviewsRating`
-            images: Array.isArray(item.meta.images)
-              ? item.meta.images // Use `images` directly
-              : [],
-            amenities: Array.isArray(item.amenities) ? item.amenities : [], // Map amenities
-            description: item.description?.short_description || "No Description", // Map short description
-            type: item.type || "Unknown Type", // Map property type
-            reviewsCount: item.reviewsCount || 0, // Map reviews count
-            featuredImagePath: item.featuredImagePath || "", // Map featured image
+            city: item.location?.city || "Unknown City",
+            country: item.location?.country || "Unknown Country",
+            price: item.pricing?.minPrice ? `₹${item.pricing.minPrice}` : "N/A",
+            rating: item.reviewsRating || "No Rating",
+            images: Array.isArray(item.meta?.images) ? item.meta.images : [],
+            amenities: Array.isArray(item.amenities) ? item.amenities : [],
+            description: item.description?.short_description || "No Description",
+            type: item.type || "Unknown Type",
+            reviewsCount: item.reviewsCount || 0,
+            featuredImagePath: item.featuredImagePath || "",
           }));
-  
+
           setProperties(mappedProperties);
         } else {
           console.error("Unexpected API response structure:", data);

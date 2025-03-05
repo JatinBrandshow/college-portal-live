@@ -11,6 +11,8 @@ import { API_NODE_URL, API_KEY } from "../../../../config/config";
 import dynamic from "next/dynamic";
 import { useMap } from "react-leaflet";
 import { FaChevronLeft, FaChevronRight, FaChevronUp, FaChevronDown } from "react-icons/fa";
+import Enquire from "@/components/Enquire";
+
 
 
 // 📌 Dynamic imports for Leaflet components to avoid SSR issues
@@ -58,7 +60,7 @@ const PropertyMap = ({ property }) => {
   const position = [property.location.latitude, property.location.longitude];
 
   return (
-    <div className="h-[300px] lg:h-[600px] bg-gray-200 rounded-lg relative">
+    <div className="h-[300px] lg:h-[600px] bg-gray-200 rounded-lg relative z-0">
       <MapContainer center={position} zoom={13} className="w-full h-full">
         {/* 📌 OpenStreetMap Tile Layer */}
         <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
@@ -267,6 +269,14 @@ const Pages = ({ id }) => {
     },
   ];
   const [currentPropertiesIndex, setCurrentPropertiesIndex] = useState(0);
+  const [isEnquireOpen, setIsEnquireOpen] = useState(false);
+  // Add a state to store the selected accommodation details
+    const [selectedAccommodation, setSelectedAccommodation] = useState({
+    image: "",
+    name: "",
+    address: "",
+    id: "",
+  });
   const [itemsPerPage, setItemsPerPage] = useState(4);
   useEffect(() => {
     const updateItemsPerPage = () => {
@@ -294,7 +304,7 @@ const Pages = ({ id }) => {
   };
 
   // Fetch property details
-  useEffect(() => {
+useEffect(() => {
     const fetchPropertyDetails = async () => {
       try {
         const response = await fetch(`${API_NODE_URL}accommodation/all-accommodations`, {
@@ -303,15 +313,15 @@ const Pages = ({ id }) => {
             Authorization: `Bearer ${API_KEY}`,
           },
         });
-
+  
         const text = await response.text();
         const data = JSON.parse(text);
-        console.log(data);
-
-        if (Array.isArray(data.data)) {
-          setAllProperties(data.data); // Store all accommodations
-          const foundProperty = data.data.find((item) => item._id === id);
-          console.log(foundProperty);
+        console.log("API Response:", data);
+  
+        if (Array.isArray(data.accommodations)) { 
+          setAllProperties(data.accommodations); // Store all accommodations
+          const foundProperty = data.accommodations.find((item) => item._id === id);
+          console.log("Found Property:", foundProperty);
           if (foundProperty) {
             setProperty(foundProperty); // Set the entire property object
           } else {
@@ -327,11 +337,12 @@ const Pages = ({ id }) => {
         setLoading(false);
       }
     };
-
+  
     if (id) {
       fetchPropertyDetails();
     }
   }, [id]);
+  
 
   if (loading) {
     return <div className="text-center py-10">Loading property details...</div>;
@@ -898,9 +909,32 @@ const Pages = ({ id }) => {
                         <button className="w-full border-red-500 text-red-500 outline-red-500 py-2 rounded-md shadow-md ">
                             View Rooms
                         </button>
-                        <button className="w-full text-white bg-red-500  py-2 rounded-md shadow-md mt-3">
-                            Enquire Now
-                        </button>
+                        <button
+                          className="w-full px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
+                          onClick={(event) => {
+                              event.preventDefault();
+                              event.stopPropagation();
+                              setIsEnquireOpen(true);
+                              setSelectedAccommodation({
+                                  image: property.meta.images[0],
+                                  name: property.name,
+                                  address: `${property.location.streetNumber} ${property.location.route}, ${property.location.locality}, ${property.location.city}, ${property.location.state}, ${property.location.country}`,
+                                  id: property._id,
+                                  price: property.pricing.minPrice,
+                                });
+                          }}
+                      >
+                          Enquire
+                      </button>
+                      <Enquire
+                  isOpen={isEnquireOpen}
+                  setIsOpen={setIsEnquireOpen}
+                  accommodationImage={selectedAccommodation.image}
+                  accommodationName={selectedAccommodation.name}
+                  accommodationAddress={selectedAccommodation.address}
+                  accommodationId={selectedAccommodation.id}
+                  accommodationPrice={selectedAccommodation.price}
+              />
                     </div>
                     <div className='border border-1 rounded-lg p-3 my-2'>
                         <div className="w-full max-w-md mx-auto">

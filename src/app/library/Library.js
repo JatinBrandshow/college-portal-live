@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { Search, Filter } from "lucide-react";
 
 const books = [
-  { title: "Introduction to AI", author: "John Doe", image: "/books/ai.jpg", category: "Technology" },
-  { title: "Modern Web Development", author: "Jane Smith", image: "/books/webdev.jpg", category: "Technology" },
-  { title: "Digital Marketing", author: "Alice Brown", image: "/books/marketing.jpg", category: "Business" },
-  { title: "World History", author: "David Lee", image: "/books/history.jpg", category: "History" },
-  { title: "Psychology 101", author: "Emily White", image: "/books/psychology.jpg", category: "Science" },
+  { title: "Introduction to AI", author: "John Doe", image: "/image/demo/ai.webp", category: "Technology" },
+  { title: "Modern Web Development", author: "Jane Smith", image: "/image/demo/dm.webp", category: "Technology" },
+  { title: "Digital Marketing", author: "Alice Brown", image: "/image/demo/web.webp", category: "Business" },
+  { title: "World History", author: "David Lee", image: "/image/demo/wh.webp", category: "History" },
+  { title: "Psychology 101", author: "Emily White", image: "/image/demo/ai.webp", category: "Science" },
 ];
 
 const categories = ["All", "Technology", "Business", "History", "Science"];

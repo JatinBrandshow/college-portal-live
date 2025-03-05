@@ -9,13 +9,13 @@ const alumniStories = [
         name: "Alice Johnson",
         graduationYear: "2010",
         story: "After graduating, Alice founded a successful tech startup...",
-        photo: "/images/alumni/alice_johnson.jpg",
+        photo: "/image/dashboard/profile.webp",
     },
     {
         name: "Bob Smith",
         graduationYear: "2012",
         story: "Bob transitioned into a leading role at a non-profit organization...",
-        photo: "/images/alumni/bob_smith.jpg",
+        photo: "/image/dashboard/profile.webp",
     },
     // Add more stories as needed
 ];

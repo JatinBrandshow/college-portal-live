@@ -11,7 +11,7 @@ const facultyData = [
         department: "Computer Science",
         email: "jane.smith@example.com",
         phone: "(123) 456-7890",
-        photo: "/images/faculty/jane_smith.jpg",
+        photo: "/image/dashboard/profile.webp",
     },
     {
         name: "Dr. John Doe",
@@ -19,7 +19,7 @@ const facultyData = [
         department: "Mathematics",
         email: "john.doe@example.com",
         phone: "(123) 456-7891",
-        photo: "/images/faculty/john_doe.jpg",
+        photo: "/image/dashboard/profile.webp",
     },
     // Add more faculty members as needed
 ];

@@ -169,20 +169,16 @@ const Accommodation = () => {
           },
         }
       );
+
       const result = await response.json();
       console.log("API Response:", result);
 
-      if (response.ok && result.status) {
-        if (Array.isArray(result.data)) {
-          console.log("Data:", result.data);
-          setAccommodations(result.data);
-        } else {
-          console.error("API response data is not an array:", result.data);
-          setAccommodations([]);
-        }
+      if (response.ok && Array.isArray(result.accommodations)) { 
+        console.log("Data:", result.accommodations);
+        setAccommodations(result.accommodations);
       } else {
-        console.error("Failed to fetch accommodations:", result.message);
-        setAccommodations([]);
+        console.error("API response does not contain accommodations:", result);
+        setAccommodations([]); 
       }
     } catch (error) {
       console.error("Failed to fetch accommodations:", error);
@@ -193,6 +189,7 @@ const Accommodation = () => {
   useEffect(() => {
     fetchAccommodations();
   }, []);
+
 
   // Update filters when URL search params change
   useEffect(() => {
@@ -392,7 +389,7 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
     <div className="p-0">
     
       {/* Filter Buttons */}
-<div className="sticky top-[75px] z-40 bg-white shadow-md px-6 py-2 flex items-center rounded-lg">
+<div className="sticky top-[77px] z-40 bg-white shadow-md px-6 py-2 flex items-center rounded-lg">
   {/* Left Scroll Button */}
   <button
     onClick={scrollLeft}
@@ -575,44 +572,37 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
 
       {/* Location Popup */}
       {isLocationPopupOpen && (
-        <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
-          style={{
-            top: getPopupPosition(locationButtonRef).top,
-            left: getPopupPosition(locationButtonRef).left,
-          }}
-        >
-          <button
-            onClick={() => setIsLocationPopupOpen(false)}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Location</h2>
-          <input
-            type="text"
-            placeholder="Search Location (City or State)"
-            value={filters.location}
-            onChange={(e) => handleFilterChange("location", e.target.value)}
-            className="w-full p-2 border rounded"
-          />
-          <button
-            onClick={() => resetFilter("location")}
-            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Reset Location
-          </button>
-        </div>
-      )}
+  <div
+    className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px]"
+  >
+    <button
+      onClick={() => setIsLocationPopupOpen(false)}
+      className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+    >
+      <X className="w-6 h-6" />
+    </button>
+    <h2 className="text-xl font-semibold mb-4">Location</h2>
+    <input
+      type="text"
+      placeholder="Search Location (City or State)"
+      value={filters.location}
+      onChange={(e) => handleFilterChange("location", e.target.value)}
+      className="w-full p-2 border rounded"
+    />
+    <button
+      onClick={() => resetFilter("location")}
+      className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+    >
+      Reset Location
+    </button>
+  </div>
+)}
 
       {/* Locality Popup */}
       {isLocalityPopupOpen && (
         <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
-          style={{
-            top: getPopupPosition(localityButtonRef).top,
-            left: getPopupPosition(localityButtonRef).left,
-          }}
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[200px]"
+          
         >
           <button
             onClick={() => setIsLocalityPopupOpen(false)}
@@ -641,11 +631,8 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
       {/* Budget Popup */}
       {isBudgetPopupOpen && (
         <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
-          style={{
-            top: getPopupPosition(budgetButtonRef).top,
-            left: getPopupPosition(budgetButtonRef).left,
-          }}
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[300px]"
+          
         >
           <button
             onClick={() => setIsBudgetPopupOpen(false)}
@@ -678,11 +665,8 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
       {/* Room Type Popup */}
       {isRoomTypePopupOpen && (
         <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
-          style={{
-            top: getPopupPosition(roomTypeButtonRef).top,
-            left: getPopupPosition(roomTypeButtonRef).left,
-          }}
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[350px]"
+          
         >
           <button
             onClick={() => setIsRoomTypePopupOpen(false)}
@@ -711,11 +695,8 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
       {/* Sort Popup */}
       {isSortPopupOpen && (
         <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
-          style={{
-            top: getPopupPosition(sortButtonRef).top,
-            left: getPopupPosition(sortButtonRef).left,
-          }}
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px] lg:left-[30px]"
+          
         >
           <button
             onClick={() => setIsSortPopupOpen(false)}
@@ -744,11 +725,8 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
       {/* Stay Duration Popup */}
       {isStayDurationPopupOpen && (
         <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50"
-          style={{
-            top: getPopupPosition(stayDurationButtonRef).top,
-            left: getPopupPosition(stayDurationButtonRef).left,
-          }}
+          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[100px] lg:left-[400px]"
+          
         >
           <button
             onClick={() => setIsStayDurationPopupOpen(false)}
