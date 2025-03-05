@@ -168,6 +168,20 @@ const Hero = () => {
           </p>
         </div>
 
+        {/* College and Accommodation Buttons */}
+        <div className="flex justify-start space-x-1 max-sm:space-x-0.5 max-sm:mb-1">
+          <button
+            className={`px-8 py-5 font-bold text-base rounded-lg max-sm:text-sm max-md:px-6 max-sm:px-4 max-md:py-4 max-sm:py-3 bg-violet-600 text-white `}
+          >
+            COLLEGE
+          </button>
+          <button
+            className={`px-8 py-5 font-bold text-base rounded-lg max-sm:text-sm max-md:px-6 max-sm:px-4 max-md:py-4 max-sm:py-3 bg-gray-200 text-black hover:bg-violet-600 hover:text-white`}
+          >
+            ACCOMMODATIONS
+          </button>
+        </div>
+
         {/* Search Bar */}
         <div className="flex flex-col md:absolute md:pr-5 z-20 xl:w-2/3">
           <div className="flex flex-col md:items-center md:flex-row gap-10 bg-white py-5 px-5 rounded-2xl shadow-sm max-lg:gap-7 max-md:gap-5 max-sm:gap-3 max-md:py-4 max-sm:py-3 max-md:px-4 max-sm:px-3">
