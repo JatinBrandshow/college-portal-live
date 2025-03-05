@@ -1,29 +1,46 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Header from '@/components/Header';
-import AboutSection from '@/components/AboutSection';
-import ProgramsSection from '@/components/ProgramsSection';
-import EventsSection from '@/components/EventsSection';
-import Achievements from '@/components/Achievements';
-import Footer from '@/components/Footer';
-import Banner from '@/components/Banner';
-import LogoSlider from '@/components/LogoSlider';
-import StudyGoal from '@/components/StudyGoal';
-import PropertyType from '@/components/PropertyType';
-import BudgetProperties from '@/components/BudgetProperties';
+import Hero from '@/components/Hero';
 import PopularCities from '@/components/PopularCities';
 import PopularColleges from '@/components/PopularColleges';
-import Hero from '@/components/Hero';
 import Usp from '@/components/Usp';
+import BudgetProperties from '@/components/BudgetProperties';
+import PropertyType from '@/components/PropertyType';
+import StudyGoal from '@/components/StudyGoal';
 import OurTestimonial from '@/components/OurTestimonial';
+import Footer from '@/components/Footer';
 
 const HomePage = () => {
+  const [isHeroVisible, setIsHeroVisible] = useState(true);
+  const heroRef = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 } // Adjust threshold as needed
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    return () => {
+      if (heroRef.current) {
+        observer.unobserve(heroRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div>
-      <Header />
-      <Hero />
-      {/* <AboutSection /> */}
+      <Header showSearchBar={!isHeroVisible} />
+      <div ref={heroRef}>
+        <Hero />
+      </div>
       <PopularCities />
       <PopularColleges />
       <Usp />
@@ -31,10 +48,6 @@ const HomePage = () => {
       <PropertyType />
       <StudyGoal />
       <OurTestimonial />
-      {/* <Banner />
-      <EventsSection />
-      <LogoSlider />
-      <Achievements /> */}
       <Footer />
     </div>
   );

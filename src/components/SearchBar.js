@@ -5,51 +5,121 @@ import { API_NODE_URL, API_KEY } from "../../config/config";
 
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [suggestions, setSuggestions] = useState({ cities: [], states: [] });
+  const [suggestions, setSuggestions] = useState([]);
+  const [colleges, setColleges] = useState([]);
+  const [accommodations, setAccommodations] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const searchBarRef = useRef(null);
 
-  // Fetch accommodations for suggestions
-  const fetchSuggestions = async () => {
-    try {
-      const response = await fetch(
-        `${API_NODE_URL}accommodation/all-accommodations`,
-        {
-          method: "GET",
+  // Fetch colleges from API
+  useEffect(() => {
+    const fetchColleges = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}college/colleges`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
           },
+        });
+
+        const text = await response.text();
+        const data = JSON.parse(text);
+        console.log(data);
+
+        if (Array.isArray(data)) {
+          setColleges(data);
+        } else {
+          console.error("Unexpected API response structure");
         }
-      );
-      const data = await response.json();
-      if (response.ok) {
-        // Extract unique cities and states for suggestions
-        const uniqueCities = [...new Set(data.data.map((acc) => acc.location.city))];
-        const uniqueStates = [...new Set(data.data.map((acc) => acc.location.state))];
-        setSuggestions({ cities: uniqueCities, states: uniqueStates });
+      } catch (error) {
+        console.error("Failed to fetch colleges:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch suggestions:", error);
+    };
+
+    fetchColleges();
+  }, []);
+
+  // Fetch accommodations from API
+  useEffect(() => {
+    const fetchAccommodations = async () => {
+      try {
+        const response = await fetch(
+          `${API_NODE_URL}accommodation/all-accommodations`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${API_KEY}`,
+            },
+          }
+        );
+
+        const result = await response.json();
+        console.log("API Response:", result);
+
+        if (response.ok && Array.isArray(result.accommodations)) {
+          console.log("Data:", result.accommodations);
+          setAccommodations(result.accommodations);
+        } else {
+          console.error("API response does not contain accommodations:", result);
+          setAccommodations([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch accommodations:", error);
+        setAccommodations([]);
+      }
+    };
+
+    fetchAccommodations();
+  }, []);
+
+  // Handle search input change
+  useEffect(() => {
+    if (searchQuery.length > 2) {
+      // Filter colleges by name, city, or state
+      const collegeSuggestions = colleges.filter((college) =>
+        college.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        college.city.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        college.state.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      // Filter accommodations by city or state
+      const accommodationCities = accommodations
+        .map((accommodation) => accommodation.location.city)
+        .filter((city, index, self) => self.indexOf(city) === index); // Remove duplicates
+
+      const accommodationSuggestions = accommodationCities.filter((city) =>
+        city.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      // Combine suggestions
+      setSuggestions([
+        ...collegeSuggestions.map((college) => ({ ...college, type: "college" })),
+        ...accommodationSuggestions.map((city) => ({ city, type: "accommodation" })),
+      ]);
+      setShowSuggestions(true);
+    } else {
+      setSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [searchQuery, colleges, accommodations]);
+
+  // Handle search button click
+  const handleSearch = () => {
+    if (searchQuery) {
+      router.push(`/accommodation`); // Redirect to /accommodation without query parameters
     }
   };
 
-  useEffect(() => {
-    if (searchQuery) {
-      fetchSuggestions();
-      setShowSuggestions(true);
-    } else {
-      setSuggestions({ cities: [], states: [] });
-      setShowSuggestions(false);
-    }
-  }, [searchQuery]);
-
-  // Handle search
-  const handleSearch = (query) => {
-    if (query.trim()) {
-      router.push(`/accommodation?location=${query}`);
-      setShowSuggestions(false);
+  // Handle suggestion click
+  const handleSuggestionClick = (suggestion) => {
+    if (suggestion.type === "college") {
+      // It's a college
+      router.push(`/college?name=${suggestion.name}`);
+    } else if (suggestion.type === "accommodation") {
+      // It's an accommodation city
+      router.push(`/accommodation?location=${suggestion.city}`);
     }
   };
 
@@ -72,50 +142,61 @@ const SearchBar = () => {
       <div className="flex">
         <input
           type="text"
-          placeholder="Search for city or state..."
+          placeholder="Search for colleges or accommodations..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500"
         />
         <button
-          onClick={() => handleSearch(searchQuery)}
+          onClick={handleSearch}
           className="ml-2 px-4 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-500"
         >
           Search
         </button>
       </div>
-      {showSuggestions && (suggestions.cities.length > 0 || suggestions.states.length > 0) && (
+      {showSuggestions && suggestions.length > 0 && (
         <div className="absolute mt-2 w-full bg-white shadow-lg rounded-lg z-50">
-          {/* City Suggestions */}
-          {suggestions.cities.length > 0 && (
-            <div>
-              <div className="px-4 py-2 text-sm font-semibold text-gray-500">Cities</div>
-              {suggestions.cities.map((city, index) => (
-                <div
-                  key={`city-${index}`}
-                  onClick={() => handleSearch(city)}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  {city}
+          {suggestions.map((suggestion, index) => (
+            <div
+              key={index}
+              className="p-2 hover:bg-gray-100 cursor-pointer"
+              onClick={() => handleSuggestionClick(suggestion)}
+            >
+              <div className="flex justify-between items-center">
+                <span>{suggestion.name || suggestion.city}</span>
+                <div className="flex gap-2">
+                  {/* Show Admission button for both college and accommodation suggestions */}
+                  <button
+                    className="px-2 py-1 bg-violet-600 text-white rounded hover:bg-violet-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (suggestion.type === "college") {
+                        router.push(`/college?city=${suggestion.city}`);
+                      } else {
+                        router.push(`/college?city=${suggestion.city}`);
+                      }
+                    }}
+                  >
+                    Admission
+                  </button>
+                  {/* Show Stay button for both college and accommodation suggestions */}
+                  <button
+                    className="px-2 py-1 bg-violet-600 text-white rounded hover:bg-violet-700"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (suggestion.type === "college") {
+                        router.push(`/accommodation?location=${suggestion.city}`);
+                      } else {
+                        router.push(`/accommodation?location=${suggestion.city}`);
+                      }
+                    }}
+                  >
+                    Stay
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
-          {/* State Suggestions */}
-          {suggestions.states.length > 0 && (
-            <div>
-              <div className="px-4 py-2 text-sm font-semibold text-gray-500">States</div>
-              {suggestions.states.map((state, index) => (
-                <div
-                  key={`state-${index}`}
-                  onClick={() => handleSearch(state)}
-                  className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                >
-                  {state}
-                </div>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
       )}
     </div>
