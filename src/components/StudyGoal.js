@@ -36,7 +36,7 @@ const StudyGoal = () => {
           <div ref={scrollRef} className="flex space-x-6 overflow-x-auto no-scrollbar scroll-smooth max-lg:space-x-5 max-md:space-x-4 max-sm:space-x-3">
             {studyGoals.map((goal, index) => (
               <div key={index} className="min-w-[250px] md:min-w-[280px] lg:min-w-[320px] flex-shrink-0">
-                <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow h-72 flex flex-col justify-between border-2 border-gray-300 max-lg:p-5 max-md:p-4 max-sm:p-3 max-sm:justify-center max-sm:h-60">
+                <div className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-shadow h-[300px] flex flex-col justify-between border-2 border-gray-300 max-lg:p-5 max-md:p-4 max-sm:p-3 max-sm:justify-center">
                   {goal.title === "See All" ? (
                     <button className="flex justify-center items-center h-full text-orange-500 font-semibold text-lg underline">
                       {goal.title} <FaArrowRight className="ml-2 rounded-full border-2 border-orange-500" />
@@ -55,14 +55,12 @@ const StudyGoal = () => {
                         </div>
                       </div>
                       {goal.branches && (
-                        <ul className="mt-4 border-t pt-4 text-gray-700 h-[200px] overflow-auto">
+                        <ul className="mt-4 border-t pt-4 text-gray-700">
                           {goal.branches.map((branch, idx) => (
                             <li
                               key={idx}
                               onClick={() => handleBranchClick(branch)}
-                              className={`hover:underline hover:text-[#5e23dd] cursor-pointer ${
-                                idx !== goal.branches.length - 1 ? "border-b" : ""
-                              } py-2 max-sm:text-sm max-sm:py-1`}
+                              className={`hover:underline hover:text-[#5e23dd] cursor-pointer ${idx !== goal.branches.length - 1 ? "border-b" : ""} py-2 max-sm:text-sm max-sm:py-1`}
                             >
                               {branch}
                             </li>

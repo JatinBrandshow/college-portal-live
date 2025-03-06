@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, Suspense ,useRef} from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, Sliders, Home, Briefcase, X } from "lucide-react";
+import { Search, Sliders, Home, Briefcase, X, ChevronDown, ChevronUp } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import Select from "react-select"; // For multi-select dropdown
 import Slider from "rc-slider"; // For budget range slider
@@ -385,388 +385,236 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
   id: "",
 });
 
+  // Function to calculate the number of applied filters
+  const getAppliedFiltersCount = () => {
+    let count = 0;
+
+    if (filters.location) count++;
+    if (filters.locality) count++;
+    if (filters.facilities.length > 0) count++;
+    if (filters.budget[0] !== 0 || filters.budget[1] !== 100000) count++;
+    if (filters.roomType) count++;
+    if (filters.sort) count++;
+    if (filters.stayDuration) count++;
+
+    return count;
+  };
+
+  const appliedFiltersCount = getAppliedFiltersCount();
+
   return (
     <div className="p-0">
-    
-      {/* Filter Buttons */}
-<div className="sticky top-[77px] z-40 bg-white shadow-md px-6 py-2 flex items-center rounded-lg">
-  {/* Left Scroll Button */}
-  <button
-    onClick={scrollLeft}
-    className="absolute lg:hidden left-0 p-2 bg-white shadow-lg rounded-full z-50"
-  >
-    <FaChevronLeft className="w-5 h-5 text-gray-600" />
-  </button>
-
-  {/* Scrollable Buttons Container */}
-  <div
-    ref={scrollContainerRef}
-    className="mx-start flex gap-4 justify-start overflow-x-auto no-scrollbar scroll-smooth px-2"
-  >
-    {/* Sort Button */}
-    <button
-      ref={sortButtonRef}
-      onClick={() => setIsSortPopupOpen(true)}
-      className={`px-4 py-2 ${
-        filters.sort ? "bg-violet-700" : "bg-violet-600"
-      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
-    >
-      {filters.sort
-        ? sortOptions.find((opt) => opt.value === filters.sort)?.label
-        : "Sort"}
-      {filters.sort && (
-        <span
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent button click event
-            resetFilter("sort");
-          }}
-          className="text-white hover:text-gray-200"
-        >
-          ×
-        </span>
-      )}
-    </button>
-
-    {/* Location Button */}
-    <button
-      ref={locationButtonRef}
-      onClick={() => setIsLocationPopupOpen(true)}
-      className={`px-4 py-2 ${
-        filters.location ? "bg-violet-700" : "bg-violet-600"
-      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
-    >
-      {filters.location || "Location"}
-      {filters.location && (
-        <span
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent button click event
-            resetFilter("location");
-          }}
-          className="text-white hover:text-gray-200"
-        >
-          ×
-        </span>
-      )}
-    </button>
-
-    {/* Locality Button */}
-    <button
-      ref={localityButtonRef}
-      onClick={() => setIsLocalityPopupOpen(true)}
-      className={`px-4 py-2 ${
-        filters.locality ? "bg-violet-700" : "bg-violet-600"
-      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
-    >
-      {filters.locality || "Locality"}
-      {filters.locality && (
-        <span
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent button click event
-            resetFilter("locality");
-          }}
-          className="text-white hover:text-gray-200"
-        >
-          ×
-        </span>
-      )}
-    </button>
-
-    {/* Budget Button */}
-    <button
-      ref={budgetButtonRef}
-      onClick={() => setIsBudgetPopupOpen(true)}
-      className={`px-4 py-2 ${
-        filters.budget[0] !== 0 || filters.budget[1] !== 100000
-          ? "bg-violet-700"
-          : "bg-violet-600"
-      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
-    >
-      {filters.budget[0] !== 0 || filters.budget[1] !== 100000
-        ? `₹${filters.budget[0]} - ₹${filters.budget[1]}`
-        : "Budget"}
-      {(filters.budget[0] !== 0 || filters.budget[1] !== 100000) && (
-        <span
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent button click event
-            resetFilter("budget");
-          }}
-          className="text-white hover:text-gray-200"
-        >
-          ×
-        </span>
-      )}
-    </button>
-
-    {/* Room Type Button */}
-    <button
-      ref={roomTypeButtonRef}
-      onClick={() => setIsRoomTypePopupOpen(true)}
-      className={`px-4 py-2 ${
-        filters.roomType ? "bg-violet-700" : "bg-violet-600"
-      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
-    >
-      {filters.roomType || "Room Type"}
-      {filters.roomType && (
-        <span
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent button click event
-            resetFilter("roomType");
-          }}
-          className="text-white hover:text-gray-200"
-        >
-          ×
-        </span>
-      )}
-    </button>
-
-    {/* Stay Duration Button */}
-    <button
-      ref={stayDurationButtonRef}
-      onClick={() => setIsStayDurationPopupOpen(true)}
-      className={`px-4 py-2 ${
-        filters.stayDuration ? "bg-violet-700" : "bg-violet-600"
-      } text-white rounded-3xl hover:bg-violet-700 text-nowrap flex items-center gap-2`}
-    >
-      {filters.stayDuration
-        ? stayDurationOptions.find((opt) => opt.value === filters.stayDuration)
-            ?.label
-        : "Stay Duration"}
-      {filters.stayDuration && (
-        <span
-          onClick={(e) => {
-            e.stopPropagation(); // Prevent button click event
-            resetFilter("stayDuration");
-          }}
-          className="text-white hover:text-gray-200"
-        >
-          ×
-        </span>
-      )}
-    </button>
-
-    {/* Open Filters Button */}
-    <button
-      onClick={() => setIsFilterPopupOpen(true)}
-      className="px-4 py-2 bg-violet-600 text-white rounded-3xl hover:bg-violet-700 text-nowrap"
-    >
-      Open Filters
-    </button>
-
-    {/* Reset Filters Button */}
-    <button
-      onClick={clearFilters}
-      className="px-4 py-2 bg-gray-100 text-red-600 font-semibold rounded-3xl text-nowrap"
-    >
-      Reset Filters
-    </button>
-  </div>
-
-  {/* Right Scroll Button */}
-  <button
-    onClick={scrollRight}
-    className="absolute lg:hidden right-0 p-2 bg-white shadow-lg rounded-full z-50"
-  >
-    <FaChevronRight className="w-5 h-5 text-gray-600" />
-  </button>
-</div>
-
-      {/* Location Popup */}
-      {isLocationPopupOpen && (
-  <div
-    className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px]"
-  >
-    <button
-      onClick={() => setIsLocationPopupOpen(false)}
-      className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-    >
-      <X className="w-6 h-6" />
-    </button>
-    <h2 className="text-xl font-semibold mb-4">Location</h2>
-    <input
-      type="text"
-      placeholder="Search Location (City or State)"
-      value={filters.location}
-      onChange={(e) => handleFilterChange("location", e.target.value)}
-      className="w-full p-2 border rounded"
-    />
-    <button
-      onClick={() => resetFilter("location")}
-      className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-    >
-      Reset Location
-    </button>
-  </div>
-)}
-
-      {/* Locality Popup */}
-      {isLocalityPopupOpen && (
-        <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[200px]"
-          
-        >
-          <button
-            onClick={() => setIsLocalityPopupOpen(false)}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Locality</h2>
-          <Select
-            options={localityOptions}
-            value={localityOptions.find((opt) => opt.value === filters.locality)}
-            onChange={(selectedOption) =>
-              handleFilterChange("locality", selectedOption?.value || "")
-            }
-            className="w-full"
-          />
-          <button
-            onClick={() => resetFilter("locality")}
-            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Reset Locality
-          </button>
-        </div>
-      )}
-
-      {/* Budget Popup */}
-      {isBudgetPopupOpen && (
-        <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[300px]"
-          
-        >
-          <button
-            onClick={() => setIsBudgetPopupOpen(false)}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Budget (₹)</h2>
-          <Slider
-            range
-            min={0}
-            max={100000}
-            value={filters.budget}
-            onChange={(value) => handleFilterChange("budget", value)}
-            className="w-full"
-          />
-          <div className="flex justify-between text-sm text-gray-600">
-            <span>₹{filters.budget[0]}</span>
-            <span>₹{filters.budget[1]}</span>
-          </div>
-          <button
-            onClick={() => resetFilter("budget")}
-            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Reset Budget
-          </button>
-        </div>
-      )}
-
-      {/* Room Type Popup */}
-      {isRoomTypePopupOpen && (
-        <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[350px]"
-          
-        >
-          <button
-            onClick={() => setIsRoomTypePopupOpen(false)}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Room Type</h2>
-          <Select
-            options={roomTypeOptions}
-            value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
-            onChange={(selectedOption) =>
-              handleFilterChange("roomType", selectedOption?.value || "")
-            }
-            className="w-full"
-          />
-          <button
-            onClick={() => resetFilter("roomType")}
-            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Reset Room Type
-          </button>
-        </div>
-      )}
-
-      {/* Sort Popup */}
-      {isSortPopupOpen && (
-        <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px] lg:left-[30px]"
-          
-        >
-          <button
-            onClick={() => setIsSortPopupOpen(false)}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Sort By</h2>
-          <Select
-            options={sortOptions}
-            value={sortOptions.find((opt) => opt.value === filters.sort)}
-            onChange={(selectedOption) =>
-              handleFilterChange("sort", selectedOption?.value || "")
-            }
-            className="w-full"
-          />
-          <button
-            onClick={() => resetFilter("sort")}
-            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Reset Sort
-          </button>
-        </div>
-      )}
-
-      {/* Stay Duration Popup */}
-      {isStayDurationPopupOpen && (
-        <div
-          className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[100px] lg:left-[400px]"
-          
-        >
-          <button
-            onClick={() => setIsStayDurationPopupOpen(false)}
-            className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
-          >
-            <X className="w-6 h-6" />
-          </button>
-          <h2 className="text-xl font-semibold mb-4">Stay Duration</h2>
-          <Select
-            options={stayDurationOptions}
-            value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
-            onChange={(selectedOption) =>
-              handleFilterChange("stayDuration", selectedOption?.value || "")
-            }
-            className="w-full"
-          />
-          <button
-            onClick={() => resetFilter("stayDuration")}
-            className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-          >
-            Reset Stay Duration
-          </button>
-        </div>
-      )}
-
-      {/* Open Filters Popup */}
-      {isFilterPopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg h-2/3 overflow-auto no-scrollbar w-11/12 max-w-2xl relative">
+      <h1 className="text-3xl font-bold mt-2 px-6 pt-2">Accommodation</h1>
+      {/* Accommodation List and Map Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 ">
+        {/* Left Side: Accommodation Cards */}
+        <div className="lg:col-span-2">
+          {/* Filter Buttons */}
+          <div className="sticky top-[68px] md:top-[77px] z-30 bg-white shadow-xs px-6 py-2 flex items-center rounded-lg">
+            {/* Left Scroll Button */}
             <button
-              onClick={() => setIsFilterPopupOpen(false)}
-              className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              onClick={scrollLeft}
+              className="absolute left-2 p-2 bg-white shadow-lg rounded-full z-50"
             >
-              <X className="w-6 h-6" />
+              <FaChevronLeft className="w-3 h-3 text-gray-600" />
             </button>
-            <h2 className="text-xl font-semibold mb-4">Filters</h2>
 
-            {/* Location */}
-            <div className="mb-4">
-              <label className="block text-gray-700">Location</label>
+            {/* Scrollable Buttons Container */}
+            <div
+              ref={scrollContainerRef}
+              className="mx-start flex gap-4 justify-start overflow-x-auto no-scrollbar scroll-smooth px-2"
+            >
+              {/* Sort Button */}
+              <button
+                ref={sortButtonRef}
+                onClick={() => setIsSortPopupOpen(!isSortPopupOpen)}
+                className={`px-4 py-2 ${
+                  filters.sort ? "bg-violet-700" : "bg-violet-600"
+                } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+              >
+                {filters.sort
+                  ? sortOptions.find((opt) => opt.value === filters.sort)?.label
+                  : "Sort"}
+                {filters.sort && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent button click event
+                      resetFilter("sort");
+                    }}
+                    className="text-white hover:text-gray-200"
+                  >
+                    ×
+                  </span>
+                )}
+                {isSortPopupOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {/* Location Button */}
+              <button
+                ref={locationButtonRef}
+                onClick={() => setIsLocationPopupOpen(!isLocationPopupOpen)}
+                className={`px-4 py-2 ${
+                  filters.location ? "bg-violet-700" : "bg-violet-600"
+                } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+              >
+                {filters.location || "Location"}
+                {filters.location && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent button click event
+                      resetFilter("location");
+                    }}
+                    className="text-white hover:text-gray-200"
+                  >
+                    ×
+                  </span>
+                )}
+                {isLocationPopupOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {/* Locality Button */}
+              <button
+                ref={localityButtonRef}
+                onClick={() => setIsLocalityPopupOpen(!isLocalityPopupOpen)}
+                className={`px-4 py-2 ${
+                  filters.locality ? "bg-violet-700" : "bg-violet-600"
+                } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+              >
+                {filters.locality || "Locality"}
+                {filters.locality && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent button click event
+                      resetFilter("locality");
+                    }}
+                    className="text-white hover:text-gray-200"
+                  >
+                    ×
+                  </span>
+                )}
+                {isLocalityPopupOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {/* Budget Button */}
+              <button
+                ref={budgetButtonRef}
+                onClick={() => setIsBudgetPopupOpen(!isBudgetPopupOpen)}
+                className={`px-4 py-2 ${
+                  filters.budget[0] !== 0 || filters.budget[1] !== 100000
+                    ? "bg-violet-700"
+                    : "bg-violet-600"
+                } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+              >
+                {filters.budget[0] !== 0 || filters.budget[1] !== 100000
+                  ? `₹${filters.budget[0]} - ₹${filters.budget[1]}`
+                  : "Budget"}
+                {(filters.budget[0] !== 0 || filters.budget[1] !== 100000) && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent button click event
+                      resetFilter("budget");
+                    }}
+                    className="text-white hover:text-gray-200"
+                  >
+                    ×
+                  </span>
+                )}
+                {isBudgetPopupOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {/* Room Type Button */}
+              <button
+                ref={roomTypeButtonRef}
+                onClick={() => setIsRoomTypePopupOpen(!isRoomTypePopupOpen)}
+                className={`px-4 py-2 ${
+                  filters.roomType ? "bg-violet-700" : "bg-violet-600"
+                } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+              >
+                {filters.roomType || "Room Type"}
+                {filters.roomType && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent button click event
+                      resetFilter("roomType");
+                    }}
+                    className="text-white hover:text-gray-200"
+                  >
+                    ×
+                  </span>
+                )}
+                {isRoomTypePopupOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {/* Stay Duration Button */}
+              <button
+                ref={stayDurationButtonRef}
+                onClick={() => setIsStayDurationPopupOpen(!isStayDurationPopupOpen)}
+                className={`px-4 py-2 ${
+                  filters.stayDuration ? "bg-violet-700" : "bg-violet-600"
+                } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
+              >
+                {filters.stayDuration
+                  ? stayDurationOptions.find((opt) => opt.value === filters.stayDuration)
+                      ?.label
+                  : "Stay Duration"}
+                {filters.stayDuration && (
+                  <span
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent button click event
+                      resetFilter("stayDuration");
+                    }}
+                    className="text-white hover:text-gray-200"
+                  >
+                    ×
+                  </span>
+                )}
+                {isStayDurationPopupOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {/* Open Filters Button */}
+              <button
+                onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
+                className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2"
+              >
+                Open Filters
+                {appliedFiltersCount > 0 && (
+                  <span className="bg-white text-violet-600 rounded-full px-2 py-1 text-xs">
+                    {appliedFiltersCount}
+                  </span>
+                )}
+                {isFilterPopupOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+
+              {/* Reset Filters Button */}
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 bg-gray-100 text-red-600 font-semibold rounded-md text-nowrap"
+              >
+                Reset Filters
+              </button>
+            </div>
+
+            {/* Right Scroll Button */}
+            <button
+              onClick={scrollRight}
+              className="absolute right-2 p-2 bg-white shadow-lg rounded-full z-50"
+            >
+              <FaChevronRight className="w-3 h-3 text-gray-600" />
+            </button>
+          </div>
+
+          {/* Location Popup */}
+          {isLocationPopupOpen && (
+            <div
+              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px]"
+            >
+              <button
+                onClick={() => setIsLocationPopupOpen(false)}
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Location</h2>
               <input
                 type="text"
                 placeholder="Search Location (City or State)"
@@ -774,11 +622,27 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
                 onChange={(e) => handleFilterChange("location", e.target.value)}
                 className="w-full p-2 border rounded"
               />
+              <button
+                onClick={() => resetFilter("location")}
+                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Reset Location
+              </button>
             </div>
+          )}
 
-            {/* Locality */}
-            <div className="mb-4">
-              <label className="block text-gray-700">Locality</label>
+          {/* Locality Popup */}
+          {isLocalityPopupOpen && (
+            <div
+              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[200px]"
+            >
+              <button
+                onClick={() => setIsLocalityPopupOpen(false)}
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Locality</h2>
               <Select
                 options={localityOptions}
                 value={localityOptions.find((opt) => opt.value === filters.locality)}
@@ -787,11 +651,27 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
                 }
                 className="w-full"
               />
+              <button
+                onClick={() => resetFilter("locality")}
+                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Reset Locality
+              </button>
             </div>
+          )}
 
-            {/* Budget Range Slider */}
-            <div className="mb-4">
-              <label className="block text-gray-700">Budget (₹)</label>
+          {/* Budget Popup */}
+          {isBudgetPopupOpen && (
+            <div
+              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[300px]"
+            >
+              <button
+                onClick={() => setIsBudgetPopupOpen(false)}
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Budget (₹)</h2>
               <Slider
                 range
                 min={0}
@@ -804,50 +684,56 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
                 <span>₹{filters.budget[0]}</span>
                 <span>₹{filters.budget[1]}</span>
               </div>
+              <button
+                onClick={() => resetFilter("budget")}
+                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Reset Budget
+              </button>
             </div>
+          )}
 
-            {/* Facilities Multi-Select Dropdown */}
-            <div className="mb-4">
-              <label className="block text-gray-700">Facilities</label>
-              <Select
-                isMulti
-                options={facilitiesOptions}
-                value={
-                  filters.facilities.length
-                    ? filters.facilities.map((facility) => ({
-                        value: facility,
-                        label: facility,
-                      }))
-                    : []
-                }
-                onChange={(selectedOptions) =>
-                  handleFilterChange(
-                    "facilities",
-                    selectedOptions.map((option) => option.value)
-                  )
-                }
-                className="w-full"
-              />
-            </div>
-
-            {/* Room Type Dropdown */}
-            <div className="mb-4">
-              <label className="block text-gray-700">Room Type</label>
+          {/* Room Type Popup */}
+          {isRoomTypePopupOpen && (
+            <div
+              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[350px]"
+            >
+              <button
+                onClick={() => setIsRoomTypePopupOpen(false)}
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Room Type</h2>
               <Select
                 options={roomTypeOptions}
-                value={roomTypeOptions.find(
-                  (option) => option.value === filters.roomType
-                )}
+                value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
                 onChange={(selectedOption) =>
                   handleFilterChange("roomType", selectedOption?.value || "")
                 }
                 className="w-full"
               />
+              <button
+                onClick={() => resetFilter("roomType")}
+                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Reset Room Type
+              </button>
             </div>
+          )}
 
-            {/* Sort Dropdown */}
-            <div className="mb-4">
-              <label className="block text-gray-700">Sort By</label>
+          {/* Sort Popup */}
+          {isSortPopupOpen && (
+            <div
+              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px] lg:left-[30px]"
+            >
+              <button
+                onClick={() => setIsSortPopupOpen(false)}
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Sort By</h2>
               <Select
                 options={sortOptions}
                 value={sortOptions.find((opt) => opt.value === filters.sort)}
@@ -856,11 +742,27 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
                 }
                 className="w-full"
               />
+              <button
+                onClick={() => resetFilter("sort")}
+                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Reset Sort
+              </button>
             </div>
+          )}
 
-            {/* Stay Duration Dropdown */}
-            <div className="mb-4">
-              <label className="block text-gray-700">Stay Duration</label>
+          {/* Stay Duration Popup */}
+          {isStayDurationPopupOpen && (
+            <div
+              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[100px] lg:left-[400px]"
+            >
+              <button
+                onClick={() => setIsStayDurationPopupOpen(false)}
+                className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <h2 className="text-xl font-semibold mb-4">Stay Duration</h2>
               <Select
                 options={stayDurationOptions}
                 value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
@@ -869,32 +771,152 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
                 }
                 className="w-full"
               />
+              <button
+                onClick={() => resetFilter("stayDuration")}
+                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+              >
+                Reset Stay Duration
+              </button>
             </div>
+          )}
 
-            {/* Clear Filters Button */}
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
-            >
-              Clear All Filters
-            </button>
+          {/* Open Filters Popup */}
+          {isFilterPopupOpen && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white p-6 rounded-lg h-2/3 overflow-auto no-scrollbar w-11/12 max-w-2xl relative">
+                <button
+                  onClick={() => setIsFilterPopupOpen(false)}
+                  className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+                <h2 className="text-xl font-semibold mb-4">Filters</h2>
 
-            {/* Apply Filters Button */}
-            <button
-              onClick={() => setIsFilterPopupOpen(false)}
-              className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
-            >
-              Apply Filters
-            </button>
-          </div>
-        </div>
-      )}
-    
-      <h1 className="text-3xl font-bold mt-2 px-6 pt-2">Accommodation</h1>
-      {/* Accommodation List and Map Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 p-2">
-        {/* Left Side: Accommodation Cards */}
-        <div className="lg:col-span-2">
+                {/* Location */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Location</label>
+                  <input
+                    type="text"
+                    placeholder="Search Location (City or State)"
+                    value={filters.location}
+                    onChange={(e) => handleFilterChange("location", e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                {/* Locality */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Locality</label>
+                  <Select
+                    options={localityOptions}
+                    value={localityOptions.find((opt) => opt.value === filters.locality)}
+                    onChange={(selectedOption) =>
+                      handleFilterChange("locality", selectedOption?.value || "")
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Budget Range Slider */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Budget (₹)</label>
+                  <Slider
+                    range
+                    min={0}
+                    max={100000}
+                    value={filters.budget}
+                    onChange={(value) => handleFilterChange("budget", value)}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>₹{filters.budget[0]}</span>
+                    <span>₹{filters.budget[1]}</span>
+                  </div>
+                </div>
+
+                {/* Facilities Multi-Select Dropdown */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Facilities</label>
+                  <Select
+                    isMulti
+                    options={facilitiesOptions}
+                    value={
+                      filters.facilities.length
+                        ? filters.facilities.map((facility) => ({
+                            value: facility,
+                            label: facility,
+                          }))
+                        : []
+                    }
+                    onChange={(selectedOptions) =>
+                      handleFilterChange(
+                        "facilities",
+                        selectedOptions.map((option) => option.value)
+                      )
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Room Type Dropdown */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Room Type</label>
+                  <Select
+                    options={roomTypeOptions}
+                    value={roomTypeOptions.find(
+                      (option) => option.value === filters.roomType
+                    )}
+                    onChange={(selectedOption) =>
+                      handleFilterChange("roomType", selectedOption?.value || "")
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Sort Dropdown */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Sort By</label>
+                  <Select
+                    options={sortOptions}
+                    value={sortOptions.find((opt) => opt.value === filters.sort)}
+                    onChange={(selectedOption) =>
+                      handleFilterChange("sort", selectedOption?.value || "")
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Stay Duration Dropdown */}
+                <div className="mb-4">
+                  <label className="block text-gray-700">Stay Duration</label>
+                  <Select
+                    options={stayDurationOptions}
+                    value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
+                    onChange={(selectedOption) =>
+                      handleFilterChange("stayDuration", selectedOption?.value || "")
+                    }
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Clear Filters Button */}
+                <button
+                  onClick={clearFilters}
+                  className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400 mr-2"
+                >
+                  Clear All Filters
+                </button>
+
+                {/* Apply Filters Button */}
+                <button
+                  onClick={() => setIsFilterPopupOpen(false)}
+                  className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
+                >
+                  Apply Filters
+                </button>
+              </div>
+            </div>
+          )}
           {sortedAccommodations.length > 0 ? (
           sortedAccommodations.map((accommodation) => (
             <div key={accommodation._id}>
@@ -999,7 +1021,7 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
 
         {/* Right Side: Map */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md sticky top-28">
+          <div className="bg-white rounded-lg shadow-md sticky top-20">
             <MapComponent
               accommodations={sortedAccommodations}
               hoveredAccommodationId={hoveredAccommodationId}

@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
 import Modal from "react-modal";
 import { FiFilter, FiX } from "react-icons/fi";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown, FaChevronUp, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useRouter, useSearchParams } from "next/navigation";
 import { API_NODE_URL, API_KEY } from "../../../config/config";
 import { useMap } from "react-leaflet";
@@ -75,6 +75,8 @@ const College = () => {
   });
   const [activeFilter, setActiveFilter] = useState(null);
   const filterRef = useRef(null);
+  const scrollContainerRef = useRef(null);
+
 
   
 
@@ -191,6 +193,19 @@ const College = () => {
     // Add logic to apply filters (e.g., filter data, update state, etc.)
   };
 
+  // Scroll left and right functions
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -200, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 200, behavior: "smooth" });
+    }
+  };
+
   return (
     <div className="bg-white min-h-screen">
       {/* Slider Section */}
@@ -231,28 +246,107 @@ const College = () => {
       </section>
       */}
 
-      {/* Filter Section */}
-      <section className="sticky top-16 bg-white shadow-md py-4 px-6 z-50">
-      <div className="container">
-        <div className="flex flex-wrap gap-10 items-center justify-start">
-          {/* All Filters Button */}
-          <div className="relative" ref={filterRef}>
-            <button
-              className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-md transition-all ${
-                isAllFiltersOpen ? "bg-gray-100 text-violet-600" : "bg-violet-600 text-white"
-              }`}
-              onClick={() => setIsAllFiltersOpen(!isAllFiltersOpen)}
-            >
-              <FiFilter className="w-4 h-4" />
-              All Filters
-              <span className="transition-transform duration-300">
-                {isAllFiltersOpen ? <FaChevronUp /> : <FaChevronDown />}
-              </span>
-            </button>
+      
 
+      {/* College List */}
+      <h1 className="text-3xl font-bold mt-2 px-6 pt-2">Colleges</h1>
+
+      <div className="flex flex-wrap min-h-screen ">
+        
+        {/* Left Section */}
+        <div className="w-full lg:w-2/3 ">
+        {/* Filter Section */}
+          <section className="sticky top-[68px] md:top-[75px] bg-white shadow-md py-4 px-6 z-30">
+            <div className="container relative">
+              {/* Left Scroll Button */}
+              <button
+                onClick={scrollLeft}
+                className="absolute lg:hidden -left-4 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-40"
+              >
+                <FaChevronLeft className="w-3 h-3" />
+              </button>
+
+              {/* Right Scroll Button */}
+              <button
+                onClick={scrollRight}
+                className="absolute lg:hidden -right-4 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md z-40"
+              >
+                <FaChevronRight className="w-3 h-3" />
+              </button>
+
+              {/* Scrollable Filter Buttons */}
+              <div
+                ref={scrollContainerRef}
+                className="flex gap-4 items-center justify-start overflow-x-scroll no-scrollbar"
+              >
+                {/* All Filters Button */}
+                <div className="relative" ref={filterRef}>
+                  <button
+                    className={`flex items-center gap-2 px-4 py-2 rounded-md shadow-md transition-all text-nowrap ${
+                      isAllFiltersOpen ? "bg-gray-100 text-violet-600" : "bg-violet-600 text-white"
+                    }`}
+                    onClick={() => setIsAllFiltersOpen(!isAllFiltersOpen)}
+                  >
+                    <FiFilter className="w-4 h-4" />
+                    All Filters
+                    <span className="transition-transform duration-300">
+                      {isAllFiltersOpen ? <FaChevronUp /> : <FaChevronDown />}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Individual Filter Buttons */}
+                {[
+                  { id: "city", label: "City" },
+                  { id: "college_type", label: "College Type" },
+                  { id: "courses_offered", label: "Courses Offered" },
+                  { id: "budget", label: "Budget" },
+                ].map((filter) => (
+                  <div key={filter.id} className="relative">
+                    {/* Filter Button */}
+                    <button
+                      className={`flex items-center gap-2 px-4 py-2 rounded-md shadow-md transition-all text-nowrap ${
+                        filters[filter.id]
+                          ? "bg-gray-100 text-violet-600"
+                          : "bg-violet-600 text-white"
+                      }`}
+                      onClick={() => setActiveFilter(filter.id === activeFilter ? null : filter.id)}
+                    >
+                      {filter.label}
+                      {filters[filter.id] && (
+                        <span
+                          onClick={(e) => {
+                            e.stopPropagation(); // Prevent the filter button from toggling
+                            setFilters((prev) => ({ ...prev, [filter.id]: "" }));
+                          }}
+                          className="ml-2 p-1 rounded-full hover:bg-blue-600"
+                        >
+                          <FiX className="w-4 h-4" />
+                        </span>
+                      )}
+                      <span className="transition-transform duration-300">
+                        {activeFilter === filter.id ? <FaChevronUp /> : <FaChevronDown />}
+                      </span>
+                    </button>
+                  </div>
+                ))}
+
+                {/* Reset Filters Button */}
+                <button
+                  onClick={resetFilters}
+                  className="px-4 py-2 bg-red-500 text-white rounded-md text-nowrap"
+                >
+                  Reset Filters
+                </button>
+              </div>
+            </div>
+          </section>
+
+          {/* Filter Pop-ups (Outside Scrollable Container) */}
+          <div className="relative z-[1000]">
             {/* All Filters Pop-up */}
             {isAllFiltersOpen && (
-              <div className="absolute left-0 top-full mt-2 w-96 bg-white border shadow-lg rounded-lg z-[1000] p-4">
+              <div className="absolute left-0 top-full mt-2 w-96 bg-white border shadow-lg rounded-lg p-4">
                 {/* Close Button */}
                 <button
                   onClick={() => setIsAllFiltersOpen(false)}
@@ -350,149 +444,106 @@ const College = () => {
                 </div>
               </div>
             )}
-          </div>
 
-          {/* Individual Filter Buttons */}
-          {[
-            { id: "city", label: "City" },
-            { id: "college_type", label: "College Type" },
-            { id: "courses_offered", label: "Courses Offered" },
-            { id: "budget", label: "Budget" },
-          ].map((filter) => (
-            <div key={filter.id} className="relative" ref={filterRef}>
-              {/* Filter Button */}
-              <button
-                className={`flex items-center gap-2 px-4 py-2 rounded-full shadow-md transition-all ${
-                  filters[filter.id]
-                    ? "bg-gray-100 text-violet-600"
-                    : "bg-violet-600 text-white"
-                }`}
-                onClick={() => setActiveFilter(filter.id === activeFilter ? null : filter.id)}
-              >
-                {filter.label}
-                {filters[filter.id] && (
-                  <span
-                    onClick={(e) => {
-                      e.stopPropagation(); // Prevent the filter button from toggling
-                      setFilters((prev) => ({ ...prev, [filter.id]: "" }));
-                    }}
-                    className="ml-2 p-1 rounded-full hover:bg-blue-600"
-                  >
-                    <FiX className="w-4 h-4" />
-                  </span>
-                )}
-                <span className="transition-transform duration-300">
-                  {activeFilter === filter.id ? <FaChevronUp /> : <FaChevronDown />}
-                </span>
-              </button>
-
-              {/* Filter Pop-up */}
-              {activeFilter === filter.id && (
-                <div className="absolute left-0 top-full mt-2 w-64 bg-white border shadow-lg rounded-lg z-[1000] p-4">
-                  {/* Close Button */}
-                  <button
-                    onClick={() => setActiveFilter(null)}
-                    className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100"
-                  >
-                    <FiX className="w-4 h-4" />
-                  </button>
-
-                  {/* Heading */}
-                  <h4 className="text-sm font-bold mb-4">{filter.label}</h4>
-
-                  {/* Filter Content */}
-                  {filter.id === "city" && (
-                    <input
-                      type="text"
-                      placeholder="Search city..."
-                      value={filters.city}
-                      onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
-                      className="w-full px-4 py-2 mb-4 border rounded-lg"
-                    />
-                  )}
-
-                  {filter.id === "college_type" && (
-                    <select
-                      value={filters.college_type}
-                      onChange={(e) => setFilters((prev) => ({ ...prev, college_type: e.target.value }))}
-                      className="w-full px-4 py-2 mb-4 border rounded-lg"
+            {/* Individual Filter Pop-ups */}
+            {[
+              { id: "city", label: "City" },
+              { id: "college_type", label: "College Type" },
+              { id: "courses_offered", label: "Courses Offered" },
+              { id: "budget", label: "Budget" },
+            ].map((filter) => (
+              <div key={filter.id}>
+                {activeFilter === filter.id && (
+                  <div className="absolute left-0 top-full mt-2 w-64 bg-white border shadow-lg rounded-lg p-4">
+                    {/* Close Button */}
+                    <button
+                      onClick={() => setActiveFilter(null)}
+                      className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-100"
                     >
-                      <option value="">Select College Type</option>
-                      <option value="Government">Government</option>
-                      <option value="Private">Private</option>
-                    </select>
-                  )}
+                      <FiX className="w-4 h-4" />
+                    </button>
 
-                  {filter.id === "courses_offered" && (
-                    <input
-                      type="text"
-                      placeholder="Search courses..."
-                      value={filters.courses_offered}
-                      onChange={(e) => setFilters((prev) => ({ ...prev, courses_offered: e.target.value }))}
-                      className="w-full px-4 py-2 mb-4 border rounded-lg"
-                    />
-                  )}
+                    {/* Heading */}
+                    <h4 className="text-sm font-bold mb-4">{filter.label}</h4>
 
-                  {filter.id === "budget" && (
-                    <>
-                      <div className="flex gap-4">
-                        <input
-                          type="number"
-                          value={filters.budgetRange.min}
-                          onChange={(e) =>
-                            setFilters((prev) => ({
-                              ...prev,
-                              budgetRange: { ...prev.budgetRange, min: parseInt(e.target.value, 10) || 0 },
-                            }))
-                          }
-                          className="w-1/2 px-2 py-1 border rounded-lg"
-                          placeholder="Min"
-                        />
-                        <input
-                          type="number"
-                          value={filters.budgetRange.max}
-                          onChange={(e) =>
-                            setFilters((prev) => ({
-                              ...prev,
-                              budgetRange: { ...prev.budgetRange, max: parseInt(e.target.value, 10) || Infinity },
-                            }))
-                          }
-                          className="w-1/2 px-2 py-1 border rounded-lg"
-                          placeholder="Max"
-                        />
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+                    {/* Filter Content */}
+                    {filter.id === "city" && (
+                      <input
+                        type="text"
+                        placeholder="Search city..."
+                        value={filters.city}
+                        onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
+                        className="w-full px-4 py-2 mb-4 border rounded-lg"
+                      />
+                    )}
 
-          {/* Reset Filters Button */}
-          <button
-            onClick={resetFilters}
-            className="px-4 py-2 bg-red-500 text-white rounded-full"
-          >
-            Reset Filters
-          </button>
-        </div>
-      </div>
-    </section>
+                    {filter.id === "college_type" && (
+                      <select
+                        value={filters.college_type}
+                        onChange={(e) => setFilters((prev) => ({ ...prev, college_type: e.target.value }))}
+                        className="w-full px-4 py-2 mb-4 border rounded-lg"
+                      >
+                        <option value="">Select College Type</option>
+                        <option value="Government">Government</option>
+                        <option value="Private">Private</option>
+                      </select>
+                    )}
 
-      {/* College List */}
-      <div className="flex min-h-screen ">
-        {/* Left Section */}
-        <div className="w-2/3 p-4">
+                    {filter.id === "courses_offered" && (
+                      <input
+                        type="text"
+                        placeholder="Search courses..."
+                        value={filters.courses_offered}
+                        onChange={(e) => setFilters((prev) => ({ ...prev, courses_offered: e.target.value }))}
+                        className="w-full px-4 py-2 mb-4 border rounded-lg"
+                      />
+                    )}
+
+                    {filter.id === "budget" && (
+                      <>
+                        <div className="flex gap-4">
+                          <input
+                            type="number"
+                            value={filters.budgetRange.min}
+                            onChange={(e) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                budgetRange: { ...prev.budgetRange, min: parseInt(e.target.value, 10) || 0 },
+                              }))
+                            }
+                            className="w-1/2 px-2 py-1 border rounded-lg"
+                            placeholder="Min"
+                          />
+                          <input
+                            type="number"
+                            value={filters.budgetRange.max}
+                            onChange={(e) =>
+                              setFilters((prev) => ({
+                                ...prev,
+                                budgetRange: { ...prev.budgetRange, max: parseInt(e.target.value, 10) || Infinity },
+                              }))
+                            }
+                            className="w-1/2 px-2 py-1 border rounded-lg"
+                            placeholder="Max"
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
           {filteredColleges.length > 0 ? (
             filteredColleges.map((college) => (
               <div
                 key={college._id}
-                className="flex h-64 mb-6 p-4 bg-white shadow-lg rounded-lg hover:shadow-xl transition-transform transform"
+                className="flex flex-wrap h-auto md:h-64 mb-6 p-4 bg-white shadow-lg rounded-lg hover:shadow-xl transition-transform transform"
                 onMouseEnter={() => setHoveredCollege(college)}
                 onMouseLeave={() => setHoveredCollege(null)}
               >
                 {/* College Image */}
-                <div className="h-full w-1/3">
+                <div className="h-full w-full md:w-1/3">
                   <img
                     src={college.images[0]}
                     alt={college.name}
@@ -501,31 +552,31 @@ const College = () => {
                 </div>
 
                 {/* College Details */}
-                <div className="w-2/3 flex flex-col justify-between pl-4">
+                <div className="w-full md:w-2/3 flex flex-col justify-between pl-4">
                   <div>
-                    <h2 className="text-lg font-bold">{college.name}</h2>
-                    <p className="text-sm text-gray-500">{college.city}</p>
+                    <h2 className="text-sm md:text-lg font-bold">{college.name}</h2>
+                    <p className="text-xs md:text-sm text-gray-500">{college.city}</p>
                     <div className="flex justify-between items-center mt-2">
-                      <span className="text-gray-700 text-sm">{college.gender || "Co-ed"}</span>
-                      <span className="text-gray-700 text-sm">
+                      <span className="text-gray-700 text-xs md:text-sm">{college.gender || "Co-ed"}</span>
+                      <span className="text-gray-700 text-xs md:text-sm">
                         Avg Package: ₹{college.placement_details.avg_package}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-700 mt-2">
+                    <p className="text-xs md:text-sm text-gray-700 mt-2">
                       Courses: {college.courses_offered.join(", ")}
                     </p>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="flex gap-4">
+                  <div className="flex gap-1 md:gap-4">
                     <button
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg w-1/2"
+                      className="px-4 py-2 bg-blue-500 text-white text-sm md:text-base rounded-lg w-1/2"
                       onClick={() => openModal("Schedule a Visit")}
                     >
                       Schedule a Visit
                     </button>
                     <button
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg w-1/2"
+                      className="px-4 py-2 bg-green-500 text-white text-sm md:text-base rounded-lg w-1/2"
                       onClick={() => openModal("Request a Call")}
                     >
                       Request a Call
@@ -540,7 +591,7 @@ const College = () => {
         </div>
 
         {/* Right Section */}
-        <div className="w-1/3 px-4 sticky top-20 h-[600px]">
+        <div className="w-full lg:w-1/3 px-2 sticky top-20 h-[600px]">
           <MapContainer
             center={[20.5937, 78.9629]} // Default center to India
             zoom={5}
@@ -576,7 +627,7 @@ const College = () => {
           onRequestClose={closeModal}
           ariaHideApp={false}
           className="flex justify-center items-center fixed inset-0 bg-black bg-opacity-50"
-          overlayClassName="fixed inset-0"
+          overlayClassName="fixed inset-0 z-40"
         >
           <div className="bg-white rounded-lg shadow-lg p-6 w-96">
             {/* Toggle Buttons */}
