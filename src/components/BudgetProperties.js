@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -26,26 +28,24 @@ const BudgetProperties = () => {
             "Authorization": `Bearer ${API_KEY}`,
           },
         });
-
+  
         const text = await response.text();
         const data = JSON.parse(text);
 
-        if (Array.isArray(data.data)) {
-          const mappedProperties = data.data.map((item) => ({
+        if (Array.isArray(data.accommodations)) { // Correctly accessing accommodations array
+          const mappedProperties = data.accommodations.map((item) => ({
             id: item._id,
             title: item.name || "No Name",
-            city: item.location.city || "Unknown City",
-            country: item.location.country || "Unknown Country",
-            price: item.pricing ? `₹${item.pricing.minPrice}` : "N/A", // Use `pricing.minPrice`
-            rating: item.reviewsRating || "No Rating", // Use `reviewsRating`
-            images: Array.isArray(item.meta.images)
-              ? item.meta.images // Use `images` directly
-              : [],
-            amenities: Array.isArray(item.amenities) ? item.amenities : [], // Map amenities
-            description: item.description?.short_description || "No Description", // Map short description
-            type: item.type || "Unknown Type", // Map property type
-            reviewsCount: item.reviewsCount || 0, // Map reviews count
-            featuredImagePath: item.featuredImagePath || "", // Map featured image
+            city: item.location?.city || "Unknown City",
+            country: item.location?.country || "Unknown Country",
+            price: item.pricing?.minPrice ? `₹${item.pricing.minPrice}` : "N/A",
+            rating: item.reviewsRating || "No Rating",
+            images: Array.isArray(item.meta?.images) ? item.meta.images : [],
+            amenities: Array.isArray(item.amenities) ? item.amenities : [],
+            description: item.description?.short_description || "No Description",
+            type: item.type || "Unknown Type",
+            reviewsCount: item.reviewsCount || 0,
+            featuredImagePath: item.featuredImagePath || "",
           }));
 
           setProperties(mappedProperties);
@@ -56,23 +56,20 @@ const BudgetProperties = () => {
         console.error("Error fetching properties:", error);
       }
     };
-
+  
     fetchProperties();
   }, []);
+  
 
   // Get unique cities dynamically from API data
   const cities = ["All", ...new Set(properties.map((prop) => prop.city))];
 
-  // Filter properties based on selected city and then sort by price (low to high)
-  const filteredProperties = filter === "All" 
-    ? properties
-    : properties.filter((prop) => prop.city === filter);
+  const filteredProperties = filter === "All" ? properties : properties.filter((prop) => prop.city === filter);
 
-  // Sort by price in ascending order
+  // Sort properties from low to high price
   const sortedProperties = filteredProperties.sort((a, b) => {
-    // If the price is 'N/A', push that item to the end
-    const priceA = a.price === "N/A" ? Infinity : parseInt(a.price.replace("₹", ""));
-    const priceB = b.price === "N/A" ? Infinity : parseInt(b.price.replace("₹", ""));
+    const priceA = parseFloat(a.price.replace(/[^0-9.-]+/g, "")); // Extract numeric value from price string
+    const priceB = parseFloat(b.price.replace(/[^0-9.-]+/g, "")); // Extract numeric value from price string
     return priceA - priceB;
   });
 
@@ -81,7 +78,7 @@ const BudgetProperties = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading and Subheading */}
         <div className="mb-10">
-          <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties by Cities</h2>
+        <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties by Cities </h2>
           <p className="text-gray-600 mt-2 text-left">
             From studios to private rooms to shared apartments, we’ve got it all.
           </p>
@@ -123,7 +120,9 @@ const BudgetProperties = () => {
           >
             {sortedProperties.map((property) => (
               <SwiperSlide key={property.id}>
-                <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer" onClick={() => handleCardClick(property.id)}>
+                <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer"
+            onClick={() => handleCardClick(property.id)} // Navigate on click
+                >
                   {/* Image Slider */}
                   <div className="relative w-full h-48">
                     <Swiper
