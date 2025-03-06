@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 const studyGoals = [
   { icon: <FaSchool size={30} />, title: "Engineering", colleges: "6259 Colleges", branches: ["B.Tech", "Diploma in Engineering", "M.Tech", "BE"] },
-  { icon: <FaBusinessTime size={30} />, title: "Management", colleges: "7754 Colleges", branches: ["MBA", "PGDM", "BBA" ,"BMS", "Executive MBA"] },
+  { icon: <FaBusinessTime size={30} />, title: "Management", colleges: "7754 Colleges", branches: ["MBA", "PGDM", "BBA" ,"BMS"] },
   { icon: <FaBalanceScale size={30} />, title: "Commerce", colleges: "4979 Colleges", branches: ["B.Com", "M.Com"] },
   { icon: <FaPaintBrush size={30} />, title: "Arts", colleges: "5617 Colleges", branches: ["BA", "MA", "BFA", "BSW"] },
   { icon: <FaHeartbeat size={30} />, title: "Medical", colleges: "4587 Colleges", branches: ["MBBS", "BDS", "BAMS"] },

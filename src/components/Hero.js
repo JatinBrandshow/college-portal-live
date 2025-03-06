@@ -144,7 +144,7 @@ const Hero = () => {
     <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50 max-sm:h-fit">
       {/* Left Section */}
       <div className="items-center justify-center sm:pl-5 lg:pl-10 xl:pl-32 2xl:pl-80 w-full md:w-1/2 md:mb-20">
-        <div className="mb-6 md:text-left pt-8 md:pt-0">
+        <div className="mb-6 md:text-left pt-8 md:pt-24">
           {/* Typewriter Effect */}
           <h1 className="text-6xl font-bold text-gray-900 leading-tight mb-3 max-lg:text-5xl max-md:text-4xl max-sm:text-3xl">
             <span className="text-violet-600">
