@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, Suspense ,useRef} from "react";
+import { useEffect, useState, Suspense, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Search, Sliders, Home, Briefcase, X, ChevronDown, ChevronUp } from "lucide-react";
 import "leaflet/dist/leaflet.css";
@@ -12,8 +12,6 @@ import { useMap } from "react-leaflet";
 import Link from 'next/link';
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import Enquire from "@/components/Enquire";
-
-
 
 // Dynamically import MapContainer and related components with SSR disabled
 const MapContainer = dynamic(
@@ -148,13 +146,23 @@ const Accommodation = () => {
   const [isLocalityPopupOpen, setIsLocalityPopupOpen] = useState(false);
   const [isEnquireOpen, setIsEnquireOpen] = useState(false);
 
-
   const locationButtonRef = useRef(null);
   const localityButtonRef = useRef(null);
   const budgetButtonRef = useRef(null);
   const roomTypeButtonRef = useRef(null);
   const sortButtonRef = useRef(null);
   const stayDurationButtonRef = useRef(null);
+
+  // Function to close all popups except the one being opened
+  const closeAllPopups = () => {
+    setIsLocationPopupOpen(false);
+    setIsBudgetPopupOpen(false);
+    setIsSortPopupOpen(false);
+    setIsStayDurationPopupOpen(false);
+    setIsRoomTypePopupOpen(false);
+    setIsLocalityPopupOpen(false);
+    setIsFilterPopupOpen(false);
+  };
 
   // Fetch accommodations based on filters
   const fetchAccommodations = async () => {
@@ -189,7 +197,6 @@ const Accommodation = () => {
   useEffect(() => {
     fetchAccommodations();
   }, []);
-
 
   // Update filters when URL search params change
   useEffect(() => {
@@ -251,6 +258,7 @@ const Accommodation = () => {
       label: locality,
     }));
   };
+
   const getPopupPosition = (buttonRef) => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -364,6 +372,7 @@ const Accommodation = () => {
       return 0; // Default: no sorting
     }
   });
+
   const scrollContainerRef = useRef(null);
 
   const scrollLeft = () => {
@@ -377,13 +386,14 @@ const Accommodation = () => {
       scrollContainerRef.current.scrollBy({ left: 200, behavior: "smooth" });
     }
   };
+
   // Add a state to store the selected accommodation details
-const [selectedAccommodation, setSelectedAccommodation] = useState({
-  image: "",
-  name: "",
-  address: "",
-  id: "",
-});
+  const [selectedAccommodation, setSelectedAccommodation] = useState({
+    image: "",
+    name: "",
+    address: "",
+    id: "",
+  });
 
   // Function to calculate the number of applied filters
   const getAppliedFiltersCount = () => {
@@ -414,7 +424,7 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
             {/* Left Scroll Button */}
             <button
               onClick={scrollLeft}
-              className="absolute left-2 p-2 bg-white shadow-lg rounded-full z-50"
+              className="absolute lg:hidden left-2 p-2 bg-white shadow-lg rounded-full z-50"
             >
               <FaChevronLeft className="w-3 h-3 text-gray-600" />
             </button>
@@ -427,7 +437,10 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
               {/* Sort Button */}
               <button
                 ref={sortButtonRef}
-                onClick={() => setIsSortPopupOpen(!isSortPopupOpen)}
+                onClick={() => {
+                  closeAllPopups();
+                  setIsSortPopupOpen(!isSortPopupOpen);
+                }}
                 className={`px-4 py-2 ${
                   filters.sort ? "bg-violet-700" : "bg-violet-600"
                 } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
@@ -452,7 +465,10 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
               {/* Location Button */}
               <button
                 ref={locationButtonRef}
-                onClick={() => setIsLocationPopupOpen(!isLocationPopupOpen)}
+                onClick={() => {
+                  closeAllPopups();
+                  setIsLocationPopupOpen(!isLocationPopupOpen);
+                }}
                 className={`px-4 py-2 ${
                   filters.location ? "bg-violet-700" : "bg-violet-600"
                 } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
@@ -475,7 +491,10 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
               {/* Locality Button */}
               <button
                 ref={localityButtonRef}
-                onClick={() => setIsLocalityPopupOpen(!isLocalityPopupOpen)}
+                onClick={() => {
+                  closeAllPopups();
+                  setIsLocalityPopupOpen(!isLocalityPopupOpen);
+                }}
                 className={`px-4 py-2 ${
                   filters.locality ? "bg-violet-700" : "bg-violet-600"
                 } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
@@ -498,7 +517,10 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
               {/* Budget Button */}
               <button
                 ref={budgetButtonRef}
-                onClick={() => setIsBudgetPopupOpen(!isBudgetPopupOpen)}
+                onClick={() => {
+                  closeAllPopups();
+                  setIsBudgetPopupOpen(!isBudgetPopupOpen);
+                }}
                 className={`px-4 py-2 ${
                   filters.budget[0] !== 0 || filters.budget[1] !== 100000
                     ? "bg-violet-700"
@@ -525,7 +547,10 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
               {/* Room Type Button */}
               <button
                 ref={roomTypeButtonRef}
-                onClick={() => setIsRoomTypePopupOpen(!isRoomTypePopupOpen)}
+                onClick={() => {
+                  closeAllPopups();
+                  setIsRoomTypePopupOpen(!isRoomTypePopupOpen);
+                }}
                 className={`px-4 py-2 ${
                   filters.roomType ? "bg-violet-700" : "bg-violet-600"
                 } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
@@ -548,7 +573,10 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
               {/* Stay Duration Button */}
               <button
                 ref={stayDurationButtonRef}
-                onClick={() => setIsStayDurationPopupOpen(!isStayDurationPopupOpen)}
+                onClick={() => {
+                  closeAllPopups();
+                  setIsStayDurationPopupOpen(!isStayDurationPopupOpen);
+                }}
                 className={`px-4 py-2 ${
                   filters.stayDuration ? "bg-violet-700" : "bg-violet-600"
                 } text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2`}
@@ -573,10 +601,13 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
 
               {/* Open Filters Button */}
               <button
-                onClick={() => setIsFilterPopupOpen(!isFilterPopupOpen)}
+                onClick={() => {
+                  closeAllPopups();
+                  setIsFilterPopupOpen(!isFilterPopupOpen);
+                }}
                 className="px-4 py-2 bg-violet-600 text-white rounded-md hover:bg-violet-700 text-nowrap flex items-center gap-2"
               >
-                Open Filters
+                More Filters
                 {appliedFiltersCount > 0 && (
                   <span className="bg-white text-violet-600 rounded-full px-2 py-1 text-xs">
                     {appliedFiltersCount}
@@ -597,7 +628,7 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
             {/* Right Scroll Button */}
             <button
               onClick={scrollRight}
-              className="absolute right-2 p-2 bg-white shadow-lg rounded-full z-50"
+              className="absolute lg:hidden right-2 p-2 bg-white shadow-lg rounded-full z-50"
             >
               <FaChevronRight className="w-3 h-3 text-gray-600" />
             </button>
@@ -606,7 +637,11 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
           {/* Location Popup */}
           {isLocationPopupOpen && (
             <div
-              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px]"
+              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              style={{
+                top: getPopupPosition(locationButtonRef).top,
+                left: getPopupPosition(locationButtonRef).left,
+              }}
             >
               <button
                 onClick={() => setIsLocationPopupOpen(false)}
@@ -634,7 +669,11 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
           {/* Locality Popup */}
           {isLocalityPopupOpen && (
             <div
-              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[200px]"
+              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              style={{
+                top: getPopupPosition(localityButtonRef).top,
+                left: getPopupPosition(localityButtonRef).left,
+              }}
             >
               <button
                 onClick={() => setIsLocalityPopupOpen(false)}
@@ -663,7 +702,11 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
           {/* Budget Popup */}
           {isBudgetPopupOpen && (
             <div
-              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[300px]"
+              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              style={{
+                top: getPopupPosition(budgetButtonRef).top,
+                left: getPopupPosition(budgetButtonRef).left,
+              }}
             >
               <button
                 onClick={() => setIsBudgetPopupOpen(false)}
@@ -696,7 +739,11 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
           {/* Room Type Popup */}
           {isRoomTypePopupOpen && (
             <div
-              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[50px] lg:left-[350px]"
+              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              style={{
+                top: getPopupPosition(roomTypeButtonRef).top,
+                left: getPopupPosition(roomTypeButtonRef).left,
+              }}
             >
               <button
                 onClick={() => setIsRoomTypePopupOpen(false)}
@@ -725,7 +772,11 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
           {/* Sort Popup */}
           {isSortPopupOpen && (
             <div
-              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[30px] lg:left-[30px]"
+              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              style={{
+                top: getPopupPosition(sortButtonRef).top,
+                left: getPopupPosition(sortButtonRef).left,
+              }}
             >
               <button
                 onClick={() => setIsSortPopupOpen(false)}
@@ -754,7 +805,11 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
           {/* Stay Duration Popup */}
           {isStayDurationPopupOpen && (
             <div
-              className="fixed bg-white p-6 rounded-lg shadow-lg z-50 top-[135px] left-[100px] lg:left-[400px]"
+              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              style={{
+                top: getPopupPosition(stayDurationButtonRef).top,
+                left: getPopupPosition(stayDurationButtonRef).left,
+              }}
             >
               <button
                 onClick={() => setIsStayDurationPopupOpen(false)}
@@ -917,6 +972,7 @@ const [selectedAccommodation, setSelectedAccommodation] = useState({
               </div>
             </div>
           )}
+          
           {sortedAccommodations.length > 0 ? (
           sortedAccommodations.map((accommodation) => (
             <div key={accommodation._id}>

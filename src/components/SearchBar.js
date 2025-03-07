@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { API_NODE_URL, API_KEY } from "../../config/config";
+import { X } from "lucide-react"; // Import the X icon for the clear button
 
 const SearchBar = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -123,6 +124,13 @@ const SearchBar = () => {
     }
   };
 
+  // Clear search query and suggestions
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSuggestions([]);
+    setShowSuggestions(false);
+  };
+
   // Handle click outside to close suggestions
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -140,13 +148,24 @@ const SearchBar = () => {
   return (
     <div className="relative flex-grow max-w-lg mx-4 hidden lg:block z-50" ref={searchBarRef}>
       <div className="flex">
-        <input
-          type="text"
-          placeholder="Search for colleges or accommodations..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500"
-        />
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="Search for colleges or accommodations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setShowSuggestions(true)} // Show suggestions when focused
+            className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-violet-500"
+          />
+          {searchQuery && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
         <button
           onClick={handleSearch}
           className="ml-2 px-4 py-2 bg-violet-500 text-white rounded-lg hover:bg-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-500"

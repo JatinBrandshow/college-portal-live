@@ -1,6 +1,6 @@
 "use client";
 import { Search, Sliders, Home, Briefcase, X } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // Added useRef
 import { Typewriter } from "react-simple-typewriter";
 import { useRouter } from "next/navigation"; // Import useRouter from Next.js
 import { API_NODE_URL, API_KEY } from "../../config/config";
@@ -20,6 +20,8 @@ const Hero = () => {
   const [colleges, setColleges] = useState([]);
   const [accommodations, setAccommodations] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false); // Track whether to show suggestions
+  const searchBarRef = useRef(null); // Ref for the search bar container
 
   // Fetch colleges from API
   useEffect(() => {
@@ -117,9 +119,18 @@ const Hero = () => {
         ...collegeSuggestions.map((college) => ({ ...college, type: "college" })),
         ...accommodationSuggestions.map((city) => ({ city, type: "accommodation" })),
       ]);
+      setShowSuggestions(true); // Show suggestions when typing
     } else {
       setSuggestions([]);
+      setShowSuggestions(false); // Hide suggestions when query is too short
     }
+  };
+
+  // Clear search query and suggestions
+  const clearSearch = () => {
+    setSearchQuery("");
+    setSuggestions([]);
+    setShowSuggestions(false);
   };
 
   // Handle search button click
@@ -139,6 +150,20 @@ const Hero = () => {
       router.push(`/accommodation?location=${suggestion.city}`);
     }
   };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
+        setShowSuggestions(false); // Hide suggestions when clicking outside
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="relative min-h-[85vh] flex flex-col md:flex-row items-center px-4 md:px-0 bg-sky-50 max-sm:h-fit">
@@ -183,17 +208,28 @@ const Hero = () => {
         </div>
 
         {/* Search Bar */}
-        <div className="flex flex-col md:absolute md:pr-5 z-20 xl:w-2/3">
+        <div className="flex flex-col md:absolute md:pr-5 z-20 xl:w-2/3" ref={searchBarRef}>
           <div className="flex flex-col md:items-center md:flex-row gap-10 bg-white py-5 px-5 rounded-2xl shadow-sm max-lg:gap-7 max-md:gap-5 max-sm:gap-3 max-md:py-4 max-sm:py-3 max-md:px-4 max-sm:px-3">
             <div className="flex flex-col w-full">
-              <input
-                type="text"
-                placeholder="Search for colleges or accommodations..."
-                className="outline-none text-black rounded-xl w-full p-2 border"
-                value={searchQuery}
-                onChange={handleSearchChange}
-              />
-              {suggestions.length > 0 && (
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search for colleges or accommodations..."
+                  className="outline-none text-black rounded-xl w-full p-2 border"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                  onFocus={() => setShowSuggestions(true)} // Show suggestions when focused
+                />
+                {searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                )}
+              </div>
+              {showSuggestions && suggestions.length > 0 && (
                 <div className="mt-2 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {suggestions.map((suggestion, index) => (
                     <div
