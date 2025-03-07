@@ -28,11 +28,11 @@ const BudgetProperties = () => {
             "Authorization": `Bearer ${API_KEY}`,
           },
         });
-  
+
         const text = await response.text();
         const data = JSON.parse(text);
 
-        if (Array.isArray(data.accommodations)) { // Correctly accessing accommodations array
+        if (Array.isArray(data.accommodations)) {
           const mappedProperties = data.accommodations.map((item) => ({
             id: item._id,
             title: item.name || "No Name",
@@ -56,15 +56,21 @@ const BudgetProperties = () => {
         console.error("Error fetching properties:", error);
       }
     };
-  
+
     fetchProperties();
   }, []);
-  
 
-  // Get unique cities dynamically from API data
-  const cities = ["All", ...new Set(properties.map((prop) => prop.city))];
+  // Filter properties with price up to ₹5000
+  const budgetProperties = properties.filter((prop) => {
+    const price = parseFloat(prop.price.replace(/[^0-9.-]+/g, "")); // Extract numeric value from price string
+    return price <= 5000; // Only include properties with price <= ₹5000
+  });
 
-  const filteredProperties = filter === "All" ? properties : properties.filter((prop) => prop.city === filter);
+  // Get unique cities dynamically from budgetProperties
+  const cities = ["All", ...new Set(budgetProperties.map((prop) => prop.city))];
+
+  // Filter properties based on selected city
+  const filteredProperties = filter === "All" ? budgetProperties : budgetProperties.filter((prop) => prop.city === filter);
 
   // Sort properties from low to high price
   const sortedProperties = filteredProperties.sort((a, b) => {
@@ -78,13 +84,13 @@ const BudgetProperties = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading and Subheading */}
         <div className="mb-10">
-        <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties by Cities </h2>
+          <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties by Cities </h2>
           <p className="text-gray-600 mt-2 text-left">
             From studios to private rooms to shared apartments, we’ve got it all.
           </p>
         </div>
 
-        {/* Filter Buttons (Dynamic from API) */}
+        {/* Filter Buttons (Dynamic from budgetProperties) */}
         <div className="flex justify-left space-x-4 mb-8 overflow-x-auto">
           {cities.map((city) => (
             <button
@@ -120,8 +126,9 @@ const BudgetProperties = () => {
           >
             {sortedProperties.map((property) => (
               <SwiperSlide key={property.id}>
-                <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer"
-            onClick={() => handleCardClick(property.id)} // Navigate on click
+                <div
+                  className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer"
+                  onClick={() => handleCardClick(property.id)} // Navigate on click
                 >
                   {/* Image Slider */}
                   <div className="relative w-full h-48">

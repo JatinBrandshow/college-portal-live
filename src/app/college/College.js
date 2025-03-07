@@ -78,7 +78,27 @@ const College = () => {
   const scrollContainerRef = useRef(null);
 
 
-  
+  // Refs for each filter button
+  const cityRef = useRef(null);
+  const collegeTypeRef = useRef(null);
+  const coursesOfferedRef = useRef(null);
+  const budgetRef = useRef(null);
+
+  // Function to calculate the left position of the pop-up
+  const getLeftPosition = (filterId) => {
+    switch (filterId) {
+      case "city":
+        return cityRef.current ? cityRef.current.getBoundingClientRect().left : 0;
+      case "college_type":
+        return collegeTypeRef.current ? collegeTypeRef.current.getBoundingClientRect().left : 0;
+      case "courses_offered":
+        return coursesOfferedRef.current ? coursesOfferedRef.current.getBoundingClientRect().left : 0;
+      case "budget":
+        return budgetRef.current ? budgetRef.current.getBoundingClientRect().left : 0;
+      default:
+        return 0;
+    }
+  };
 
   // Slider data
   const slides = [
@@ -297,12 +317,12 @@ const College = () => {
 
                 {/* Individual Filter Buttons */}
                 {[
-                  { id: "city", label: "City" },
-                  { id: "college_type", label: "College Type" },
-                  { id: "courses_offered", label: "Courses Offered" },
-                  { id: "budget", label: "Budget" },
+                  { id: "city", label: "City", ref: cityRef },
+                  { id: "college_type", label: "College Type", ref: collegeTypeRef },
+                  { id: "courses_offered", label: "Courses Offered", ref: coursesOfferedRef },
+                  { id: "budget", label: "Budget", ref: budgetRef },
                 ].map((filter) => (
-                  <div key={filter.id} className="relative">
+                  <div key={filter.id} className="relative" ref={filter.ref}>
                     {/* Filter Button */}
                     <button
                       className={`flex items-center gap-2 px-4 py-2 rounded-md shadow-md transition-all text-nowrap ${
@@ -343,7 +363,7 @@ const College = () => {
           </section>
 
           {/* Filter Pop-ups (Outside Scrollable Container) */}
-          <div className="relative z-[1000]">
+          <div className="relative z-[1000] sticky top-[140px]">
             {/* All Filters Pop-up */}
             {isAllFiltersOpen && (
               <div className="absolute left-0 top-full mt-2 w-96 bg-white border shadow-lg rounded-lg p-4">
@@ -454,7 +474,10 @@ const College = () => {
             ].map((filter) => (
               <div key={filter.id}>
                 {activeFilter === filter.id && (
-                  <div className="absolute left-0 top-full mt-2 w-64 bg-white border shadow-lg rounded-lg p-4">
+                  <div 
+                    className="absolute top-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4"
+                    style={{ left: getLeftPosition(filter.id) }}
+                  >
                     {/* Close Button */}
                     <button
                       onClick={() => setActiveFilter(null)}
