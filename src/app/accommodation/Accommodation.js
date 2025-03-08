@@ -45,6 +45,22 @@ const MapUpdater = ({ position }) => {
   return null;
 };
 
+// 📌 Custom hook to detect clicks outside of a component
+const useOutsideClick = (ref, callback) => {
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (ref.current && !ref.current.contains(event.target)) {
+        callback();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [ref, callback]);
+};
+
 // 📌 Main Map Component
 const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
   const [L, setLeaflet] = useState(null);
@@ -153,6 +169,15 @@ const Accommodation = () => {
   const sortButtonRef = useRef(null);
   const stayDurationButtonRef = useRef(null);
 
+  // Refs for popups
+  const locationPopupRef = useRef(null);
+  const localityPopupRef = useRef(null);
+  const budgetPopupRef = useRef(null);
+  const roomTypePopupRef = useRef(null);
+  const sortPopupRef = useRef(null);
+  const stayDurationPopupRef = useRef(null);
+  const filterPopupRef = useRef(null);
+
   // Function to close all popups except the one being opened
   const closeAllPopups = () => {
     setIsLocationPopupOpen(false);
@@ -163,6 +188,15 @@ const Accommodation = () => {
     setIsLocalityPopupOpen(false);
     setIsFilterPopupOpen(false);
   };
+
+  // Use the custom hook for each popup
+  useOutsideClick(locationPopupRef, () => setIsLocationPopupOpen(false));
+  useOutsideClick(localityPopupRef, () => setIsLocalityPopupOpen(false));
+  useOutsideClick(budgetPopupRef, () => setIsBudgetPopupOpen(false));
+  useOutsideClick(roomTypePopupRef, () => setIsRoomTypePopupOpen(false));
+  useOutsideClick(sortPopupRef, () => setIsSortPopupOpen(false));
+  useOutsideClick(stayDurationPopupRef, () => setIsStayDurationPopupOpen(false));
+  useOutsideClick(filterPopupRef, () => setIsFilterPopupOpen(false));
 
   // Fetch accommodations based on filters
   const fetchAccommodations = async () => {
@@ -637,6 +671,7 @@ const Accommodation = () => {
           {/* Location Popup */}
           {isLocationPopupOpen && (
             <div
+              ref={locationPopupRef}
               className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(locationButtonRef).top,
@@ -649,7 +684,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-xl font-semibold mb-4">Location</h2>
+              <h2 className="text-base font-semibold mb-4">Location</h2>
               <input
                 type="text"
                 placeholder="Search Location (City or State)"
@@ -659,7 +694,7 @@ const Accommodation = () => {
               />
               <button
                 onClick={() => resetFilter("location")}
-                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="mt-4 px-2 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
               >
                 Reset Location
               </button>
@@ -669,6 +704,7 @@ const Accommodation = () => {
           {/* Locality Popup */}
           {isLocalityPopupOpen && (
             <div
+              ref={localityPopupRef}
               className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(localityButtonRef).top,
@@ -681,7 +717,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-xl font-semibold mb-4">Locality</h2>
+              <h2 className="text-base font-semibold mb-4">Locality</h2>
               <Select
                 options={localityOptions}
                 value={localityOptions.find((opt) => opt.value === filters.locality)}
@@ -692,7 +728,7 @@ const Accommodation = () => {
               />
               <button
                 onClick={() => resetFilter("locality")}
-                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="mt-4 px-2 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
               >
                 Reset Locality
               </button>
@@ -702,6 +738,7 @@ const Accommodation = () => {
           {/* Budget Popup */}
           {isBudgetPopupOpen && (
             <div
+              ref={budgetPopupRef}
               className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(budgetButtonRef).top,
@@ -714,7 +751,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-xl font-semibold mb-4">Budget (₹)</h2>
+              <h2 className="text-base font-semibold mb-4">Budget (₹)</h2>
               <Slider
                 range
                 min={0}
@@ -729,7 +766,7 @@ const Accommodation = () => {
               </div>
               <button
                 onClick={() => resetFilter("budget")}
-                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="mt-4 px-2 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
               >
                 Reset Budget
               </button>
@@ -739,6 +776,7 @@ const Accommodation = () => {
           {/* Room Type Popup */}
           {isRoomTypePopupOpen && (
             <div
+              ref={roomTypePopupRef}
               className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(roomTypeButtonRef).top,
@@ -751,7 +789,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-xl font-semibold mb-4">Room Type</h2>
+              <h2 className="text-base font-semibold mb-4">Room Type</h2>
               <Select
                 options={roomTypeOptions}
                 value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
@@ -762,7 +800,7 @@ const Accommodation = () => {
               />
               <button
                 onClick={() => resetFilter("roomType")}
-                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="mt-4 px-2 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
               >
                 Reset Room Type
               </button>
@@ -772,6 +810,7 @@ const Accommodation = () => {
           {/* Sort Popup */}
           {isSortPopupOpen && (
             <div
+              ref={sortPopupRef}
               className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(sortButtonRef).top,
@@ -784,7 +823,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-xl font-semibold mb-4">Sort By</h2>
+              <h2 className="text-base font-semibold mb-4">Sort By</h2>
               <Select
                 options={sortOptions}
                 value={sortOptions.find((opt) => opt.value === filters.sort)}
@@ -795,7 +834,7 @@ const Accommodation = () => {
               />
               <button
                 onClick={() => resetFilter("sort")}
-                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="mt-4 px-2 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
               >
                 Reset Sort
               </button>
@@ -805,6 +844,7 @@ const Accommodation = () => {
           {/* Stay Duration Popup */}
           {isStayDurationPopupOpen && (
             <div
+              ref={stayDurationPopupRef}
               className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(stayDurationButtonRef).top,
@@ -817,7 +857,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-xl font-semibold mb-4">Stay Duration</h2>
+              <h2 className="text-base font-semibold mb-4">Stay Duration</h2>
               <Select
                 options={stayDurationOptions}
                 value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
@@ -828,7 +868,7 @@ const Accommodation = () => {
               />
               <button
                 onClick={() => resetFilter("stayDuration")}
-                className="mt-4 px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+                className="mt-4 px-2 py-1 text-sm bg-gray-300 rounded hover:bg-gray-400"
               >
                 Reset Stay Duration
               </button>
@@ -838,7 +878,10 @@ const Accommodation = () => {
           {/* Open Filters Popup */}
           {isFilterPopupOpen && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white p-6 rounded-lg h-2/3 overflow-auto no-scrollbar w-11/12 max-w-2xl relative">
+              <div
+                ref={filterPopupRef}
+                className="bg-white p-6 rounded-lg h-2/3 overflow-auto no-scrollbar w-11/12 max-w-2xl relative"
+              >
                 <button
                   onClick={() => setIsFilterPopupOpen(false)}
                   className="absolute top-4 right-4 text-gray-600 hover:text-gray-900"

@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, useRef, Suspense } from "react";
 import dynamic from "next/dynamic";
 import "leaflet/dist/leaflet.css";
@@ -8,6 +9,8 @@ import { FaChevronDown, FaChevronUp, FaChevronLeft, FaChevronRight } from "react
 import { useRouter, useSearchParams } from "next/navigation";
 import { API_NODE_URL, API_KEY } from "../../../config/config";
 import { useMap } from "react-leaflet";
+import Slider from "rc-slider"; // For budget range slider
+import "rc-slider/assets/index.css"; // Slider styles
 
 // Dynamically import Leaflet and related components with SSR disabled
 const MapContainer = dynamic(
@@ -26,7 +29,6 @@ const Popup = dynamic(
   () => import("react-leaflet").then((mod) => mod.Popup),
   { ssr: false }
 );
-
 
 const markerIcon = typeof window !== "undefined" 
   ? (() => {
@@ -77,12 +79,17 @@ const College = () => {
   const filterRef = useRef(null);
   const scrollContainerRef = useRef(null);
 
-
   // Refs for each filter button
   const cityRef = useRef(null);
   const collegeTypeRef = useRef(null);
   const coursesOfferedRef = useRef(null);
   const budgetRef = useRef(null);
+
+  // Refs for each filter pop-up
+  const cityPopUpRef = useRef(null);
+  const collegeTypePopUpRef = useRef(null);
+  const coursesOfferedPopUpRef = useRef(null);
+  const budgetPopUpRef = useRef(null);
 
   // Function to calculate the left position of the pop-up
   const getLeftPosition = (filterId) => {
@@ -115,8 +122,6 @@ const College = () => {
     setIsAllFiltersOpen((prev) => !prev); // Toggle the "All Filters" pop-up
     setActiveFilter(null); // Close any other open pop-up
   };
-
-  
 
   // Slider data
   const slides = [
@@ -168,7 +173,6 @@ const College = () => {
 
     fetchColleges();
   }, []);
-
 
   // Autoplay functionality for slider
   useEffect(() => {
@@ -243,7 +247,33 @@ const College = () => {
       scrollContainerRef.current.scrollBy({ left: 200, behavior: "smooth" });
     }
   };
-  
+
+  // Handle clicks outside the filter pop-ups
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if 
+        (cityPopUpRef.current && !cityPopUpRef.current.contains(event.target)) {
+        setActiveFilter(null);
+      }
+      if 
+        (collegeTypePopUpRef.current && !collegeTypePopUpRef.current.contains(event.target)) {
+        setActiveFilter(null);
+      }
+      if 
+        (coursesOfferedPopUpRef.current && !coursesOfferedPopUpRef.current.contains(event.target)) {
+        setActiveFilter(null);
+      }
+      if 
+        (budgetPopUpRef.current && !budgetPopUpRef.current.contains(event.target)) {
+        setActiveFilter(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="bg-white min-h-screen">
@@ -284,8 +314,6 @@ const College = () => {
         </div>
       </section>
       */}
-
-      
 
       {/* College List */}
       <h1 className="text-3xl font-bold mt-2 px-6 pt-2">Colleges</h1>
@@ -436,36 +464,27 @@ const College = () => {
                     />
                   </div>
 
-                  {/* Budget Filter */}
                   <div className="mb-4">
-                    <h4 className="text-sm font-bold mb-2">Budget</h4>
-                    <div className="flex gap-4">
-                      <input
-                        type="number"
-                        value={filters.budgetRange.min}
-                        onChange={(e) =>
-                          setFilters((prev) => ({
-                            ...prev,
-                            budgetRange: { ...prev.budgetRange, min: parseInt(e.target.value, 10) || 0 },
-                          }))
-                        }
-                        className="w-1/2 px-2 py-1 border rounded-lg"
-                        placeholder="Min"
-                      />
-                      <input
-                        type="number"
-                        value={filters.budgetRange.max}
-                        onChange={(e) =>
-                          setFilters((prev) => ({
-                            ...prev,
-                            budgetRange: { ...prev.budgetRange, max: parseInt(e.target.value, 10) || Infinity },
-                          }))
-                        }
-                        className="w-1/2 px-2 py-1 border rounded-lg"
-                        placeholder="Max"
-                      />
+                  <h4 className="text-sm font-bold mb-2">Budget</h4>
+                  <div className="w-full">
+                    <Slider
+                      range
+                      min={0}
+                      max={1000000} // Adjust the max value as needed
+                      value={[filters.budgetRange.min, filters.budgetRange.max]}
+                      onChange={(value) =>
+                        setFilters((prev) => ({
+                          ...prev,
+                          budgetRange: { min: value[0], max: value[1] },
+                        }))
+                      }
+                    />
+                    <div className="flex justify-between mt-2">
+                      <span>Min: ₹{filters.budgetRange.min}</span>
+                      <span>Max: ₹{filters.budgetRange.max}</span>
                     </div>
                   </div>
+                </div>
 
                   {/* Apply and Reset Buttons */}
                   <div className="flex gap-4 mt-6">
@@ -496,8 +515,14 @@ const College = () => {
               <div key={filter.id}>
                 {activeFilter === filter.id && (
                   <div
-                    className="absolute top-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-4"
+                    className="absolute top-0 mt-2 w-64 bg-white border shadow-lg rounded-lg p-3"
                     style={{ left: getLeftPosition(filter.id) }}
+                    ref={
+                      filter.id === "city" ? cityPopUpRef :
+                      filter.id === "college_type" ? collegeTypePopUpRef :
+                      filter.id === "courses_offered" ? coursesOfferedPopUpRef :
+                      budgetPopUpRef
+                    }
                   >
                     {/* Close Button */}
                     <button
@@ -544,34 +569,24 @@ const College = () => {
                     )}
 
                     {filter.id === "budget" && (
-                      <>
-                        <div className="flex gap-4">
-                          <input
-                            type="number"
-                            value={filters.budgetRange.min}
-                            onChange={(e) =>
-                              setFilters((prev) => ({
-                                ...prev,
-                                budgetRange: { ...prev.budgetRange, min: parseInt(e.target.value, 10) || 0 },
-                              }))
-                            }
-                            className="w-1/2 px-2 py-1 border rounded-lg"
-                            placeholder="Min"
-                          />
-                          <input
-                            type="number"
-                            value={filters.budgetRange.max}
-                            onChange={(e) =>
-                              setFilters((prev) => ({
-                                ...prev,
-                                budgetRange: { ...prev.budgetRange, max: parseInt(e.target.value, 10) || Infinity },
-                              }))
-                            }
-                            className="w-1/2 px-2 py-1 border rounded-lg"
-                            placeholder="Max"
-                          />
+                      <div className="w-full">
+                        <Slider
+                          range
+                          min={0}
+                          max={1000000} // Adjust the max value as needed
+                          value={[filters.budgetRange.min, filters.budgetRange.max]}
+                          onChange={(value) =>
+                            setFilters((prev) => ({
+                              ...prev,
+                              budgetRange: { min: value[0], max: value[1] },
+                            }))
+                          }
+                        />
+                        <div className="flex justify-between mt-2">
+                          <span>Min: ₹{filters.budgetRange.min}</span>
+                          <span>Max: ₹{filters.budgetRange.max}</span>
                         </div>
-                      </>
+                      </div>
                     )}
                   </div>
                 )}
