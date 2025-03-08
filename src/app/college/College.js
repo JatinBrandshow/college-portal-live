@@ -542,7 +542,7 @@ const College = () => {
                         placeholder="Search city..."
                         value={filters.city}
                         onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
-                        className="w-full px-4 py-2 mb-4 border rounded-lg"
+                        className="w-full px-4 py-2 border rounded-lg"
                       />
                     )}
 
@@ -550,7 +550,7 @@ const College = () => {
                       <select
                         value={filters.college_type}
                         onChange={(e) => setFilters((prev) => ({ ...prev, college_type: e.target.value }))}
-                        className="w-full px-4 py-2 mb-4 border rounded-lg"
+                        className="w-full px-4 py-2 border rounded-lg"
                       >
                         <option value="">Select College Type</option>
                         <option value="Government">Government</option>
@@ -564,7 +564,7 @@ const College = () => {
                         placeholder="Search courses..."
                         value={filters.courses_offered}
                         onChange={(e) => setFilters((prev) => ({ ...prev, courses_offered: e.target.value }))}
-                        className="w-full px-4 py-2 mb-4 border rounded-lg"
+                        className="w-full px-4 py-2 border rounded-lg"
                       />
                     )}
 

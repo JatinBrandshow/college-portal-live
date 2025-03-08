@@ -672,7 +672,7 @@ const Accommodation = () => {
           {isLocationPopupOpen && (
             <div
               ref={locationPopupRef}
-              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(locationButtonRef).top,
                 left: getPopupPosition(locationButtonRef).left,
@@ -705,7 +705,7 @@ const Accommodation = () => {
           {isLocalityPopupOpen && (
             <div
               ref={localityPopupRef}
-              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(localityButtonRef).top,
                 left: getPopupPosition(localityButtonRef).left,
@@ -739,7 +739,7 @@ const Accommodation = () => {
           {isBudgetPopupOpen && (
             <div
               ref={budgetPopupRef}
-              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(budgetButtonRef).top,
                 left: getPopupPosition(budgetButtonRef).left,
@@ -777,7 +777,7 @@ const Accommodation = () => {
           {isRoomTypePopupOpen && (
             <div
               ref={roomTypePopupRef}
-              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(roomTypeButtonRef).top,
                 left: getPopupPosition(roomTypeButtonRef).left,
@@ -811,7 +811,7 @@ const Accommodation = () => {
           {isSortPopupOpen && (
             <div
               ref={sortPopupRef}
-              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(sortButtonRef).top,
                 left: getPopupPosition(sortButtonRef).left,
@@ -845,7 +845,7 @@ const Accommodation = () => {
           {isStayDurationPopupOpen && (
             <div
               ref={stayDurationPopupRef}
-              className="absolute bg-white p-6 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(stayDurationButtonRef).top,
                 left: getPopupPosition(stayDurationButtonRef).left,
