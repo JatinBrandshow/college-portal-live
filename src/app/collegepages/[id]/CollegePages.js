@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import Select from "react-select"; // For multi-select dropdown
@@ -10,7 +10,6 @@ import { API_NODE_URL, API_KEY } from "../../../../config/config"; // Update to 
 import dynamic from "next/dynamic";
 import { useMap } from "react-leaflet";
 import { useRouter } from "next/navigation";
-
 
 // 📌 Dynamic imports for Leaflet components to avoid SSR issues
 const MapContainer = dynamic(() => import("react-leaflet").then((mod) => mod.MapContainer), { ssr: false });
@@ -34,60 +33,59 @@ const MapUpdater = ({ position }) => {
 
 // 📌 Main Map Component for Colleges
 const MapComponent = ({ college }) => {
-    const [L, setLeaflet] = useState(null);
-    const [customMarker, setCustomMarker] = useState(null);
-  
-    // 📌 Load Leaflet library on client-side only
-    useEffect(() => {
-      import("leaflet").then((leaflet) => {
-        setLeaflet(leaflet);
-        setCustomMarker(
-          new leaflet.Icon({
-            iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg", // Custom icon URL
-            iconSize: [25, 25], // Adjust the size of the marker
-            className: "ping-marker", // Apply ping effect
-          })
-        );
-      });
-    }, []);
-  
-    if (!L || !customMarker) return <p>Loading map...</p>; // Ensure Leaflet is loaded before rendering
-  
-    // 📌 Default location for the map based on college's latitude and longitude
-    const position = [college.location.latitude, college.location.longitude];
-  
-    return (
-      <div className="h-[300px] lg:h-[600px] bg-gray-200 rounded-lg relative">
-        <MapContainer center={position} zoom={13} className="w-full h-full">
-          {/* 📌 OpenStreetMap Tile Layer */}
-          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-  
-          {/* 📌 Update map position smoothly */}
-          <MapUpdater position={position} />
-  
-          {/* 📌 Display marker for the college */}
-          <Marker
-            position={position}
-            icon={customMarker}
-            eventHandlers={{
-              add: (e) => {
-                // Open the popup as soon as the marker is added to the map
-                e.target.openPopup();
-              },
-            }}
-          >
-            <Popup autoClose={false} closeOnClick={false}>
-              <div className="text-center">
-                <p className="font-semibold">{college.name}</p>
-                <p>{college.city}, {college.state}</p>
-              </div>
-            </Popup>
-          </Marker>
-        </MapContainer>
-      </div>
-    );
-  };
+  const [L, setLeaflet] = useState(null);
+  const [customMarker, setCustomMarker] = useState(null);
 
+  // 📌 Load Leaflet library on client-side only
+  useEffect(() => {
+    import("leaflet").then((leaflet) => {
+      setLeaflet(leaflet);
+      setCustomMarker(
+        new leaflet.Icon({
+          iconUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg", // Custom icon URL
+          iconSize: [25, 25], // Adjust the size of the marker
+          className: "ping-marker", // Apply ping effect
+        })
+      );
+    });
+  }, []);
+
+  if (!L || !customMarker) return <p>Loading map...</p>; // Ensure Leaflet is loaded before rendering
+
+  // 📌 Default location for the map based on college's latitude and longitude
+  const position = [college.location.latitude, college.location.longitude];
+
+  return (
+    <div className="h-[300px] lg:h-[600px] bg-gray-200 rounded-lg relative">
+      <MapContainer center={position} zoom={13} className="w-full h-full">
+        {/* 📌 OpenStreetMap Tile Layer */}
+        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+
+        {/* 📌 Update map position smoothly */}
+        <MapUpdater position={position} />
+
+        {/* 📌 Display marker for the college */}
+        <Marker
+          position={position}
+          icon={customMarker}
+          eventHandlers={{
+            add: (e) => {
+              // Open the popup as soon as the marker is added to the map
+              e.target.openPopup();
+            },
+          }}
+        >
+          <Popup autoClose={false} closeOnClick={false}>
+            <div className="text-center">
+              <p className="font-semibold">{college.name}</p>
+              <p>{college.city}, {college.state}</p>
+            </div>
+          </Popup>
+        </Marker>
+      </MapContainer>
+    </div>
+  );
+};
 
 const CollegePages = ({ id }) => {
   const router = useRouter();
@@ -100,7 +98,7 @@ const CollegePages = ({ id }) => {
   useEffect(() => {
     const fetchCollegeDetails = async () => {
       try {
-        const response = await fetch(`${API_NODE_URL}college/popular-colleges`, {
+        const response = await fetch(`${API_NODE_URL}college/colleges`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
@@ -154,122 +152,120 @@ const CollegePages = ({ id }) => {
 
   return (
     <div className="p-2 lg:p-6">
-    <h1 className="text-2xl md:text-4xl font-bold mb-6 mt-2 text-center">{collegeDetails.name}</h1>
-  
-    {/* College Details and Map Section */}
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-0">
-    <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-2">
-  {/* College Image */}
-  <div className="w-full mb-8">
-    <img
-      src={collegeDetails.img[0] || "/placeholder-image.jpg"}
-      alt={collegeDetails.name}
-      className="w-full h-80 object-cover rounded-xl shadow-md"
-    />
-  </div>
+      <h1 className="text-2xl md:text-4xl font-bold mb-6 mt-2 text-center">{collegeDetails.name}</h1>
 
-  {/* College Details */}
-  <div>
-    {/* About College */}
-    <div className="mb-8">
-      <h2 className="text-base lg:text-3xl font-semibold text-gray-800 mb-4">About {collegeDetails.name}</h2>
-      <p className="text-sm md:text-lg text-gray-700">{collegeDetails.description}</p>
-    </div>
+      {/* College Details and Map Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-0">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg p-2">
+          {/* College Image */}
+          <div className="w-full mb-8">
+            <img
+              src={collegeDetails.images[0] || "/placeholder-image.jpg"} /* Updated from `img` to `images` */
+              alt={collegeDetails.name}
+              className="w-full h-80 object-cover rounded-xl shadow-md"
+            />
+          </div>
 
-    {/* Established Year */}
-    <div className="grid grid-cols-2 gap-6 mb-6">
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-gray-800">Established Year</h3>
-        <p className="text-gray-600">{collegeDetails.established_year}</p>
-      </div>
+          {/* College Details */}
+          <div>
+            {/* About College */}
+            <div className="mb-8">
+              <h2 className="text-base lg:text-3xl font-semibold text-gray-800 mb-4">About {collegeDetails.name}</h2>
+              <p className="text-sm md:text-lg text-gray-700">{collegeDetails.description}</p>
+            </div>
 
-      {/* Affiliation */}
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-gray-800">Affiliation</h3>
-        <p className="text-gray-600">{collegeDetails.affiliation}</p>
-      </div>
-    </div>
+            {/* Established Year */}
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              <div>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800">Established Year</h3>
+                <p className="text-gray-600">{collegeDetails.established_year}</p>
+              </div>
 
-    {/* College Type */}
-    <div className="grid grid-cols-2 gap-6 mb-6">
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-gray-800">College Type</h3>
-        <p className="text-gray-600">{collegeDetails.college_type}</p>
-      </div>
+              {/* Affiliation */}
+              <div>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800">Affiliation</h3>
+                <p className="text-gray-600">{collegeDetails.affiliated_university}</p>
+              </div>
+            </div>
 
-      {/* Address */}
-      <div>
-        <h3 className="text-base md:text-lg font-semibold text-gray-800">Address</h3>
-        <p className="text-gray-600">{collegeDetails.address}</p>
-      </div>
-    </div>
+            {/* College Type */}
+            <div className="grid grid-cols-2 gap-6 mb-6">
+              <div>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800">College Type</h3>
+                <p className="text-gray-600">{collegeDetails.college_type}</p>
+              </div>
 
-    {/* Location */}
-    <div className="mb-6">
-      <h3 className="text-base md:text-lg font-semibold text-gray-800">Location</h3>
-      <p className="text-gray-600">{collegeDetails.city}, {collegeDetails.state}, {collegeDetails.country}</p>
-    </div>
+              {/* Address */}
+              <div>
+                <h3 className="text-base md:text-lg font-semibold text-gray-800">Address</h3>
+                <p className="text-gray-600">{collegeDetails.address}</p>
+              </div>
+            </div>
 
-    {/* Contact Information */}
-    <div className="mb-6">
-      <h3 className="text-base md:text-lg font-semibold text-gray-800">Contact</h3>
-      <p className="text-gray-600">Phone: <span className="font-semibold">{collegeDetails.contact_number}</span></p>
-      <p className="text-gray-600">Email: <a href={`mailto:${collegeDetails.email}`} className="text-blue-600 hover:text-blue-800">{collegeDetails.email}</a></p>
-      <p className="text-gray-600">Website: <a href={collegeDetails.website} className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">{collegeDetails.website}</a></p>
-    </div>
+            {/* Location */}
+            <div className="mb-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Location</h3>
+              <p className="text-gray-600">{collegeDetails.city}, {collegeDetails.state}, {collegeDetails.country}</p>
+            </div>
 
-    {/* Courses Offered */}
-    <div className="mb-6">
-      <h3 className="text-base md:text-lg font-semibold text-gray-800">Courses Offered</h3>
-      <div className="flex flex-wrap gap-4 mt-2">
-        {collegeDetails.courses_offered.map((course, index) => (
-          <span
-            key={index}
-            className="bg-blue-100 text-blue-700 px-4 py-2 text-sm md:text-base rounded-full"
-          >
-            {course}
-          </span>
-        ))}
-      </div>
-    </div>
+            {/* Contact Information */}
+            <div className="mb-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Contact</h3>
+              <p className="text-gray-600">Phone: <span className="font-semibold">{collegeDetails.phone}</span></p>
+              <p className="text-gray-600">Email: <a href={`mailto:${collegeDetails.email}`} className="text-blue-600 hover:text-blue-800">{collegeDetails.email}</a></p>
+              <p className="text-gray-600">Website: <a href={collegeDetails.website_url} className="text-blue-600 hover:text-blue-800" target="_blank" rel="noopener noreferrer">{collegeDetails.website_url}</a></p>
+            </div>
 
-    {/* Placement Details */}
-    <div className="mb-6">
-      <h3 className="text-base md:text-lg font-semibold text-gray-800">Placement Details</h3>
-      <p className="text-gray-600">Highest Package: ₹{collegeDetails.placement_details.highest_package}</p>
-      <p className="text-gray-600">Average Package: ₹{collegeDetails.placement_details.avg_package}</p>
-    </div>
+            {/* Courses Offered */}
+            <div className="mb-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Courses Offered</h3>
+              <div className="flex flex-wrap gap-4 mt-2">
+                {collegeDetails.courses_offered.map((course, index) => (
+                  <span
+                    key={index}
+                    className="bg-blue-100 text-blue-700 px-4 py-2 text-sm md:text-base rounded-full"
+                  >
+                    {course}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-    {/* Scholarship Details */}
-    <div className="mb-6">
-      <h3 className="text-base md:text-lg font-semibold text-gray-800">Scholarship Details</h3>
-      <p className="text-gray-600">{collegeDetails.scholarship_details}</p>
-    </div>
+            {/* Placement Details */}
+            <div className="mb-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Placement Details</h3>
+              <p className="text-gray-600">Highest Package: ₹{collegeDetails.placement_details.highest_package}</p>
+              <p className="text-gray-600">Average Package: ₹{collegeDetails.placement_details.avg_package}</p>
+            </div>
 
-    {/* Hostel Availability */}
-    <div className="mb-6">
-      <h3 className="text-base md:text-lg font-semibold text-gray-800">Hostel Availability</h3>
-      <p className="text-gray-600">{collegeDetails.hostel_availability ? 'Available' : 'Not Available'}</p>
-    </div>
+            {/* Scholarship Details */}
+            <div className="mb-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Scholarship Details</h3>
+              <p className="text-gray-600">{collegeDetails.scholarship_details}</p>
+            </div>
 
-    {/* Ranking */}
-    <div className="mb-6">
-      <h3 className="text-base md:text-lg font-semibold text-gray-800">Ranking</h3>
-      <p className="text-gray-600">{collegeDetails.ranking}</p>
-    </div>
-  </div>
-</div>
+            {/* Hostel Availability */}
+            <div className="mb-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Hostel Availability</h3>
+              <p className="text-gray-600">{collegeDetails.hostel_availability ? 'Available' : 'Not Available'}</p>
+            </div>
 
-  
-      {/* Right Side: Map */}
-      <div className="lg:col-span-1">
-        <div className="sticky top-6 bg-white rounded-lg shadow-lg border border-gray-200">
-          <MapComponent college={collegeDetails} />
+            {/* Ranking */}
+            <div className="mb-6">
+              <h3 className="text-base md:text-lg font-semibold text-gray-800">Ranking</h3>
+              <p className="text-gray-600">{collegeDetails.ranking}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Map */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-6 bg-white rounded-lg shadow-lg border border-gray-200">
+            <MapComponent college={collegeDetails} />
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  
   );
 };
 

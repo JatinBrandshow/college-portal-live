@@ -318,9 +318,9 @@ useEffect(() => {
         const data = JSON.parse(text);
         console.log("API Response:", data);
   
-        if (Array.isArray(data.accommodations)) { 
-          setAllProperties(data.accommodations); // Store all accommodations
-          const foundProperty = data.accommodations.find((item) => item._id === id);
+        if (Array.isArray(data)) { 
+          setAllProperties(data); // Store all accommodations
+          const foundProperty = data.find((item) => item._id === id);
           console.log("Found Property:", foundProperty);
           if (foundProperty) {
             setProperty(foundProperty); // Set the entire property object

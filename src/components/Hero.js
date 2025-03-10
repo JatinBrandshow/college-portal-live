@@ -69,11 +69,11 @@ const Hero = () => {
         const result = await response.json();
         console.log("API Response:", result);
 
-        if (response.ok && Array.isArray(result.accommodations)) {
-          console.log("Data:", result.accommodations);
-          setAccommodations(result.accommodations);
+        if (response.ok && Array.isArray(result)) { // Check if the response is an array
+          console.log("Data:", result);
+          setAccommodations(result); // Directly set the accommodations state with the response
         } else {
-          console.error("API response does not contain accommodations:", result);
+          console.error("API response is not an array:", result);
           setAccommodations([]);
         }
       } catch (error) {
@@ -81,7 +81,7 @@ const Hero = () => {
         setAccommodations([]);
       }
     };
-
+  
     fetchAccommodations();
   }, []);
 
@@ -92,11 +92,10 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Handle search input change
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-
+  
     if (query.length > 2) {
       // Filter colleges by name, city, state, or country
       const collegeSuggestions = colleges.filter((college) =>
@@ -104,16 +103,17 @@ const Hero = () => {
         college.city.toLowerCase().includes(query.toLowerCase()) ||
         college.state.toLowerCase().includes(query.toLowerCase())
       );
-
+  
       // Filter accommodations by city, state, or country
       const accommodationCities = accommodations
-        .map((accommodation) => accommodation.location.city)
+        .map((accommodation) => accommodation.location?.city) // Use optional chaining to avoid errors
+        .filter((city) => city !== null && city !== undefined) // Filter out null or undefined cities
         .filter((city, index, self) => self.indexOf(city) === index); // Remove duplicates
-
+  
       const accommodationSuggestions = accommodationCities.filter((city) =>
         city.toLowerCase().includes(query.toLowerCase())
       );
-
+  
       // Combine suggestions
       setSuggestions([
         ...collegeSuggestions.map((college) => ({ ...college, type: "college" })),
@@ -193,24 +193,10 @@ const Hero = () => {
           </p>
         </div>
 
-        {/* College and Accommodation Buttons */}
-        <div className="flex justify-start space-x-1 max-sm:space-x-0.5 max-sm:mb-1">
-          <button
-            className={`px-8 py-5 font-bold text-base rounded-lg max-sm:text-sm max-md:px-6 max-sm:px-4 max-md:py-4 max-sm:py-3 bg-violet-600 text-white `}
-          >
-            COLLEGE
-          </button>
-          <button
-            className={`px-8 py-5 font-bold text-base rounded-lg max-sm:text-sm max-md:px-6 max-sm:px-4 max-md:py-4 max-sm:py-3 bg-gray-200 text-black hover:bg-violet-600 hover:text-white`}
-          >
-            ACCOMMODATIONS
-          </button>
-        </div>
-
         {/* Search Bar */}
         <div className="flex flex-col md:absolute md:pr-5 z-20 xl:w-2/3" ref={searchBarRef}>
           <div className="flex flex-col md:items-center md:flex-row gap-10 bg-white py-5 px-5 rounded-2xl shadow-sm max-lg:gap-7 max-md:gap-5 max-sm:gap-3 max-md:py-4 max-sm:py-3 max-md:px-4 max-sm:px-3">
-            <div className="flex flex-col w-full">
+            <div className="flex flex-col w-full relative">
               <div className="relative">
                 <input
                   type="text"
@@ -230,7 +216,7 @@ const Hero = () => {
                 )}
               </div>
               {showSuggestions && suggestions.length > 0 && (
-                <div className="mt-2 bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute top-10 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
                   {suggestions.map((suggestion, index) => (
                     <div
                       key={index}
@@ -246,7 +232,7 @@ const Hero = () => {
                             onClick={(e) => {
                               e.stopPropagation();
                               if (suggestion.type === "college") {
-                                router.push(`/college?city=${suggestion.city}`);
+                                router.push(`/collegepages/${suggestion._id}`);
                               } else {
                                 router.push(`/college?city=${suggestion.city}`);
                               }

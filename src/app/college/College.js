@@ -90,6 +90,7 @@ const College = () => {
   const collegeTypePopUpRef = useRef(null);
   const coursesOfferedPopUpRef = useRef(null);
   const budgetPopUpRef = useRef(null);
+  const allFiltersPopUpRef = useRef(null);
 
   // Function to calculate the left position of the pop-up
   const getLeftPosition = (filterId) => {
@@ -267,6 +268,10 @@ const College = () => {
         (budgetPopUpRef.current && !budgetPopUpRef.current.contains(event.target)) {
         setActiveFilter(null);
       }
+      // Close "More Filters" pop-up if clicked outside
+    if (allFiltersPopUpRef.current && !allFiltersPopUpRef.current.contains(event.target)) {
+      setIsAllFiltersOpen(false);
+    }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -414,7 +419,8 @@ const College = () => {
             {/* All Filters Pop-up */}
             {isAllFiltersOpen && (
               <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-                <div className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-2xl relative">
+                <div ref={allFiltersPopUpRef} 
+                className="bg-white rounded-lg shadow-lg p-6 w-11/12 max-w-2xl relative">
                   {/* Close Button */}
                   <button
                     onClick={() => setIsAllFiltersOpen(false)}

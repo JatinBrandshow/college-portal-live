@@ -14,39 +14,110 @@ const BudgetProperties = () => {
   const router = useRouter();
   const [properties, setProperties] = useState([]);
   const [filter, setFilter] = useState("All");
+  const [cities, setCities] = useState([]); // State for cities data
+  const [countries, setCountries] = useState([]); // State for countries data
 
   const handleCardClick = (id) => {
     router.push(`/pages/${id}`);
   };
 
+  // Fetch cities and countries data
+  useEffect(() => {
+    const fetchCitiesAndCountries = async () => {
+      try {
+        // Fetch cities
+        const citiesResponse = await fetch(`${API_NODE_URL}city/cities`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+        const citiesData = await citiesResponse.json();
+        if (Array.isArray(citiesData)) {
+          setCities(citiesData);
+        } else {
+          console.error("Unexpected API response structure for cities:", citiesData);
+        }
+
+        // Fetch countries
+        const countriesResponse = await fetch(`${API_NODE_URL}country/countries`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+        const countriesData = await countriesResponse.json();
+        if (Array.isArray(countriesData)) {
+          setCountries(countriesData);
+        } else {
+          console.error("Unexpected API response structure for countries:", countriesData);
+        }
+      } catch (error) {
+        console.error("Error fetching cities and countries:", error);
+      }
+    };
+
+    fetchCitiesAndCountries();
+  }, []);
+
+  // Fetch accommodations and map city and country names
   useEffect(() => {
     const fetchProperties = async () => {
       try {
         const response = await fetch(`${API_NODE_URL}accommodation/all-accommodations`, {
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`,
+            Authorization: `Bearer ${API_KEY}`,
           },
         });
 
         const text = await response.text();
         const data = JSON.parse(text);
 
-        if (Array.isArray(data.accommodations)) {
-          const mappedProperties = data.accommodations.map((item) => ({
-            id: item._id,
-            title: item.name || "No Name",
-            city: item.location?.city || "Unknown City",
-            country: item.location?.country || "Unknown Country",
-            price: item.pricing?.minPrice ? `₹${item.pricing.minPrice}` : "N/A",
-            rating: item.reviewsRating || "No Rating",
-            images: Array.isArray(item.meta?.images) ? item.meta.images : [],
-            amenities: Array.isArray(item.amenities) ? item.amenities : [],
-            description: item.description?.short_description || "No Description",
-            type: item.type || "Unknown Type",
-            reviewsCount: item.reviewsCount || 0,
-            featuredImagePath: item.featuredImagePath || "",
-          }));
+        if (Array.isArray(data)) {
+          const mappedProperties = data.map((item) => {
+            // Check if location.city and location.country are missing
+            const hasLocationCity = item.location?.city;
+            const hasLocationCountry = item.location?.country;
+
+            let cityName = hasLocationCity || "Unknown City";
+            let countryName = hasLocationCountry || "Unknown Country";
+
+            // If location.city or location.country is missing, use city object
+            if (!hasLocationCity || !hasLocationCountry) {
+              const cityData = item.city;
+              if (cityData) {
+                // Map city_name using city_number
+                const cityInfo = cities.find((city) => city.city_number === cityData.city_number);
+                if (cityInfo) {
+                  cityName = cityInfo.city_name || cityName;
+                }
+
+                // Map country_name using country_number
+                const countryInfo = countries.find(
+                  (country) => country.country_number === cityData.country_number
+                );
+                if (countryInfo) {
+                  countryName = countryInfo.country_name || countryName;
+                }
+              }
+            }
+
+            return {
+              id: item._id,
+              title: item.name || "No Name",
+              city: cityName,
+              country: countryName,
+              price: item.pricing?.minPrice ? `₹${item.pricing.minPrice}` : "N/A",
+              rating: item.reviewsRating || "No Rating",
+              images: Array.isArray(item.meta?.images) ? item.meta.images : [],
+              amenities: Array.isArray(item.amenities) ? item.amenities : [],
+              description: item.description?.short_description || "No Description",
+              type: item.type || "Unknown Type",
+              reviewsCount: item.reviewsCount || 0,
+              featuredImagePath: item.featuredImagePath || "",
+            };
+          });
 
           setProperties(mappedProperties);
         } else {
@@ -57,8 +128,10 @@ const BudgetProperties = () => {
       }
     };
 
-    fetchProperties();
-  }, []);
+    if (cities.length > 0 && countries.length > 0) {
+      fetchProperties();
+    }
+  }, [cities, countries]);
 
   // Filter properties with price up to ₹5000
   const budgetProperties = properties.filter((prop) => {
@@ -67,10 +140,13 @@ const BudgetProperties = () => {
   });
 
   // Get unique cities dynamically from budgetProperties
-  const cities = ["All", ...new Set(budgetProperties.map((prop) => prop.city))];
+  const uniqueCities = ["All", ...new Set(budgetProperties.map((prop) => prop.city))];
 
   // Filter properties based on selected city
-  const filteredProperties = filter === "All" ? budgetProperties : budgetProperties.filter((prop) => prop.city === filter);
+  const filteredProperties =
+    filter === "All"
+      ? budgetProperties
+      : budgetProperties.filter((prop) => prop.city === filter);
 
   // Sort properties from low to high price
   const sortedProperties = filteredProperties.sort((a, b) => {
@@ -84,7 +160,7 @@ const BudgetProperties = () => {
       <div className="max-w-7xl mx-auto px-6">
         {/* Heading and Subheading */}
         <div className="mb-10">
-          <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties by Cities </h2>
+          <h2 className="text-3xl font-bold text-gray-800 text-left">Budget Properties by Cities</h2>
           <p className="text-gray-600 mt-2 text-left">
             From studios to private rooms to shared apartments, we’ve got it all.
           </p>
@@ -92,12 +168,14 @@ const BudgetProperties = () => {
 
         {/* Filter Buttons (Dynamic from budgetProperties) */}
         <div className="flex justify-left space-x-4 mb-8 overflow-x-auto">
-          {cities.map((city) => (
+          {uniqueCities.map((city) => (
             <button
               key={city}
               onClick={() => setFilter(city)}
               className={`px-4 py-2 rounded-full border ${
-                filter === city ? "bg-[#5e23dd] text-white border-[#5e23dd]" : "bg-white text-gray-700 border-gray-300"
+                filter === city
+                  ? "bg-[#5e23dd] text-white border-[#5e23dd]"
+                  : "bg-white text-gray-700 border-gray-300"
               } transition`}
             >
               {city}

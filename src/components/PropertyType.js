@@ -20,7 +20,7 @@ const fetchAccommodations = async () => {
     }
 
     const result = await response.json();
-    return result.accommodations || []; // Corrected extraction of accommodations array
+    return result || []; // Directly return the array of accommodations
   } catch (error) {
     console.error("Error fetching accommodations:", error);
     return []; // Return an empty array in case of error
@@ -41,8 +41,10 @@ const countAvailableTypes = (accommodations) => {
   }
 
   accommodations.forEach((accommodation) => {
-    if (Array.isArray(accommodation?.meta?.availableType)) { 
-      accommodation.meta.availableType.forEach((type) => {
+    // Safely access meta.availableType using optional chaining
+    const availableTypes = accommodation?.meta?.availableType;
+    if (Array.isArray(availableTypes)) {
+      availableTypes.forEach((type) => {
         if (counts.hasOwnProperty(type)) {
           counts[type]++;
         }
@@ -141,7 +143,6 @@ const PropertyType = () => {
               <h3 className="text-lg font-semibold text-gray-800 mt-4 text-center max-md:text-base max-sm:text-sm">
                 {property.title}
               </h3>
-              
             </div>
           ))}
         </div>

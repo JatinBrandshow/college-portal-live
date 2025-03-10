@@ -26,7 +26,6 @@ const SearchBar = () => {
 
         const text = await response.text();
         const data = JSON.parse(text);
-        console.log(data);
 
         if (Array.isArray(data)) {
           setColleges(data);
@@ -57,13 +56,12 @@ const SearchBar = () => {
         );
 
         const result = await response.json();
-        console.log("API Response:", result);
 
-        if (response.ok && Array.isArray(result.accommodations)) {
-          console.log("Data:", result.accommodations);
-          setAccommodations(result.accommodations);
+        if (response.ok && Array.isArray(result)) { // Check if the response is an array
+          // console.log("Data:", result);
+          setAccommodations(result); // Directly set the accommodations state with the response
         } else {
-          console.error("API response does not contain accommodations:", result);
+          console.error("API response is not an array:", result);
           setAccommodations([]);
         }
       } catch (error) {
@@ -87,7 +85,8 @@ const SearchBar = () => {
 
       // Filter accommodations by city or state
       const accommodationCities = accommodations
-        .map((accommodation) => accommodation.location.city)
+        .map((accommodation) => accommodation.location?.city) // Use optional chaining to avoid errors
+        .filter((city) => city !== null && city !== undefined) // Filter out null or undefined cities
         .filter((city, index, self) => self.indexOf(city) === index); // Remove duplicates
 
       const accommodationSuggestions = accommodationCities.filter((city) =>
@@ -190,7 +189,7 @@ const SearchBar = () => {
                     onClick={(e) => {
                       e.stopPropagation();
                       if (suggestion.type === "college") {
-                        router.push(`/college?city=${suggestion.city}`);
+                        router.push(`/collegepages/${suggestion._id}`);
                       } else {
                         router.push(`/college?city=${suggestion.city}`);
                       }

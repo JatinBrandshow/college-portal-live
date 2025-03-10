@@ -215,9 +215,9 @@ const Accommodation = () => {
       const result = await response.json();
       console.log("API Response:", result);
 
-      if (response.ok && Array.isArray(result.accommodations)) { 
-        console.log("Data:", result.accommodations);
-        setAccommodations(result.accommodations);
+      if (response.ok && Array.isArray(result)) { 
+        console.log("Data:", result);
+        setAccommodations(result);
       } else {
         console.error("API response does not contain accommodations:", result);
         setAccommodations([]); 
@@ -343,45 +343,45 @@ const Accommodation = () => {
   // Filter accommodations based on filters
   const filteredAccommodations = accommodations.filter((accommodation) => {
     const matchesLocation = filters.location
-      ? accommodation.location.city
-          .toLowerCase()
+      ? accommodation.location?.city
+          ?.toLowerCase()
           .includes(filters.location.toLowerCase()) ||
-        accommodation.location.state
-          .toLowerCase()
+        accommodation.location?.state
+          ?.toLowerCase()
           .includes(filters.location.toLowerCase())
       : true;
 
     const matchesLocality = filters.locality
-      ? accommodation.location.locality
-          .toLowerCase()
+      ? accommodation.location?.locality
+          ?.toLowerCase()
           .includes(filters.locality.toLowerCase())
       : true;
 
     const matchesBudget =
-      accommodation.pricing.minPrice >= filters.budget[0] &&
-      accommodation.pricing.maxPrice <= filters.budget[1];
+      accommodation.pricing?.minPrice >= filters.budget[0] &&
+      accommodation.pricing?.maxPrice <= filters.budget[1];
 
     const matchesFacilities = filters.facilities.length
       ? filters.facilities.every((facility) =>
-          accommodation.amenities.includes(facility)
+          accommodation.amenities?.includes(facility)
         )
       : true;
 
     const matchesRoomType = filters.roomType
-      ? accommodation.meta.availableType.includes(filters.roomType)
+      ? accommodation.meta?.availableType?.includes(filters.roomType)
       : true;
 
     const matchesStayDuration =
       filters.stayDuration === ""
         ? true
         : filters.stayDuration === "0-4"
-        ? accommodation.pricing.duration <= 4
+        ? accommodation.pricing?.duration <= 4
         : filters.stayDuration === "5-10"
-        ? accommodation.pricing.duration >= 5 && accommodation.pricing.duration <= 10
+        ? accommodation.pricing?.duration >= 5 && accommodation.pricing?.duration <= 10
         : filters.stayDuration === "10-25"
-        ? accommodation.pricing.duration >= 10 && accommodation.pricing.duration <= 25
+        ? accommodation.pricing?.duration >= 10 && accommodation.pricing?.duration <= 25
         : filters.stayDuration === "25+"
-        ? accommodation.pricing.duration >= 25
+        ? accommodation.pricing?.duration >= 25
         : true;
 
     return (
@@ -672,7 +672,7 @@ const Accommodation = () => {
           {isLocationPopupOpen && (
             <div
               ref={locationPopupRef}
-              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(locationButtonRef).top,
                 left: getPopupPosition(locationButtonRef).left,
@@ -684,7 +684,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-base font-semibold mb-4">Location</h2>
+              <h2 className="text-base font-semibold mb-2">Location</h2>
               <input
                 type="text"
                 placeholder="Search Location (City or State)"
@@ -705,7 +705,7 @@ const Accommodation = () => {
           {isLocalityPopupOpen && (
             <div
               ref={localityPopupRef}
-              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(localityButtonRef).top,
                 left: getPopupPosition(localityButtonRef).left,
@@ -717,7 +717,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-base font-semibold mb-4">Locality</h2>
+              <h2 className="text-base font-semibold mb-2">Locality</h2>
               <Select
                 options={localityOptions}
                 value={localityOptions.find((opt) => opt.value === filters.locality)}
@@ -739,7 +739,7 @@ const Accommodation = () => {
           {isBudgetPopupOpen && (
             <div
               ref={budgetPopupRef}
-              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(budgetButtonRef).top,
                 left: getPopupPosition(budgetButtonRef).left,
@@ -751,7 +751,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-base font-semibold mb-4">Budget (₹)</h2>
+              <h2 className="text-base font-semibold mb-2">Budget (₹)</h2>
               <Slider
                 range
                 min={0}
@@ -777,7 +777,7 @@ const Accommodation = () => {
           {isRoomTypePopupOpen && (
             <div
               ref={roomTypePopupRef}
-              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(roomTypeButtonRef).top,
                 left: getPopupPosition(roomTypeButtonRef).left,
@@ -789,7 +789,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-base font-semibold mb-4">Room Type</h2>
+              <h2 className="text-base font-semibold mb-2">Room Type</h2>
               <Select
                 options={roomTypeOptions}
                 value={roomTypeOptions.find((opt) => opt.value === filters.roomType)}
@@ -811,7 +811,7 @@ const Accommodation = () => {
           {isSortPopupOpen && (
             <div
               ref={sortPopupRef}
-              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(sortButtonRef).top,
                 left: getPopupPosition(sortButtonRef).left,
@@ -823,7 +823,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-base font-semibold mb-4">Sort By</h2>
+              <h2 className="text-base font-semibold mb-2">Sort By</h2>
               <Select
                 options={sortOptions}
                 value={sortOptions.find((opt) => opt.value === filters.sort)}
@@ -845,7 +845,7 @@ const Accommodation = () => {
           {isStayDurationPopupOpen && (
             <div
               ref={stayDurationPopupRef}
-              className="absolute bg-white p-4 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
               style={{
                 top: getPopupPosition(stayDurationButtonRef).top,
                 left: getPopupPosition(stayDurationButtonRef).left,
@@ -857,7 +857,7 @@ const Accommodation = () => {
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-base font-semibold mb-4">Stay Duration</h2>
+              <h2 className="text-base font-semibold mb-2">Stay Duration</h2>
               <Select
                 options={stayDurationOptions}
                 value={stayDurationOptions.find((opt) => opt.value === filters.stayDuration)}
@@ -880,7 +880,7 @@ const Accommodation = () => {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
               <div
                 ref={filterPopupRef}
-                className="bg-white p-6 rounded-lg h-2/3 overflow-auto no-scrollbar w-11/12 max-w-2xl relative"
+                className="bg-white p-4 rounded-lg h-2/3 overflow-auto no-scrollbar w-11/12 max-w-2xl relative"
               >
                 <button
                   onClick={() => setIsFilterPopupOpen(false)}
