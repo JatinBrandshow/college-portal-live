@@ -24,12 +24,12 @@ const ListOfAccommodations = () => {
           },
         });
         const result = await response.json();
-        console.log("result", result);
-
-        // Check if the response contains the expected 'data' field
-        if (result.status && Array.isArray(result.data)) {
-          setData(result.data);  // Set the accommodations data
-          setFilteredData(result.data);  // Set the filtered data
+        console.log("API Response:", result);
+  
+        // Check if the response contains the expected 'data' field and 'accommodations' array
+        if (result.status === "success" && Array.isArray(result.data.accommodations)) {
+          setData(result.data.accommodations);  // Set the accommodations data
+          setFilteredData(result.data.accommodations);  // Set the filtered data
         } else {
           console.error("Unexpected response format:", result);
           setData([]);
@@ -100,7 +100,7 @@ const ListOfAccommodations = () => {
               <th className="px-2 py-1 text-left border border-gray-300">Name</th>
               <th className="px-2 py-1 text-left border border-gray-300">Type</th>
               <th className="px-2 py-1 text-left border border-gray-300">Address</th>
-              <th className="px-2 py-1 text-left border border-gray-300">City</th>
+              <th className="px-2 py-1 text-left border border-gray-300">City Number</th>
               <th className="px-2 py-1 text-left border border-gray-300">State</th>
               <th className="px-2 py-1 text-left border border-gray-300">Pincode</th>
               <th className="px-2 py-1 text-left border border-gray-300">Price</th>
@@ -128,7 +128,7 @@ const ListOfAccommodations = () => {
                     {accommodation.location.route}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
-                    {accommodation.location.city}
+                    {accommodation.location.city_number}
                   </td>
                   <td className="px-4 py-2 text-sm text-gray-600 truncate">
                     {accommodation.location.state}

@@ -302,7 +302,71 @@ const Pages = ({ id }) => {
     console.log("Button clicked!"); // Debugging log
     mapRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+  const [cities, setCities] = useState([]); // State for cities data
+const [countries, setCountries] = useState([]); // State for countries data
 
+// Fetch cities from API
+useEffect(() => {
+  const fetchCities = async () => {
+    try {
+      const response = await fetch(`${API_NODE_URL}city/cities`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+      });
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setCities(data);
+      } else {
+        console.error("Unexpected API response structure for cities:", data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch cities:", error);
+    }
+  };
+
+  fetchCities();
+}, []);
+
+// Fetch countries from API
+useEffect(() => {
+  const fetchCountries = async () => {
+    try {
+      const response = await fetch(`${API_NODE_URL}country/countries`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${API_KEY}`,
+        },
+      });
+
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setCountries(data);
+      } else {
+        console.error("Unexpected API response structure for countries:", data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch countries:", error);
+    }
+  };
+
+  fetchCountries();
+}, []);
+
+// Map city_number to city_name and country_name
+const getCityAndCountryName = (cityNumber) => {
+    const cityInfo = cities.find((city) => city.city_number === cityNumber);
+    if (!cityInfo) return { cityName: "Unknown City", countryName: "Unknown Country" };
+  
+    const countryInfo = countries.find(
+      (country) => country.country_number === cityInfo.country_number
+    );
+    const countryName = countryInfo ? countryInfo.country_name : "Unknown Country";
+  
+    return { cityName: cityInfo.city_name, countryName };
+  };
   // Fetch property details
 useEffect(() => {
     const fetchPropertyDetails = async () => {
@@ -314,13 +378,13 @@ useEffect(() => {
           },
         });
   
-        const text = await response.text();
-        const data = JSON.parse(text);
-        console.log("API Response:", data);
+        const result = await response.json();
+        console.log("API Response:", result);
   
-        if (Array.isArray(data)) { 
-          setAllProperties(data); // Store all accommodations
-          const foundProperty = data.find((item) => item._id === id);
+        if (response.ok && result.status === "success" && Array.isArray(result.data.accommodations)) {
+          console.log("Data:", result.data.accommodations);
+          setAllProperties(result.data.accommodations); // Store all accommodations
+          const foundProperty = result.data.accommodations.find((item) => item._id === id);
           console.log("Found Property:", foundProperty);
           if (foundProperty) {
             setProperty(foundProperty); // Set the entire property object
@@ -356,15 +420,16 @@ useEffect(() => {
     return <div className="text-center py-10 text-red-500">Property not found.</div>;
   }
 
-
+// Example usage in the JSX
+const { cityName, countryName } = getCityAndCountryName(property.location.city_number);
     return (
         <>
             <div className="grid grid-cols-12">
                 <div className="col-span-12 sm:col-span-1 md:col-span-8 lg:col-span-8 xl:col-span-8 2xl:col-span-8 overflow-y-auto max-h-[100vh] no-scrollbar">
                     <div className="border border-1 border-t-0 rounded-lg p-6 mb-3">
-                    <p className="UniColor text-l my-1">
-                        {property.location?.country} / {property.location?.state} / {property.location?.city}
-                    </p>                        
+                        <p className="text-sm md:text-base text-gray-500">
+                            {property.location.route}, {property.location.locality}, {cityName}, {countryName}
+                        </p>                     
                         <div className="grid grid-cols-12 gap-4">
                             <div className="col-span-12 sm:col-span-8 md:col-span-9 lg:col-span-9 xl:col-span-9 2xl:col-span-9 bg-white flex items-center">
                                 <div className="m-3 w-full">
@@ -465,7 +530,7 @@ useEffect(() => {
 
                         {/* Location */}
                         <p className="text-sm md:text-base text-gray-500">
-                            {property?.location?.route}, {property?.location?.locality}, {property?.location?.city}, {property?.location?.state}, {property?.location?.country}
+                            {property?.location?.route}, {property?.location?.locality}, {cityName}, {countryName}
                         </p>
 
                         {/* Distance & Map */}
@@ -492,7 +557,7 @@ useEffect(() => {
                             </p>
                             </div>
                         </div>
-                                <div className="col-span-12 space-y-2 md:col-span-3 gap-2 xl:flex text-sm">
+                                {/* <div className="col-span-12 space-y-2 md:col-span-3 gap-2 xl:flex text-sm">
                                     <p className="flex items-center gap-2 p-2 border border-gray-300 rounded-full">
                                         <i className="fa-solid fa-graduation-cap"></i>
                                         Queen Mary University of London | 0.11 mi
@@ -501,7 +566,7 @@ useEffect(() => {
                                         <i className="fa-solid fa-graduation-cap"></i>
                                         University of Cumbria London | 1.04 mi
                                     </p>
-                                </div>
+                                </div> */}
                             </div>
                             <div className="col-span-12 md:col-span-3 md:text-right l:text-right space-y-1">
                                 <p className="text-sm text-gray-500">From</p>
@@ -900,7 +965,7 @@ useEffect(() => {
                 <div className="col-span-12 sm:col-span-12 md:col-span-4 lg:col-span-4 xl:col-span-4 2xl:col-span-4" >
                     <div className='border border-1 rounded-lg p-3 my-2 pb-5 '>
                         <div className='flex justify-between my-3'>
-                            <h2 className="text-m font-semibold">{property.name}, {property.location.city}</h2>
+                            <h2 className="text-m font-semibold">{property.name}, {cityName}, {countryName}</h2>
                             <div className='mb-2'>
                                 <button className='rounded-full p-1.5 mx-1 border border-1 text-sm'><i className="fa-regular fa-heart fa-sm"></i></button>
                                 <button className='rounded-full p-1.5 mx-1 border border-1 text-sm'><i className="fa-solid fa-arrow-up-from-bracket fa-sm"></i></button>
@@ -918,7 +983,7 @@ useEffect(() => {
                               setSelectedAccommodation({
                                   image: property.meta.images[0],
                                   name: property.name,
-                                  address: `${property.location.streetNumber} ${property.location.route}, ${property.location.locality}, ${property.location.city}, ${property.location.state}, ${property.location.country}`,
+                                  address: `${property.location.streetNumber} ${property.location.route}, ${property.location.locality}, ${cityName}, ${countryName}`,
                                   id: property._id,
                                   price: property.pricing.minPrice,
                                 });

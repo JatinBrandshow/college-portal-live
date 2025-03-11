@@ -87,8 +87,8 @@ const AdminDashBoard = () => {
         const result = await response.json();
         console.log("Accommodations result:", result);
 
-        if (result.status && Array.isArray(result.data)) {
-          setAccommodationsCount(result.data.length); // Set the count of accommodations
+        if (result.status && result.data && Array.isArray(result.data.accommodations)) {
+          setAccommodationsCount(result.data.accommodations.length); // Set the count of accommodations
         } else {
           console.error("Unexpected response format for accommodations:", result);
           setAccommodationsCount(0);
