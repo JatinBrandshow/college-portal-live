@@ -404,7 +404,7 @@ const Accommodation = () => {
 
   // Locality options for dropdown
   const localityOptions = getUniqueLocalities();
-  
+
   // Filter accommodations based on filters
   const filteredAccommodations = accommodations.filter((accommodation) => {
     const { cityName, countryName } = getCityAndCountryName(accommodation.location.city_number);
@@ -735,7 +735,7 @@ const Accommodation = () => {
           {isLocationPopupOpen && (
             <div
               ref={locationPopupRef}
-              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40 w-[250px]"
               style={{
                 top: getPopupPosition(locationButtonRef).top,
                 left: getPopupPosition(locationButtonRef).left,
@@ -768,7 +768,7 @@ const Accommodation = () => {
           {isLocalityPopupOpen && (
             <div
               ref={localityPopupRef}
-              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40 w-[250px]"
               style={{
                 top: getPopupPosition(localityButtonRef).top,
                 left: getPopupPosition(localityButtonRef).left,
@@ -802,7 +802,7 @@ const Accommodation = () => {
           {isBudgetPopupOpen && (
             <div
               ref={budgetPopupRef}
-              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40 w-[250px]"
               style={{
                 top: getPopupPosition(budgetButtonRef).top,
                 left: getPopupPosition(budgetButtonRef).left,
@@ -840,7 +840,7 @@ const Accommodation = () => {
           {isRoomTypePopupOpen && (
             <div
               ref={roomTypePopupRef}
-              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40 w-[250px]"
               style={{
                 top: getPopupPosition(roomTypeButtonRef).top,
                 left: getPopupPosition(roomTypeButtonRef).left,
@@ -874,7 +874,7 @@ const Accommodation = () => {
           {isSortPopupOpen && (
             <div
               ref={sortPopupRef}
-              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40 w-[250px]"
               style={{
                 top: getPopupPosition(sortButtonRef).top,
                 left: getPopupPosition(sortButtonRef).left,
@@ -908,7 +908,7 @@ const Accommodation = () => {
           {isStayDurationPopupOpen && (
             <div
               ref={stayDurationPopupRef}
-              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40"
+              className="absolute bg-white p-2.5 rounded-lg shadow-lg z-40 w-[250px]"
               style={{
                 top: getPopupPosition(stayDurationButtonRef).top,
                 left: getPopupPosition(stayDurationButtonRef).left,

@@ -1111,12 +1111,12 @@ const { cityName, countryName } = getCityAndCountryName(property.location.city_n
                             <div className=' md:flex justify-between'>
                                 <button
                                     onClick={() => setView("map")}
-                                    className={`px-6 py-2 rounded-lg text-sm ${view === "map" ? "border border-2 text-black" : "bg-gray-200"}`}>
+                                    className={`px-6 py-2 rounded-lg text-sm ${view === "map" ? "border text-black" : "bg-gray-200"}`}>
                                     Map View
                                 </button>
                                 <button
                                     onClick={() => setView("street")}
-                                    className={`px-6 py-2 rounded-lg text-sm ${view === "map" ? "border border-2 text-black" : "bg-gray-200"}`}>
+                                    className={`px-6 py-2 rounded-lg text-sm ${view === "map" ? "border text-black" : "bg-gray-200"}`}>
                                     Street View
                                 </button>
                             </div>
