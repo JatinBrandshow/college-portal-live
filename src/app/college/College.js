@@ -366,7 +366,7 @@ const College = () => {
                     </span>
                   </button>
                 </div>
-
+                
                 {/* Individual Filter Buttons */}
                 {[
                   { id: "city", label: "City", ref: cityRef },
@@ -378,20 +378,35 @@ const College = () => {
                     {/* Filter Button */}
                     <button
                       className={`flex items-center gap-2 px-4 py-2 rounded-md shadow-md transition-all text-nowrap ${
-                        filters[filter.id]
+                        filters[filter.id] || (filter.id === "budget" && (filters.budgetRange.min > 0 || filters.budgetRange.max < Infinity))
                           ? "bg-gray-100 text-violet-600"
                           : "bg-violet-600 text-white"
                       }`}
                       onClick={() => handleFilterClick(filter.id)}
                     >
-                      {filter.label}
-                      {filters[filter.id] && (
+                      {filter.id === "budget" ? (
+                        filters.budgetRange.min > 0 || filters.budgetRange.max < Infinity ? (
+                          `₹${filters.budgetRange.min} - ₹${filters.budgetRange.max}`
+                        ) : (
+                          filter.label
+                        )
+                      ) : (
+                        filters[filter.id] ? `${filters[filter.id]}` : filter.label
+                      )}
+                      {(filters[filter.id] || (filter.id === "budget" && (filters.budgetRange.min > 0 || filters.budgetRange.max < Infinity))) && (
                         <span
                           onClick={(e) => {
                             e.stopPropagation(); // Prevent the filter button from toggling
-                            setFilters((prev) => ({ ...prev, [filter.id]: "" }));
+                            if (filter.id === "budget") {
+                              setFilters((prev) => ({
+                                ...prev,
+                                budgetRange: { min: 0, max: Infinity },
+                              }));
+                            } else {
+                              setFilters((prev) => ({ ...prev, [filter.id]: "" }));
+                            }
                           }}
-                          className="ml-2 p-1 rounded-full hover:bg-blue-600"
+                          className="ml-2 p-1 rounded-full hover:bg-purple-600 hover:text-white"
                         >
                           <FiX className="w-4 h-4" />
                         </span>

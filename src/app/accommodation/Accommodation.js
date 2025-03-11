@@ -143,6 +143,8 @@ const MapComponent = ({ accommodations, hoveredAccommodationId }) => {
 const Accommodation = () => {
   const searchParams = useSearchParams();
   const [accommodations, setAccommodations] = useState([]);
+  const [cities, setCities] = useState([]); // State for cities data
+  const [countries, setCountries] = useState([]); // State for countries data
   const [filters, setFilters] = useState({
     location: searchParams.get("location") || "",
     locality: searchParams.get("locality") || "",
@@ -198,37 +200,87 @@ const Accommodation = () => {
   useOutsideClick(stayDurationPopupRef, () => setIsStayDurationPopupOpen(false));
   useOutsideClick(filterPopupRef, () => setIsFilterPopupOpen(false));
 
-  // Fetch accommodations based on filters
-  const fetchAccommodations = async () => {
-    try {
-      const response = await fetch(
-        `${API_NODE_URL}accommodation/all-accommodations`,
-        {
-          method: "GET",
+  // Fetch cities from API
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}city/cities`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${API_KEY}`,
           },
+        });
+
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setCities(data);
+        } else {
+          console.error("Unexpected API response structure for cities:", data);
         }
-      );
-
-      const result = await response.json();
-      console.log("API Response:", result);
-
-      if (response.ok && Array.isArray(result)) { 
-        console.log("Data:", result);
-        setAccommodations(result);
-      } else {
-        console.error("API response does not contain accommodations:", result);
-        setAccommodations([]); 
+      } catch (error) {
+        console.error("Failed to fetch cities:", error);
       }
-    } catch (error) {
-      console.error("Failed to fetch accommodations:", error);
-      setAccommodations([]);
-    }
-  };
+    };
 
+    fetchCities();
+  }, []);
+
+  // Fetch countries from API
   useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}country/countries`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setCountries(data);
+        } else {
+          console.error("Unexpected API response structure for countries:", data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch countries:", error);
+      }
+    };
+
+    fetchCountries();
+  }, []);
+
+  // Fetch accommodations from API
+  useEffect(() => {
+    const fetchAccommodations = async () => {
+      try {
+        const response = await fetch(
+          `${API_NODE_URL}accommodation/all-accommodations`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${API_KEY}`,
+            },
+          }
+        );
+
+        const result = await response.json();
+        console.log("API Response:", result);
+
+        if (response.ok && result.status === "success" && Array.isArray(result.data.accommodations)) {
+          console.log("Data:", result.data.accommodations);
+          setAccommodations(result.data.accommodations); // Set accommodations with the extracted array
+        } else {
+          console.error("API response does not contain accommodations:", result);
+          setAccommodations([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch accommodations:", error);
+        setAccommodations([]);
+      }
+    };
+
     fetchAccommodations();
   }, []);
 
@@ -293,6 +345,19 @@ const Accommodation = () => {
     }));
   };
 
+  // Map city_number to city_name and country_name
+  const getCityAndCountryName = (cityNumber) => {
+    const cityInfo = cities.find((city) => city.city_number === cityNumber);
+    if (!cityInfo) return { cityName: "Unknown City", countryName: "Unknown Country" };
+
+    const countryInfo = countries.find(
+      (country) => country.country_number === cityInfo.country_number
+    );
+    const countryName = countryInfo ? countryInfo.country_name : "Unknown Country";
+
+    return { cityName: cityInfo.city_name, countryName };
+  };
+
   const getPopupPosition = (buttonRef) => {
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -339,16 +404,14 @@ const Accommodation = () => {
 
   // Locality options for dropdown
   const localityOptions = getUniqueLocalities();
-
+  
   // Filter accommodations based on filters
   const filteredAccommodations = accommodations.filter((accommodation) => {
+    const { cityName, countryName } = getCityAndCountryName(accommodation.location.city_number);
+
     const matchesLocation = filters.location
-      ? accommodation.location?.city
-          ?.toLowerCase()
-          .includes(filters.location.toLowerCase()) ||
-        accommodation.location?.state
-          ?.toLowerCase()
-          .includes(filters.location.toLowerCase())
+      ? cityName.toLowerCase().includes(filters.location.toLowerCase()) ||
+        countryName.toLowerCase().includes(filters.location.toLowerCase())
       : true;
 
     const matchesLocality = filters.locality
@@ -1017,102 +1080,105 @@ const Accommodation = () => {
           )}
           
           {sortedAccommodations.length > 0 ? (
-          sortedAccommodations.map((accommodation) => (
-            <div key={accommodation._id}>
-              <Link href={`/pages/${accommodation._id}`} passHref>
-                <div
-                  className="bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col md:flex-row items-start transition hover:shadow-xl cursor-pointer"
-                  onMouseEnter={() => setHoveredAccommodationId(accommodation._id)}
-                  onMouseLeave={() => setHoveredAccommodationId(null)}
-                >
-                  {/* Left Side: Image */}
-                  <div className="w-full md:w-1/3">
-                    <img
-                      src={accommodation.meta.images[0] || "/placeholder-image.jpg"}
-                      alt={accommodation.name}
-                      className="w-full h-72 object-cover rounded-lg"
-                    />
-                  </div>
+          sortedAccommodations.map((accommodation) => {
+            const { cityName, countryName } = getCityAndCountryName(accommodation.location.city_number);
 
-                  {/* Right Side: Details */}
-                  <div className="w-full md:w-2/3 md:pl-6 flex flex-col justify-between">
-                    <div>
-                      <h2 className="text-xl font-semibold">{accommodation.name}</h2>
-                      <p className="text-gray-600 mt-1">
-                        {accommodation.location.streetNumber} {accommodation.location.route},{" "}
-                        {accommodation.location.locality},{" "}
-                        {accommodation.location.city},{" "}
-                        {accommodation.location.state},{" "}
-                        {accommodation.location.country}
-                      </p>
+            return (
+              <div key={accommodation._id}>
+                <Link href={`/pages/${accommodation._id}`} passHref>
+                  <div
+                    className="bg-white p-6 rounded-lg shadow-lg mb-6 flex flex-col md:flex-row items-start transition hover:shadow-xl cursor-pointer"
+                    onMouseEnter={() => setHoveredAccommodationId(accommodation._id)}
+                    onMouseLeave={() => setHoveredAccommodationId(null)}
+                  >
+                    {/* Left Side: Image */}
+                    <div className="w-full md:w-1/3">
+                      <img
+                        src={accommodation.meta.images[0] || "/placeholder-image.jpg"}
+                        alt={accommodation.name}
+                        className="w-full h-72 object-cover rounded-lg"
+                      />
+                    </div>
 
-                      {/* Facilities */}
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {accommodation.amenities.map((amenity, index) => (
-                          <span key={index} className="bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full">
-                            {amenity}
-                          </span>
-                        ))}
-                      </div>
-
-                      {/* Description */}
-                      <div className="mt-3">
-                        <h3 className="text-lg font-semibold">Description:</h3>
-                        <p className="text-gray-600">
-                          {accommodation.description.short_description}
+                    {/* Right Side: Details */}
+                    <div className="w-full md:w-2/3 md:pl-6 flex flex-col justify-between">
+                      <div>
+                        <h2 className="text-xl font-semibold">{accommodation.name}</h2>
+                        <p className="text-gray-600 mt-1">
+                          {accommodation.location.streetNumber} {accommodation.location.route},{" "}
+                          {accommodation.location.locality},{" "}
+                          {cityName},{" "}
+                          {countryName}
                         </p>
-                      </div>
 
-                      {/* Room Options */}
-                      <div className="mt-3">
-                        <h3 className="text-lg font-semibold">Room Options:</h3>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {accommodation.meta.availableType.map((option, index) => (
-                            <span key={index} className="bg-violet-100 text-violet-700 px-3 py-1 text-sm rounded-full">
-                              {option}
+                        {/* Facilities */}
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {accommodation.amenities.map((amenity, index) => (
+                            <span key={index} className="bg-gray-200 text-gray-700 px-3 py-1 text-sm rounded-full">
+                              {amenity}
                             </span>
                           ))}
                         </div>
+
+                        {/* Description */}
+                        <div className="mt-3">
+                          <h3 className="text-lg font-semibold">Description:</h3>
+                          <p className="text-gray-600">
+                            {accommodation.description.short_description}
+                          </p>
+                        </div>
+
+                        {/* Room Options */}
+                        <div className="mt-3">
+                          <h3 className="text-lg font-semibold">Room Options:</h3>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {accommodation.meta.availableType.map((option, index) => (
+                              <span key={index} className="bg-violet-100 text-violet-700 px-3 py-1 text-sm rounded-full">
+                                {option}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Price & Enquiry Button */}
+                      <div className="mt-4 flex justify-between items-center">
+                        <p className="text-lg font-semibold">
+                          Starting from ₹{accommodation.pricing.minPrice}/month
+                        </p>
+                        <button
+                            className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
+                            onClick={(event) => {
+                                event.preventDefault();
+                                event.stopPropagation();
+                                setIsEnquireOpen(true);
+                                setSelectedAccommodation({
+                                    image: accommodation.meta.images[0],
+                                    name: accommodation.name,
+                                    address: `${accommodation.location.streetNumber} ${accommodation.location.route}, ${accommodation.location.locality}, ${cityName}, ${countryName}`,
+                                    id: accommodation._id,
+                                    price: accommodation.pricing.minPrice,
+                                  });
+                            }}
+                        >
+                            Enquire
+                        </button>
                       </div>
                     </div>
-
-                    {/* Price & Enquiry Button */}
-                    <div className="mt-4 flex justify-between items-center">
-                      <p className="text-lg font-semibold">
-                        Starting from ₹{accommodation.pricing.minPrice}/month
-                      </p>
-                      <button
-                          className="px-4 py-2 bg-violet-600 text-white rounded hover:bg-violet-700"
-                          onClick={(event) => {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              setIsEnquireOpen(true);
-                              setSelectedAccommodation({
-                                  image: accommodation.meta.images[0],
-                                  name: accommodation.name,
-                                  address: `${accommodation.location.streetNumber} ${accommodation.location.route}, ${accommodation.location.locality}, ${accommodation.location.city}, ${accommodation.location.state}, ${accommodation.location.country}`,
-                                  id: accommodation._id,
-                                  price: accommodation.pricing.minPrice,
-                                });
-                          }}
-                      >
-                          Enquire
-                      </button>
-                    </div>
                   </div>
-                </div>
-              </Link>
-                <Enquire
-                  isOpen={isEnquireOpen}
-                  setIsOpen={setIsEnquireOpen}
-                  accommodationImage={selectedAccommodation.image}
-                  accommodationName={selectedAccommodation.name}
-                  accommodationAddress={selectedAccommodation.address}
-                  accommodationId={selectedAccommodation.id}
-                  accommodationPrice={selectedAccommodation.price}
-              />
-            </div>
-          ))
+                </Link>
+                  <Enquire
+                    isOpen={isEnquireOpen}
+                    setIsOpen={setIsEnquireOpen}
+                    accommodationImage={selectedAccommodation.image}
+                    accommodationName={selectedAccommodation.name}
+                    accommodationAddress={selectedAccommodation.address}
+                    accommodationId={selectedAccommodation.id}
+                    accommodationPrice={selectedAccommodation.price}
+                />
+              </div>
+            );
+          })
         ) : (
           <p className="text-gray-600">No accommodations found.</p>
         )}

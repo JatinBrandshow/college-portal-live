@@ -20,7 +20,7 @@ const fetchAccommodations = async () => {
     }
 
     const result = await response.json();
-    return result || []; // Directly return the array of accommodations
+    return result.data.accommodations || []; // Extract the accommodations array from the response
   } catch (error) {
     console.error("Error fetching accommodations:", error);
     return []; // Return an empty array in case of error

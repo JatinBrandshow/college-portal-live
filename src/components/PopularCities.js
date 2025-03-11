@@ -84,22 +84,22 @@ const PopularCities = () => {
     router.push(`/accommodation?location=${cityName}`);
   };
 
-  // Filter cities by active country
-  const filteredCities = activeCountry === "All"
+  // Filter cities by active country and is_popular
+  const filteredCities = (activeCountry === "All"
     ? cities
-    : cities.filter((city) => city.country_number === activeCountry);
+    : cities.filter((city) => city.country_number === activeCountry)
+  ).filter((city) => city.is_popular); // Only include cities with is_popular true
 
   // Split cities into two rows
-  const firstRowCount = filteredCities.length > 7
-    ? Math.min(9, Math.ceil(filteredCities.length / 2))
-    : filteredCities.length;
+  const firstRowCount =
+    filteredCities.length > 6
+      ? Math.min(9, Math.max(6, filteredCities.length - Math.floor(filteredCities.length / 2)))
+      : filteredCities.length;
 
   const firstRow = filteredCities.slice(0, firstRowCount);
-  const secondRow = filteredCities.length > 7
-    ? filteredCities.slice(firstRowCount)
-    : [];
+  const secondRow = filteredCities.length > 6 ? filteredCities.slice(firstRowCount) : [];
 
-  const shouldShowSecondRow = filteredCities.length > 7;
+  const shouldShowSecondRow = filteredCities.length > 6;
 
   return (
     <div className="max-w-[1500px] mx-auto py-6 px-6 my-10 relative max-md:px-5 max-sm:px-3 max-md:py-5 max-sm:py-3 max-lg:my-8 max-md:my-6 max-sm:my-4">

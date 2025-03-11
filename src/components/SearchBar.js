@@ -9,6 +9,7 @@ const SearchBar = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [colleges, setColleges] = useState([]);
   const [accommodations, setAccommodations] = useState([]);
+  const [cities, setCities] = useState([]); // State for cities data
   const [showSuggestions, setShowSuggestions] = useState(false);
   const router = useRouter();
   const searchBarRef = useRef(null);
@@ -40,6 +41,31 @@ const SearchBar = () => {
     fetchColleges();
   }, []);
 
+  // Fetch cities from API
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}city/cities`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setCities(data);
+        } else {
+          console.error("Unexpected API response structure for cities:", data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch cities:", error);
+      }
+    };
+
+    fetchCities();
+  }, []);
+
   // Fetch accommodations from API
   useEffect(() => {
     const fetchAccommodations = async () => {
@@ -57,9 +83,8 @@ const SearchBar = () => {
 
         const result = await response.json();
 
-        if (response.ok && Array.isArray(result)) { // Check if the response is an array
-          // console.log("Data:", result);
-          setAccommodations(result); // Directly set the accommodations state with the response
+        if (response.ok && result.status === "success" && Array.isArray(result.data.accommodations)) {
+          setAccommodations(result.data.accommodations); // Set accommodations with the extracted array
         } else {
           console.error("API response is not an array:", result);
           setAccommodations([]);
@@ -83,9 +108,13 @@ const SearchBar = () => {
         college.state.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
-      // Filter accommodations by city or state
+      // Filter accommodations by city_name (mapped from city_number)
       const accommodationCities = accommodations
-        .map((accommodation) => accommodation.location?.city) // Use optional chaining to avoid errors
+        .map((accommodation) => {
+          const cityNumber = accommodation.location?.city_number;
+          const cityInfo = cities.find((city) => city.city_number === cityNumber);
+          return cityInfo ? cityInfo.city_name : null;
+        })
         .filter((city) => city !== null && city !== undefined) // Filter out null or undefined cities
         .filter((city, index, self) => self.indexOf(city) === index); // Remove duplicates
 
@@ -103,7 +132,7 @@ const SearchBar = () => {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery, colleges, accommodations]);
+  }, [searchQuery, colleges, accommodations, cities]);
 
   // Handle search button click
   const handleSearch = () => {

@@ -1,8 +1,8 @@
 "use client";
 import { Search, Sliders, Home, Briefcase, X } from "lucide-react";
-import { useState, useEffect, useRef } from "react"; // Added useRef
+import { useState, useEffect, useRef } from "react";
 import { Typewriter } from "react-simple-typewriter";
-import { useRouter } from "next/navigation"; // Import useRouter from Next.js
+import { useRouter } from "next/navigation";
 import { API_NODE_URL, API_KEY } from "../../config/config";
 
 const images = [
@@ -13,15 +13,16 @@ const images = [
 ];
 
 const Hero = () => {
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [colleges, setColleges] = useState([]);
   const [accommodations, setAccommodations] = useState([]);
+  const [cities, setCities] = useState([]); // State for cities data
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false); // Track whether to show suggestions
-  const searchBarRef = useRef(null); // Ref for the search bar container
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchBarRef = useRef(null);
 
   // Fetch colleges from API
   useEffect(() => {
@@ -51,6 +52,31 @@ const Hero = () => {
     fetchColleges();
   }, []);
 
+  // Fetch cities from API
+  useEffect(() => {
+    const fetchCities = async () => {
+      try {
+        const response = await fetch(`${API_NODE_URL}city/cities`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${API_KEY}`,
+          },
+        });
+
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setCities(data);
+        } else {
+          console.error("Unexpected API response structure for cities:", data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch cities:", error);
+      }
+    };
+
+    fetchCities();
+  }, []);
+
   // Fetch accommodations from API
   useEffect(() => {
     const fetchAccommodations = async () => {
@@ -69,9 +95,9 @@ const Hero = () => {
         const result = await response.json();
         console.log("API Response:", result);
 
-        if (response.ok && Array.isArray(result)) { // Check if the response is an array
-          console.log("Data:", result);
-          setAccommodations(result); // Directly set the accommodations state with the response
+        if (response.ok && result.status === "success" && Array.isArray(result.data.accommodations)) {
+          console.log("Data:", result.data.accommodations);
+          setAccommodations(result.data.accommodations); // Set accommodations with the extracted array
         } else {
           console.error("API response is not an array:", result);
           setAccommodations([]);
@@ -81,21 +107,21 @@ const Hero = () => {
         setAccommodations([]);
       }
     };
-  
+
     fetchAccommodations();
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 3000); // Change image every 3 seconds
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-  
+
     if (query.length > 2) {
       // Filter colleges by name, city, state, or country
       const collegeSuggestions = colleges.filter((college) =>
@@ -103,17 +129,21 @@ const Hero = () => {
         college.city.toLowerCase().includes(query.toLowerCase()) ||
         college.state.toLowerCase().includes(query.toLowerCase())
       );
-  
-      // Filter accommodations by city, state, or country
+
+      // Filter accommodations by city_name (mapped from city_number)
       const accommodationCities = accommodations
-        .map((accommodation) => accommodation.location?.city) // Use optional chaining to avoid errors
+        .map((accommodation) => {
+          const cityNumber = accommodation.location?.city_number;
+          const cityInfo = cities.find((city) => city.city_number === cityNumber);
+          return cityInfo ? cityInfo.city_name : null;
+        })
         .filter((city) => city !== null && city !== undefined) // Filter out null or undefined cities
         .filter((city, index, self) => self.indexOf(city) === index); // Remove duplicates
-  
+
       const accommodationSuggestions = accommodationCities.filter((city) =>
         city.toLowerCase().includes(query.toLowerCase())
       );
-  
+
       // Combine suggestions
       setSuggestions([
         ...collegeSuggestions.map((college) => ({ ...college, type: "college" })),

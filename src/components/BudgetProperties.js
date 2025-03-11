@@ -71,37 +71,23 @@ const BudgetProperties = () => {
           },
         });
 
-        const text = await response.text();
-        const data = JSON.parse(text);
+        const data = await response.json();
 
-        if (Array.isArray(data)) {
-          const mappedProperties = data.map((item) => {
-            // Check if location.city and location.country are missing
-            const hasLocationCity = item.location?.city;
-            const hasLocationCountry = item.location?.country;
+        if (data.status === "success" && Array.isArray(data.data.accommodations)) {
+          const mappedProperties = data.data.accommodations.map((item) => {
+            // Get city_number from location
+            const cityNumber = item.location?.city_number;
 
-            let cityName = hasLocationCity || "Unknown City";
-            let countryName = hasLocationCountry || "Unknown Country";
+            // Find city data using city_number
+            const cityInfo = cities.find((city) => city.city_number === cityNumber);
+            const cityName = cityInfo?.city_name || "Unknown City";
 
-            // If location.city or location.country is missing, use city object
-            if (!hasLocationCity || !hasLocationCountry) {
-              const cityData = item.city;
-              if (cityData) {
-                // Map city_name using city_number
-                const cityInfo = cities.find((city) => city.city_number === cityData.city_number);
-                if (cityInfo) {
-                  cityName = cityInfo.city_name || cityName;
-                }
+            // Get country_number from city data
+            const countryNumber = cityInfo?.country_number;
 
-                // Map country_name using country_number
-                const countryInfo = countries.find(
-                  (country) => country.country_number === cityData.country_number
-                );
-                if (countryInfo) {
-                  countryName = countryInfo.country_name || countryName;
-                }
-              }
-            }
+            // Find country data using country_number
+            const countryInfo = countries.find((country) => country.country_number === countryNumber);
+            const countryName = countryInfo?.country_name || "Unknown Country";
 
             return {
               id: item._id,
